@@ -1,60 +1,60 @@
 #include <stdio.h>
 
 #define MAX_MENU_ITEMS 100
-#define MAX_NAME_LENGTH 50  // À½½Ä¸íÀÇ ÃÖ´ë ±æÀÌ
+#define MAX_NAME_LENGTH 50  // ìŒì‹ëª…ì˜ ìµœëŒ€ ê¸¸ì´
 #define MAX_TABLES 10
 
-// À½½Ä Ç×¸ñ
+// ë©”ë‰´ í•­ëª©
 typedef struct {
     char name[MAX_NAME_LENGTH];
     int price;
 } MenuItem;
 
-// ÁÖ¹®µÈ Ç×¸ñ
+// ì£¼ë¬¸ëœ í•­ëª©
 typedef struct {
-    int menuItemIndex;  // À½½ÄÀÇ ÀÎµ¦½º
-    int quantity;       // ÇØ´ç À½½Ä ÁÖ¹® ¼ö
+    int menuIndex;  // ìŒì‹ì˜ ì¸ë±ìŠ¤
+    int count;       // í•´ë‹¹ ìŒì‹ ì£¼ë¬¸ ìˆ˜
 } OrderItem;
 
-// Å×ÀÌºí´ç ÁÖ¹®µÈ À½½ÄÀÇ °¡Áş¼ö¿Í ÃÑ¾×
+// í…Œì´ë¸”ë‹¹ ì£¼ë¬¸ëœ ìŒì‹ì˜ ê°€ì§“ìˆ˜ì™€ ì´ì•¡
 typedef struct {
-    OrderItem items[MAX_MENU_ITEMS];
-    int itemCount;
-    int totalAmount;
-} Order;
+    OrderItem orderItems[MAX_MENU_ITEMS];
+    int foodType;
+    int totalPrice;
+} Receipt;
 
-// °¡°Ô¿¡¼­ ÆÈ°í ÀÖ´Â ÀüÃ¼ À½½Ä°ú °¡Áş¼ö
-MenuItem menu[MAX_MENU_ITEMS];  
-int menuItemCount = 0;
+// ê°€ê²Œì—ì„œ íŒ”ê³  ìˆëŠ” ì „ì²´ ìŒì‹ê³¼ ê°€ì§“ìˆ˜
+MenuItem menuItems[MAX_MENU_ITEMS];  
+int menuType = 0;
 
-Order tables[MAX_TABLES];
+Receipt receipts[MAX_TABLES];
 
-// ¸ğµç Å×ÀÌºíÀÇ ÁÖ¹®À» ÃÊ±âÈ­ÇÏ´Â ÇÔ¼ö
-void initializeTables() {
+// ëª¨ë“  í…Œì´ë¸”ì˜ ì£¼ë¬¸ì„ ì´ˆê¸°í™”í•˜ëŠ” í•¨ìˆ˜
+void resetOrders() {
 }
 
-// ½Å¸Ş´º¸¦ Ãß°¡ÇÏ´Â ÇÔ¼ö
-void addMenuItem() {
+// ì‹ ë©”ë‰´ë¥¼ ì¶”ê°€í•˜ëŠ” í•¨ìˆ˜
+void getMenu() {
 }
 
-// À½½ÄÀ» ´ÜÁ¾½ÃÅ°´Â ÇÔ¼ö
-void removeMenuItem() {
+// ìŒì‹ì„ ë‹¨ì¢…ì‹œí‚¤ëŠ” í•¨ìˆ˜
+void removeMenu() {
 }
 
-// ÁÖ¹® »ı¼º ÇÔ¼ö
-void createOrder() {
+// ì£¼ë¬¸ ìƒì„± í•¨ìˆ˜
+void getOrder() {
 }
 
-// Å×ÀÌºí ÁÖ¹® Á¶È¸ ÇÔ¼ö
-void viewOrder() {
+// í…Œì´ë¸” ì£¼ë¬¸ ì¡°íšŒ í•¨ìˆ˜
+void showReceipt() {
 }
 
-// °áÁ¦ Ã³¸® ÇÔ¼ö
-void processPayment() {
+// ê²°ì œ ì²˜ë¦¬ í•¨ìˆ˜
+void getPay() {
 }
 
 int main() {
-    // ¸ŞÀÎ ¸Ş´º Ãâ·Â
-    // »ç¿ëÀÚ ¼±ÅÃ¿¡ µû¸¥ ÇÔ¼ö È£Ãâ
+    // ë©”ì¸ ë©”ë‰´ ì¶œë ¥
+    // ì‚¬ìš©ì ì„ íƒì— ë”°ë¥¸ í•¨ìˆ˜ í˜¸ì¶œ
     return 0;
 }
