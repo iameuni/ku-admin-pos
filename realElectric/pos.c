@@ -1,60 +1,85 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
 
-#define MAX_MENU_ITEMS 100
-#define MAX_NAME_LENGTH 50  // 음식명의 최대 길이
-#define MAX_TABLES 10
+#define MAX_INPUT 100
+#define MAX_TABLES 100
 
-// 메뉴 항목
+typedef struct FoodNode {
+} FoodNode;
 typedef struct {
-    char name[MAX_NAME_LENGTH];
-    int price;
-} MenuItem;
-
-// 주문된 항목
+} Menu;
 typedef struct {
-    int menuIndex;  // 음식의 인덱스
-    int count;       // 해당 음식 주문 수
-} OrderItem;
-
-// 테이블당 주문된 음식의 가짓수와 총액
+} Ordered;
 typedef struct {
-    OrderItem orderItems[MAX_MENU_ITEMS];
-    int foodType;
-    int totalPrice;
-} Receipt;
+} Table;
 
-// 가게에서 팔고 있는 전체 음식과 가짓수
-MenuItem menuItems[MAX_MENU_ITEMS];  
-int menuType = 0;
+static int getInt(void);
+static char* getString(void);
+static int getTableNum(void);
 
-Receipt receipts[MAX_TABLES];
+static int fileClose(FILE* f);
+static void saveFoodList(Menu* m);
+static void loadFoodList(Menu* m);
+static void saveTables(Table* tables);
+static void loadTables(Table* tables);
 
-// 모든 테이블의 주문을 초기화하는 함수
-void resetOrders() {
+static int printMain(void);
+
+static void initFoodList(Menu* m);
+static void addToFoodList(Menu* m, const char* name, int price);
+static void removeFromFoodList(Menu* m, int index);
+static void printFoodList(Menu* m);
+static void freeFoodList(Menu* m);
+
+static void initTable(Table* t);
+static void addOrder(Table* t, int foodIndex, int quantity, Menu* m);
+static void clearTable(Table* t);
+static void freeTable(Table* t);
+
+static int getInt() {
+}
+static char* getString() {
 }
 
-// 신메뉴를 추가하는 함수
-void getMenu() {
+static int printMain(void) {
+}
+static void printFoodList(Menu* m) {
 }
 
-// 음식을 단종시키는 함수
-void removeMenu() {
+static int getTableNum() {
 }
 
-// 주문 생성 함수
-void getOrder() {
+static void initFoodList(Menu* m) {
+}
+static void addToFoodList(Menu* m, const char* name, int price) {
+}
+static void removeFromFoodList(Menu* m, int index) {
+}
+static void freeFoodList(Menu* m) {
 }
 
-// 테이블 주문 조회 함수
-void showReceipt() {
+static void initTable(Table* t) {
+}
+static void addOrder(Table* t, int index, int quantity, Menu* m) {
+}
+static void clearTable(Table* t) {
+}
+static void freeTable(Table* t) {
 }
 
-// 결제 처리 함수
-void getPay() {
+static int fileClose(FILE* f) {
+}
+static void saveFoodList(Menu* m) {
+}
+static void loadFoodList(Menu* m) {
+}
+static void saveTables(Table* tables) {
+}
+static void loadTables(Table* tables) {
 }
 
-int main() {
-    // 메인 메뉴 출력
-    // 사용자 선택에 따른 함수 호출
+int main(void) {
     return 0;
 }
