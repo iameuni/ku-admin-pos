@@ -8,8 +8,8 @@
 
 // 입력 규칙. \n을 제거하기 때문에 따로 입력해 줘야 함
 static int getInt() {
-    char n[MAX_INPUT + 2];
-    char* endptr;
+    char n[MAX_INPUT + 2]; 
+        char* endptr;
     long num;
 
     while (1) {
@@ -62,9 +62,20 @@ static char* getString() {
             printf("입력 오류 발생\n");
         }
         else {
-            s[strcspn(s, "\n")] = '\0';
-            if (strlen(s) <= MAX_INPUT) {
-                return s;
+            s[strcspn(s, "\n")] = '\0'; 
+            // 알파벳이 아닌 문자가 있는지 확인
+            int valid = 1;
+            for (int i = 0; s[i] != '\0'; i++) {
+                if (!isalpha((unsigned char)s[i])) {  // 알파벳이 아니면 오류
+                    valid = 0;
+                    break;
+                }
+            }
+            if (!valid) {
+                printf("경고: 항목명은 알파벳만 입력해야 합니다. 다시 입력해주세요.\n");
+            }
+            else if (strlen(s) <= MAX_INPUT) {
+                return s;  // 입력이 유효하면 반환
             }
             else {
                 printf("경고: 입력이 너무 깁니다.\n");
@@ -72,6 +83,7 @@ static char* getString() {
         }
     }
 }
+
 
 // 메인 메뉴 출력 및 사용자 선택
 static int printMain(void) {
