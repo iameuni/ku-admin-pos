@@ -202,10 +202,16 @@ static void removeFoodItem(FILE* foodFile) {
                 firstNum = 1;  // 첫 번째 숫자를 1로 변경하여 비활성화
                 found = 1;
             }
+
         }
 
         // 변경된 내용을 임시 파일에 기록 (공백 형식을 유지하여 기록)
         fprintf(tempFile, "%d  %d    %s  %d\n", firstNum, secondNum, foodName, price);
+    }
+    
+    // 모든 항목을 확인한 후에 항목을 찾지 못했을 경우 처리
+    if (!found) {
+        printf("해당 번호의 항목이 없습니다.\n");
     }
 
     fclose(tempFile);
