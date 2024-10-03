@@ -372,6 +372,9 @@ int main(void) {
         case 3:
             removeFoodItem(foodFile);
             break;
+        case 5:
+            printOrder();
+            break;
         case 7:
             exitProgram(foodFile);
             break;
