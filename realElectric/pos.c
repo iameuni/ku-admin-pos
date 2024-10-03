@@ -5,6 +5,13 @@
 
 #define MAX_INPUT 100
 #define FILE_PATH "..\\x64\\Debug\\foodlist.txt"  // 파일 경로 설정
+#define TABLE_FILE_PATH "..\\x64\\Debug\\table" //테이블 폴더 경로 설정
+
+typedef struct OrderItem { //주문할 수 있는 개수/판매 항목 목록 개수 제한이 없어서 메모리 할당
+    int itemID;
+    int quantity;
+    struct OrderItem* next;
+} OrderItem;
 
 // 입력 규칙. \n을 제거하기 때문에 따로 입력해 줘야 함
 static int getInt() {
@@ -234,6 +241,114 @@ static void exitProgram(FILE* foodFile) {
     fclose(foodFile);
     printf("프로그램을 종료합니다.\n");
     exit(0);
+}
+// 테이블 번호 입력받는 함수
+static int getTableNumber() {
+    int tableNumber;
+    while (1) {
+        printf("테이블 번호를 입력하세요 (1~5): ");
+        tableNumber = getInt();
+        if (tableNumber < 1 || tableNumber >5) {
+            printf("오류: 1~5사이의 번호를 입력하세요.\n");
+        }
+        else {
+            return tableNumber;
+        }
+    }
+}
+// 주문 항목 리스트에 항목 추가
+OrderItem* addOrderItem(OrderItem* head, int itemID) {
+    OrderItem* current = head;
+    // 이미 존재하는 항목이면 수량 증가
+    while (current != NULL) {
+        if (current->itemID == itemID) {
+            current->quantity++;
+            return head;
+        }
+        current = current->next;
+    }
+    // 새 항목 추가
+    OrderItem* newItem = (OrderItem*)malloc(sizeof(OrderItem));
+    if (newItem == NULL) {
+        printf("메모리 할당 실패\n");
+        return head;
+    }
+    newItem->itemID = itemID;
+    newItem->quantity = 1;
+    newItem->next = head;
+    return newItem;
+}
+
+// 주문 항목 리스트 해제
+void freeOrderItems(OrderItem* head) {
+    while (head != NULL) {
+        OrderItem* temp = head;
+        head = head->next;
+        free(temp);
+    }
+}
+
+// 주문 조회 기능
+static void printOrder() {
+    int tableNumber = getTableNumber();
+
+    // 테이블 파일 경로 
+    char tableFilePath[256];
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+
+    // 테이블 파일 열기
+    FILE* tableFile = fopen(tableFilePath, "r");
+    if (tableFile == NULL) {
+        printf("테이블 파일을 열 수 없습니다.\n");
+        return;
+    }
+    // 판매항목목록 파일 열기
+    FILE* foodFile = fopen(FILE_PATH, "r");
+    if (foodFile == NULL) {
+        printf("판매 항목 파일을 열 수 없습니다.\n");
+        fclose(tableFile);
+        return;
+    }
+    // 테이블 파일에서 고유번호를 읽어 수량 계산
+    int itemID;
+    OrderItem* orderList = NULL;
+
+    while (fscanf(tableFile, "%d", &itemID) == 1) {
+        orderList = addOrderItem(orderList, itemID);
+    }
+
+    // 주문 정보 출력
+    printf("\n     %d번 테이블 주문 조회     \n", tableNumber);
+    printf("%-10s %-10s %-10s\n", "메뉴", "수량", "금액");
+
+    int foundItems = 0;
+    int firstNum, secondNum, price;
+    char foodName[50];
+
+    // FILE_PATH 파일에서 고유번호에 해당하는 항목 정보 찾기
+    OrderItem* current = orderList;
+    while (current != NULL) {
+        rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+        while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
+            if (firstNum == 0 && secondNum == current->itemID) {
+                // 일치하는 항목 출력
+                int quantity = current->quantity;
+                printf("%-10s %-10d %-10d\n", foodName, quantity, quantity * price);
+                foundItems++;
+                break;
+            }
+        }
+        current = current->next;
+    }
+
+    if (foundItems == 0) {
+        printf("주문한 판매 항목이 없습니다.\n");
+    }
+
+    // 메모리 해제
+    freeOrderItems(orderList);
+    fclose(tableFile);
+    fclose(foodFile);
 }
 
 int main(void) {
