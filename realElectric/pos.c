@@ -4,8 +4,8 @@
 #include <ctype.h>
 
 #define MAX_INPUT 100
-#define FILE_PATH "..\\x64\\Debug\\foodlist.txt"  // 파일 경로 설정
-#define TABLE_FILE_PATH "..\\x64\\Debug\\table" //테이블 폴더 경로 설정
+#define FILE_PATH "foodlist.txt"  // 파일 경로 설정
+#define TABLE_FILE_PATH "table" //테이블 폴더 경로 설정
 
 typedef struct OrderItem { //주문할 수 있는 개수/판매 항목 목록 개수 제한이 없어서 메모리 할당
     int itemID;
