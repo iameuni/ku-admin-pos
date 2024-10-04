@@ -91,31 +91,7 @@ static char* getString() {
     }
 }
 
-
-// 메인 메뉴 출력 및 사용자 선택
-static int printMain(void) {
-    int s;
-    while (1) {
-        printf("\n메인 메뉴\n");
-        printf("1. 판매 항목 조회\n");
-        printf("2. 판매 항목 추가\n");
-        printf("3. 판매 항목 제거\n");
-        printf("4. 주문 생성\n");
-        printf("5. 주문 조회\n");
-        printf("6. 결제 처리\n");
-        printf("7. 종료\n");
-        printf("메뉴 선택: ");
-        s = getInt();
-        if (s > 7 || s < 1) {
-            printf("1~7 사이의 값을 입력해주세요.\n");
-        }
-        else {
-            return s;
-        }
-    }
-}
-
-// 판매 목록 출력
+// 7.5 판매 항목 조회 프롬프트
 static void printFoodList(FILE* foodFile) {
     char line[100]; // 각 행을 저장할 문자열
     int line_count = 0;
@@ -151,7 +127,7 @@ int getLastSecondNumber(FILE* file) {
     return lastSecondNum;
 }
 
-// 판매 항목 추가
+// 7.6 판매 항목 추가 프롬프트
 static void addToFoodList(FILE* foodFile) {
     int firstNum = 0;
     int secondNum = getLastSecondNumber(foodFile) + 1;
@@ -175,7 +151,7 @@ static void addToFoodList(FILE* foodFile) {
     }
 }
 
-// 판매 항목 제거 함수
+// 7.7 판매 항목 제거 프롬프트
 static void removeFoodItem(FILE* foodFile) {
     printFoodList(foodFile);  // 현재 항목을 출력
     printf("제거할 항목 번호를 입력하세요: ");
@@ -236,12 +212,6 @@ static void removeFoodItem(FILE* foodFile) {
     }
 }
 
-// 종료 기능
-static void exitProgram(FILE* foodFile) {
-    fclose(foodFile);
-    printf("프로그램을 종료합니다.\n");
-    exit(0);
-}
 // 테이블 번호 입력받는 함수
 static int getTableNumber() {
     int tableNumber;
@@ -293,6 +263,7 @@ typedef struct {
     int quantity;
 } OrderedItem;
 
+// 7.8 주문 생성 프롬프트
 static void createOrder(FILE* foodFile) {
     int tableNumber = getTableNumber();  // 테이블 번호 입력 받기
 
@@ -393,8 +364,7 @@ static void createOrder(FILE* foodFile) {
     printf(" 주문완료되었습니다.\n");
 }
 
-
-// 주문 조회 기능
+// 7.9 주문 조회 프롬프트
 static void printOrder() {
     int tableNumber = getTableNumber();
 
@@ -457,6 +427,37 @@ static void printOrder() {
     fclose(foodFile);
 }
 
+// 7.11 메인 메뉴 프롬프트
+static int printMain(void) {
+    int s;
+    while (1) {
+        printf("\n메인 메뉴\n");
+        printf("1. 판매 항목 조회\n");
+        printf("2. 판매 항목 추가\n");
+        printf("3. 판매 항목 제거\n");
+        printf("4. 주문 생성\n");
+        printf("5. 주문 조회\n");
+        printf("6. 결제 처리\n");
+        printf("7. 종료\n");
+        printf("메뉴 선택: ");
+        s = getInt();
+        if (s > 7 || s < 1) {
+            printf("1~7 사이의 값을 입력해주세요.\n");
+        }
+        else {
+            return s;
+        }
+    }
+}
+
+// 7.11 메인 메뉴 프롬프트의 종료 기능
+static void exitProgram(FILE* foodFile) {
+    fclose(foodFile);
+    printf("프로그램을 종료합니다.\n");
+    exit(0);
+}
+
+// 프로그램 실행
 int main(void) {
     FILE* foodFile;
 
@@ -470,25 +471,34 @@ int main(void) {
         int s = printMain();
         switch (s) {
         case 1:
+            // 7.5 판매 항목 조회 프롬프트
             printFoodList(foodFile);
             break;
         case 2:
+            // 7.6 판매 항목 추가 프롬프트
             addToFoodList(foodFile);
             break;
         case 3:
+            // 7.7 판매 항목 제거 프롬프트
             removeFoodItem(foodFile);
             break;
+        case 4:
+            // 7.8 주문 생성 프롬프트
+            createOrder(foodFile);
+            break;
         case 5:
+            // 7.9 주문 조회 프롬프트
             printOrder();
             break;
         case 7:
+            // 7.11 메인 메뉴 프롬프트의 종료 기능
             exitProgram(foodFile);
             break;
         default:
             break;
         }
 
-        fclose(foodFile);  // 모든 case에서 파일을 사용 후 닫음
+        fclose(foodFile);
     }
 
     return 0;
