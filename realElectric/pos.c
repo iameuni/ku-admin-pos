@@ -429,6 +429,129 @@ static void printOrder() {
     fclose(foodFile);
 }
 
+int deleteLines(const char* filePath, int startLine, int endLine) {
+    FILE *fp_read, *fp_write;
+    char line[1024];
+    int currentLine = 1;
+
+    // 파일 열기
+    fp_read = fopen(filePath, "r");
+    if (fp_read == NULL) {
+        perror("fopen");
+        return -1;
+    }
+    fp_write = fopen("temp.txt", "w");
+    if (fp_write == NULL) {
+        perror("fopen");
+        fclose(fp_read);
+        return -1;
+    }
+
+    // 파일 읽고 쓰기
+    while (fgets(line, sizeof(line), fp_read) != NULL) {
+        if (currentLine < startLine || currentLine > endLine) {
+            fputs(line, fp_write);
+        }
+        currentLine++;
+    }
+
+    // 파일 닫기
+    fclose(fp_read);
+    fclose(fp_write);
+
+    printf("%d번째 줄부터 %d번째 줄까지 삭제되었습니다.\n", startLine, endLine);
+    return 0;
+}
+
+void copy_file(const char *src_file, const char *dest_file) {
+    FILE *src_fp = fopen(src_file, "r");
+    FILE *dest_fp = fopen(dest_file, "w");
+    char buffer[1024];
+
+    if (src_fp == NULL || dest_fp == NULL) {
+        fprintf(stderr, "파일 열기 실패\n");
+        return;
+    }
+
+    while (fgets(buffer, sizeof(buffer), src_fp) != NULL) {
+        fputs(buffer, dest_fp);
+    }
+
+    fclose(src_fp);
+    fclose(dest_fp);
+}
+
+// 7.10 결제 처리 프롬프트
+static void makePayment() {
+    int tableNumber = getTableNumber();
+
+    // 테이블 파일 경로 
+    char tableFilePath[256];
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+
+    // 테이블 파일 열기
+    FILE* tableFile = fopen(tableFilePath, "r");
+    if (tableFile == NULL) {
+        printf("테이블 파일을 열 수 없습니다.\n");
+        return;
+    }
+
+    // 판매항목목록 파일 열기
+    FILE* foodFile = fopen(FILE_PATH, "r");
+    if (foodFile == NULL) {
+        printf("판매 항목 파일을 열 수 없습니다.\n");
+        fclose(tableFile);
+        return;
+    }
+
+    // 테이블 파일에서 고유번호를 읽어 수량 계산
+    int itemID;
+    OrderItem* orderList = NULL;
+
+    int counter = 0;
+    while (fscanf(tableFile, "%d", &itemID) == 1) {
+        orderList = addOrderItem(orderList, itemID);
+        counter++;
+    }
+
+    // 주문 합계 계산
+    int foundItems = 0;
+    int firstNum, secondNum, price;
+    char foodName[50];
+    int totalPrice = 0;
+
+    // FILE_PATH 파일에서 고유번호에 해당하는 항목 정보 찾기
+    OrderItem* current = orderList;
+    while (current != NULL) {
+        rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+        while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
+            if (firstNum == 0 && secondNum == current->itemID) {
+                // 일치하는 항목 출력
+                int quantity = current->quantity;
+                totalPrice = totalPrice + quantity * price;
+                foundItems++;
+                break;
+            }
+        }
+        current = current->next;
+    }
+
+    // 주문 내역 삭제
+    deleteLines(tableFilePath, 1, counter);
+    copy_file("temp.txt", tableFilePath);
+
+    if (foundItems == 0) {
+        printf("\n%d번 테이블은 결제가 불가능합니다.\n", tableNumber);
+    }
+
+    printf("\n%d번 테이블 %d원 결제완료 되었습니다.\n", tableNumber, totalPrice);
+
+    // 메모리 해제
+    freeOrderItems(orderList);
+    fclose(tableFile);
+    fclose(foodFile);
+}
+
 // 7.11 메인 메뉴 프롬프트
 static int printMain(void) {
     int s;
@@ -491,6 +614,10 @@ int main(void) {
         case 5:
             // 7.9 주문 조회 프롬프트
             printOrder();
+            break;
+        case 6:
+            // 7.10 결제 처리 프롬프트
+            makePayment();
             break;
         case 7:
             // 7.11 메인 메뉴 프롬프트의 종료 기능
