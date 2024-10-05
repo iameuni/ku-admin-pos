@@ -6,16 +6,130 @@
 #include <ctype.h>
 
 #define MAX_INPUT 100
-#define FILE_PATH "foodlist.txt"  // 파일 경로 설정
+#define FILE_PATH "foodlist.txt" // 파일 경로 설정
 #define TABLE_FILE_PATH "table" //테이블 폴더 경로 설정
 
-typedef struct OrderItem { //주문할 수 있는 개수/판매 항목 목록 개수 제한이 없어서 메모리 할당
+
+
+//////////////////// 구조체 선언 ////////////////////
+
+//주문할 수 있는 개수/판매 항목 목록 개수 제한이 없어서 메모리 할당
+typedef struct OrderItem {
     int itemID;
     int quantity;
     struct OrderItem* next;
 } OrderItem;
 
-// 입력 규칙. \n을 제거하기 때문에 따로 입력해 줘야 함
+// 7.8 주문 생성 프롬프트에서 사용되는 구조체
+typedef struct {
+    char foodName[50];
+    int quantity;
+} OrderedItem;
+
+
+
+//////////////////// 기타 함수 ////////////////////
+
+// 고유 번호를 가져오는 함수 (7.6 판매 항목 추가 프롬프트에서 사용)
+int getLastSecondNumber(FILE* file) {
+    int firstNum, secondNum, price;
+    char foodName[50];
+    int lastSecondNum = 0;
+
+    rewind(file);  // 파일 포인터를 처음으로 되돌림
+    while (fscanf(file, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {  // 공백 2칸, 4칸, 2칸 유지
+        lastSecondNum = secondNum;
+    }
+    return lastSecondNum;
+}
+
+// 주문 항목 리스트에 항목 추가 (7.9 주문 조회 프롬프트. 7.10 결제 처리 프롬프트에서 사용)
+OrderItem* addOrderItem(OrderItem* head, int itemID) {
+    OrderItem* current = head;
+    // 이미 존재하는 항목이면 수량 증가
+    while (current != NULL) {
+        if (current->itemID == itemID) {
+            current->quantity++;
+            return head;
+        }
+        current = current->next;
+    }
+    // 새 항목 추가
+    OrderItem* newItem = (OrderItem*)malloc(sizeof(OrderItem));
+    if (newItem == NULL) {
+        printf("메모리 할당 실패\n");
+        return head;
+    }
+    newItem->itemID = itemID;
+    newItem->quantity = 1;
+    newItem->next = head;
+    return newItem;
+}
+
+// 주문 항목 리스트 해제하는 함수 (7.9 주문 조회 프롬프트. 7.10 결제 처리 프롬프트에서 사용)
+void freeOrderItems(OrderItem* head) {
+    while (head != NULL) {
+        OrderItem* temp = head;
+        head = head->next;
+        free(temp);
+    }
+}
+
+// 텍스트 파일 특정 범위의 줄을 삭제하는 함수 (7.10 결제 처리 프롬프트에서 사용)
+int deleteLines(const char* filePath, int startLine, int endLine) {
+    FILE *fp_read, *fp_write;
+    char line[1024];
+    int currentLine = 1;
+
+    // 파일 열기
+    fp_read = fopen(filePath, "r");
+    if (fp_read == NULL) {
+        perror("fopen");
+        return -1;
+    }
+    fp_write = fopen("temp.txt", "w");
+    if (fp_write == NULL) {
+        perror("fopen");
+        fclose(fp_read);
+        return -1;
+    }
+
+    // 파일 읽고 쓰기
+    while (fgets(line, sizeof(line), fp_read) != NULL) {
+        if (currentLine < startLine || currentLine > endLine) {
+            fputs(line, fp_write);
+        }
+        currentLine++;
+    }
+
+    // 파일 닫기
+    fclose(fp_read);
+    fclose(fp_write);
+
+    printf("%d번째 줄부터 %d번째 줄까지 삭제되었습니다.\n", startLine, endLine);
+    return 0;
+}
+
+// 텍스트 파일의 내용을 복사해서 옮기는 함수 (7.10 결제 처리 프롬프트에서 사용)
+void copy_file(const char *src_file, const char *dest_file) {
+    FILE *src_fp = fopen(src_file, "r");
+    FILE *dest_fp = fopen(dest_file, "w");
+    char buffer[1024];
+
+    if (src_fp == NULL || dest_fp == NULL) {
+        fprintf(stderr, "파일 열기 실패\n");
+        return;
+    }
+
+    while (fgets(buffer, sizeof(buffer), src_fp) != NULL) {
+        fputs(buffer, dest_fp);
+    }
+
+    fclose(src_fp);
+    fclose(dest_fp);
+}
+
+// 입력 규칙. \n을 제거하기 때문에 따로 입력해 줘야 함.
 static int getInt() {
     char n[MAX_INPUT + 2];
     char* endptr;
@@ -93,6 +207,35 @@ static char* getString() {
     }
 }
 
+
+
+//////////////////// 기획서 기반 프롬프트 ////////////////////
+
+// 7.1 데이터 파일 무결성 검사
+
+// 7.2 판매 항목 선택 입력
+
+// 7.3.1 판매 항목명 입력
+
+// 7.3.2 판매 항목가 입력
+
+// 7.4.1 테이블 번호 입력
+static int getTableNumber() {
+    int tableNumber;
+    while (1) {
+        printf("테이블 번호를 입력하세요 (1~5): ");
+        tableNumber = getInt();
+        if (tableNumber < 1 || tableNumber >5) {
+            printf("오류: 1~5사이의 번호를 입력하세요.\n");
+        }
+        else {
+            return tableNumber;
+        }
+    }
+}
+
+// 7.4.2 수량 입력
+
 // 7.5 판매 항목 조회 프롬프트
 static void printFoodList(FILE* foodFile) {
     char line[100]; // 각 행을 저장할 문자열
@@ -114,19 +257,6 @@ static void printFoodList(FILE* foodFile) {
     if (line_count == 0) {
         printf("판매 중인 항목이 없습니다.\n");
     }
-}
-
-// 고유 번호를 가져오는 함수
-int getLastSecondNumber(FILE* file) {
-    int firstNum, secondNum, price;
-    char foodName[50];
-    int lastSecondNum = 0;
-
-    rewind(file);  // 파일 포인터를 처음으로 되돌림
-    while (fscanf(file, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {  // 공백 2칸, 4칸, 2칸 유지
-        lastSecondNum = secondNum;
-    }
-    return lastSecondNum;
 }
 
 // 7.6 판매 항목 추가 프롬프트
@@ -213,57 +343,6 @@ static void removeFoodItem(FILE* foodFile) {
         printf("해당 번호의 메뉴를 찾을 수 없습니다.\n");
     }
 }
-
-// 테이블 번호 입력받는 함수
-static int getTableNumber() {
-    int tableNumber;
-    while (1) {
-        printf("테이블 번호를 입력하세요 (1~5): ");
-        tableNumber = getInt();
-        if (tableNumber < 1 || tableNumber >5) {
-            printf("오류: 1~5사이의 번호를 입력하세요.\n");
-        }
-        else {
-            return tableNumber;
-        }
-    }
-}
-// 주문 항목 리스트에 항목 추가
-OrderItem* addOrderItem(OrderItem* head, int itemID) {
-    OrderItem* current = head;
-    // 이미 존재하는 항목이면 수량 증가
-    while (current != NULL) {
-        if (current->itemID == itemID) {
-            current->quantity++;
-            return head;
-        }
-        current = current->next;
-    }
-    // 새 항목 추가
-    OrderItem* newItem = (OrderItem*)malloc(sizeof(OrderItem));
-    if (newItem == NULL) {
-        printf("메모리 할당 실패\n");
-        return head;
-    }
-    newItem->itemID = itemID;
-    newItem->quantity = 1;
-    newItem->next = head;
-    return newItem;
-}
-
-// 주문 항목 리스트 해제
-void freeOrderItems(OrderItem* head) {
-    while (head != NULL) {
-        OrderItem* temp = head;
-        head = head->next;
-        free(temp);
-    }
-}
-
-typedef struct {
-    char foodName[50];
-    int quantity;
-} OrderedItem;
 
 // 7.8 주문 생성 프롬프트
 static void createOrder(FILE* foodFile) {
@@ -427,58 +506,6 @@ static void printOrder() {
     freeOrderItems(orderList);
     fclose(tableFile);
     fclose(foodFile);
-}
-
-int deleteLines(const char* filePath, int startLine, int endLine) {
-    FILE *fp_read, *fp_write;
-    char line[1024];
-    int currentLine = 1;
-
-    // 파일 열기
-    fp_read = fopen(filePath, "r");
-    if (fp_read == NULL) {
-        perror("fopen");
-        return -1;
-    }
-    fp_write = fopen("temp.txt", "w");
-    if (fp_write == NULL) {
-        perror("fopen");
-        fclose(fp_read);
-        return -1;
-    }
-
-    // 파일 읽고 쓰기
-    while (fgets(line, sizeof(line), fp_read) != NULL) {
-        if (currentLine < startLine || currentLine > endLine) {
-            fputs(line, fp_write);
-        }
-        currentLine++;
-    }
-
-    // 파일 닫기
-    fclose(fp_read);
-    fclose(fp_write);
-
-    printf("%d번째 줄부터 %d번째 줄까지 삭제되었습니다.\n", startLine, endLine);
-    return 0;
-}
-
-void copy_file(const char *src_file, const char *dest_file) {
-    FILE *src_fp = fopen(src_file, "r");
-    FILE *dest_fp = fopen(dest_file, "w");
-    char buffer[1024];
-
-    if (src_fp == NULL || dest_fp == NULL) {
-        fprintf(stderr, "파일 열기 실패\n");
-        return;
-    }
-
-    while (fgets(buffer, sizeof(buffer), src_fp) != NULL) {
-        fputs(buffer, dest_fp);
-    }
-
-    fclose(src_fp);
-    fclose(dest_fp);
 }
 
 // 7.10 결제 처리 프롬프트
