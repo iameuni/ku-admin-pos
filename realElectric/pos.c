@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -17,8 +17,8 @@ typedef struct OrderItem { //주문할 수 있는 개수/판매 항목 목록 �
 
 // 입력 규칙. \n을 제거하기 때문에 따로 입력해 줘야 함
 static int getInt() {
-    char n[MAX_INPUT + 2]; 
-        char* endptr;
+    char n[MAX_INPUT + 2];
+    char* endptr;
     long num;
 
     while (1) {
@@ -71,7 +71,7 @@ static char* getString() {
             printf("입력 오류 발생\n");
         }
         else {
-            s[strcspn(s, "\n")] = '\0'; 
+            s[strcspn(s, "\n")] = '\0';
             // 알파벳이 아닌 문자가 있는지 확인
             int valid = 1;
             for (int i = 0; s[i] != '\0'; i++) {
@@ -193,7 +193,7 @@ static void removeFoodItem(FILE* foodFile) {
         // 변경된 내용을 임시 파일에 기록 (공백 형식을 유지하여 기록)
         fprintf(tempFile, "%d  %d    %s  %d\n", firstNum, secondNum, foodName, price);
     }
-    
+
     // 모든 항목을 확인한 후에 항목을 찾지 못했을 경우 처리
     if (!found) {
         printf("해당 번호의 항목이 없습니다.\n");
