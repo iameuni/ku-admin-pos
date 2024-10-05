@@ -508,11 +508,23 @@ static void makePayment() {
     int itemID;
     OrderItem* orderList = NULL;
 
-    int counter = 0;
     while (fscanf(tableFile, "%d", &itemID) == 1) {
         orderList = addOrderItem(orderList, itemID);
-        counter++;
     }
+
+    int counter = 0;
+    char c;
+    FILE* tableFileForLineCount = fopen(tableFilePath, "r");
+    // 파일 끝(EOF)에 도달할 때까지 문자를 하나씩 읽기
+    while ((c = fgetc(tableFileForLineCount)) != EOF)
+    {
+        // 줄바꿈 문자(\n)을 발견하면 줄 수 증가
+        if (c == '\n')
+        {
+            counter++;
+        }
+    }
+    fclose(tableFileForLineCount);
 
     // 주문 합계 계산
     int foundItems = 0;
