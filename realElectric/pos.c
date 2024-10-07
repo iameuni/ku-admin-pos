@@ -131,7 +131,7 @@ void copy_file(const char *src_file, const char *dest_file) {
 }
 
 // 정수 입력 함수
-static int inputInt(const char* prompt) {
+static int inputInt(const char* prompt, bool allowZero) {
     char n[MAX_INPUT + 2];
     char* endptr;
     long num;
@@ -150,7 +150,7 @@ static int inputInt(const char* prompt) {
                 char* start = n;
                 char* end = n + strlen(n) - 1;
                 while (isspace((unsigned char)*start)) start++;
-                if (*start == '0') {
+                if (*start == '0' && !allowZero) {
                     printf("오류: 0으로 시작하는 수는 입력할 수 없습니다.\n");
                 }
                 else if (*start == '\0') {
@@ -277,14 +277,9 @@ static bool checkDataIntegrity(FILE* foodFile) {
 static int inputFoodNumber() {
     int foodNumber;
     while (1) {
-        foodNumber = inputInt("판매 항목 번호를 입력하세요: ");
-        if (foodNumber < 1) {
-            printf("오류: 1~99사이의 수량을 입력하세요.\n");
+        foodNumber = inputInt("판매 항목 번호를 입력하세요: ", true);
+        return foodNumber;
         }
-        else {
-            return foodNumber;
-        }
-    }
 }
 
 // 7.3.1 판매 항목명 입력
@@ -337,7 +332,7 @@ static char* inputFoodName() {
 static int inputPrice() {
     int price;
     while (1) {
-        price = inputInt("판매 항목가: ");
+        price = inputInt("판매 항목가: ", false);
         if (price >= 1 && price <= 9999999) {
             return price;
         }
@@ -351,7 +346,7 @@ static int inputPrice() {
 static int inputTableNumber() {
     int tableNumber;
     while (1) {
-        tableNumber = inputInt("테이블 번호를 입력하세요 (1~5): ");
+        tableNumber = inputInt("테이블 번호를 입력하세요 (1~5): ", false);
         if (tableNumber < 1 || tableNumber >5) {
             printf("오류: 1~5사이의 번호를 입력하세요.\n");
         }
@@ -365,7 +360,7 @@ static int inputTableNumber() {
 static int inputQuantity() {
     int quantity;
     while (1) {
-        quantity = inputInt("수량을 입력하세요: ");
+        quantity = inputInt("수량을 입력하세요: ", false);
         if (quantity < 1 || quantity >99) {
             printf("오류: 1~99사이의 수량을 입력하세요.\n");
         }
@@ -738,7 +733,7 @@ static int printMain(void) {
         printf("5. 주문 조회\n");
         printf("6. 결제 처리\n");
         printf("7. 종료\n");
-        s = inputInt("메뉴 선택: ");
+        s = inputInt("메뉴 선택: ", false);
         if (s > 7 || s < 1) {
             printf("1~7 사이의 값을 입력해주세요.\n");
         }
