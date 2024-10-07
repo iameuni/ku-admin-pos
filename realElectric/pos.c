@@ -717,10 +717,10 @@ static bool checkDataIntegrity(FILE* foodFile) {
 // 프로그램 실행
 int main(void) {
     FILE* foodFile;
-    checkDataIntegrity(foodFile);
 
     while (1) {
         foodFile = fopen(FILE_PATH, "r+");  // 파일을 읽기 및 쓰기 모드로 열기
+        checkDataIntegrity(foodFile);
         if (foodFile == NULL) {
             printf("파일을 열 수 없습니다.\n");
             return 1;
