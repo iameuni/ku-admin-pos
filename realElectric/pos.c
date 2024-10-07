@@ -130,7 +130,7 @@ void copy_file(const char *src_file, const char *dest_file) {
     fclose(dest_fp);
 }
 
-// 입력 규칙. \n을 제거하기 때문에 따로 입력해 줘야 함.
+// 정수 입력 함수
 static int inputInt(const char* prompt) {
     char n[MAX_INPUT + 2];
     char* endptr;
@@ -350,6 +350,18 @@ static int inputTableNumber() {
 }
 
 // 7.4.2 수량 입력
+static int inputQuantity() {
+    int quantity;
+    while (1) {
+        quantity = inputInt("수량을 입력하세요: ");
+        if (quantity < 1 || quantity >99) {
+            printf("오류: 1~99사이의 수량을 입력하세요.\n");
+        }
+        else {
+            return quantity;
+        }
+    }
+}
 
 // 7.5 판매 항목 조회 프롬프트
 static void printFoodList(FILE* foodFile) {
@@ -526,7 +538,7 @@ static void createOrder(FILE* foodFile) {
                 if (currentMenuIndex == selection) {  // 선택한 메뉴가 맞을 때
                     validSelection = 1;
                     //printf("%s의 수량을 입력하세요: ", foodName);
-                    int quantity = inputInt("수량을 입력하세요: ");  // 수량 입력받기
+                    int quantity = inputQuantity(); // 수량 입력받기
 
                     // 입력받은 수량만큼 메뉴 ID를 테이블 파일에 저장
                     for (int i = 0; i < quantity; i++) {
