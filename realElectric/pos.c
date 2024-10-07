@@ -131,7 +131,7 @@ void copy_file(const char *src_file, const char *dest_file) {
 }
 
 // 입력 규칙. \n을 제거하기 때문에 따로 입력해 줘야 함.
-static int getInt() {
+static int inputInt() {
     char n[MAX_INPUT + 2];
     char* endptr;
     long num;
@@ -322,7 +322,7 @@ static int inputPrice() {
     int tableNumber;
     while (1) {
         printf("테이블 번호를 입력하세요 (1~5): ");
-        tableNumber = getInt();
+        tableNumber = inputInt();
         if (tableNumber < 1 || tableNumber >5) {
             printf("오류: 1~5사이의 번호를 입력하세요.\n");
         }
@@ -337,7 +337,7 @@ static int inputTableNumber() {
     int tableNumber;
     while (1) {
         printf("테이블 번호를 입력하세요 (1~5): ");
-        tableNumber = getInt();
+        tableNumber = inputInt();
         if (tableNumber < 1 || tableNumber >5) {
             printf("오류: 1~5사이의 번호를 입력하세요.\n");
         }
@@ -382,7 +382,7 @@ static void addToFoodList(FILE* foodFile) {
 
     if (foodName != NULL) {
         printf("판매 항목가: ");
-        int price = getInt();
+        int price = inputInt();
 
         fseek(foodFile, 0, SEEK_END);  // 파일의 끝으로 이동
         fprintf(foodFile, "%d  %d    %s  %d\n", firstNum, secondNum, foodName, price);  // 공백 2칸, 4칸, 2칸 공백 적용
@@ -399,7 +399,7 @@ static void addToFoodList(FILE* foodFile) {
 static void removeFoodItem(FILE* foodFile) {
     printFoodList(foodFile);  // 현재 항목을 출력
     printf("제거할 항목 번호를 입력하세요: ");
-    int userChoice = getInt();  // 사용자가 선택한 항목 번호 (출력 순서)
+    int userChoice = inputInt();  // 사용자가 선택한 항목 번호 (출력 순서)
 
     FILE* tempFile = fopen("temp.txt", "w");
     if (tempFile == NULL) {
@@ -523,7 +523,7 @@ static void createOrder(FILE* foodFile) {
                 if (currentMenuIndex == selection) {  // 선택한 메뉴가 맞을 때
                     validSelection = 1;
                     printf("%s의 수량을 입력하세요: ", foodName);
-                    int quantity = getInt();  // 수량 입력받기
+                    int quantity = inputInt();  // 수량 입력받기
 
                     // 입력받은 수량만큼 메뉴 ID를 테이블 파일에 저장
                     for (int i = 0; i < quantity; i++) {
@@ -718,7 +718,7 @@ static int printMain(void) {
         printf("6. 결제 처리\n");
         printf("7. 종료\n");
         printf("메뉴 선택: ");
-        s = getInt();
+        s = inputInt();
         if (s > 7 || s < 1) {
             printf("1~7 사이의 값을 입력해주세요.\n");
         }
