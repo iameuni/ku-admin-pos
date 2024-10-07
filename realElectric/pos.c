@@ -149,7 +149,10 @@ static int inputInt() {
                 char* start = n;
                 char* end = n + strlen(n) - 1;
                 while (isspace((unsigned char)*start)) start++;
-                if (*start == '\0') {
+                if (*start == '0') {
+                    printf("오류: 0으로 시작하는 수는 입력할 수 없습니다.\n");
+                }
+                else if (*start == '\0') {
                     printf("오류: 입력값이 비어있습니다.\n");
                 }
                 else {
@@ -174,6 +177,7 @@ static int inputInt() {
         }
     }
 }
+
 
 
 
@@ -319,15 +323,14 @@ static char* inputFoodName() {
 
 // 7.3.2 판매 항목가 입력
 static int inputPrice() {
-    int tableNumber;
+    int price;
     while (1) {
-        printf("테이블 번호를 입력하세요 (1~5): ");
-        tableNumber = inputInt();
-        if (tableNumber < 1 || tableNumber >5) {
-            printf("오류: 1~5사이의 번호를 입력하세요.\n");
+        price = inputInt();
+        if (price >= 1 && price <= 9999999) {
+            return price;
         }
         else {
-            return tableNumber;
+            printf("오류: 1~9999999사이의 수를 입력하세요.\n");
         }
     }
 }
@@ -382,7 +385,7 @@ static void addToFoodList(FILE* foodFile) {
 
     if (foodName != NULL) {
         printf("판매 항목가: ");
-        int price = inputInt();
+        int price = inputPrice();
 
         fseek(foodFile, 0, SEEK_END);  // 파일의 끝으로 이동
         fprintf(foodFile, "%d  %d    %s  %d\n", firstNum, secondNum, foodName, price);  // 공백 2칸, 4칸, 2칸 공백 적용
