@@ -213,6 +213,94 @@ static char* getString() {
 //////////////////// 기획서 기반 프롬프트 ////////////////////
 
 // 7.1 데이터 파일 무결성 검사
+static bool checkDataIntegrity(FILE* foodFile) {
+    int item_ids[100];
+    int item_count = 0;
+    char line[256];
+
+    // 판매 항목 데이터 읽기
+    int line_number = 0;
+    int expected_id = 1;  // 예상되는 ID 값 (1부터 시작)
+    while (fgets(line, sizeof(line), foodFile) && item_count < 100) {
+        line_number++;
+        int first_num, id;
+        char name[50];
+        int price;
+
+        // 줄의 시작부터 첫 번째와 두 번째 숫자를 찾습니다.
+        char* ptr = line;
+        while (*ptr && isspace(*ptr)) ptr++; // 앞쪽 공백 건너뛰기
+        if (sscanf(ptr, "%d", &first_num) != 1) continue;
+        while (*ptr && !isspace(*ptr)) ptr++; // 첫 번째 숫자 건너뛰기
+        while (*ptr && isspace(*ptr)) ptr++; // 중간 공백 건너뛰기
+        if (sscanf(ptr, "%d", &id) != 1) continue;
+
+        // 이름과 가격은 무시하지만, 형식 검증을 위해 파싱합니다.
+        while (*ptr && !isspace(*ptr)) ptr++; // 두 번째 숫자 건너뛰기
+        while (*ptr && isspace(*ptr)) ptr++; // 중간 공백 건너뛰기
+        if (sscanf(ptr, "%s", name) != 1) continue;
+        while (*ptr && !isspace(*ptr)) ptr++; // 이름 건너뛰기
+        while (*ptr && isspace(*ptr)) ptr++; // 중간 공백 건너뛰기
+        if (sscanf(ptr, "%d", &price) != 1) continue;
+
+        // 고유 번호 중복 검사
+        for (int i = 0; i < item_count; i++) {
+            if (item_ids[i] == id) {
+                printf("판매 항목 데이터 파일 %d번째 줄과 %d번째 줄에서 고유 번호 중복이 발생했습니다. 프로그램을 종료합니다.\n", i + 1, line_number);
+                return false;
+            }
+        }
+
+        // 고유 번호 순차적 증가 검사
+        if (id != expected_id) {
+            printf("판매 항목 데이터 파일의 고유 번호가 올바른 순서로 증가하지 않습니다. 프로그램을 종료합니다.\n");
+            return false;
+        }
+
+        item_ids[item_count++] = id;
+        expected_id++;  // 다음 예상 ID 값
+    }
+
+    // 테이블 주문 파일들 검사
+    for (int table = 1; table <= 5; table++) {
+        char table_file_name[256];
+        snprintf(table_file_name, sizeof(table_file_name), "%s/%d.txt", TABLE_FILE_PATH, table);
+
+        FILE* table_file = fopen(table_file_name, "r");
+        if (!table_file) {
+            printf("%d번 테이블 주문 파일을 열 수 없습니다.\n", table);
+            return false;
+        }
+
+        int table_line_number = 0;
+        while (fgets(line, sizeof(line), table_file)) {
+            table_line_number++;
+            int sale_item_id;
+            if (sscanf(line, "%d", &sale_item_id) == 1) {
+                bool found = false;
+                for (int i = 0; i < item_count; i++) {
+                    if (item_ids[i] == sale_item_id) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    printf("테이블 데이터 파일의 %d번째 줄의 판매 항목 고유 번호 %d는 올바른 판매 항목 고유 번호가 아닙니다. 프로그램을 종료합니다.\n",
+                        table_line_number, sale_item_id);
+                    fclose(table_file);
+                    return false;
+                }
+            }
+            else {
+                printf("테이블 데이터 파일의 %d번째 줄에서 올바른 형식의 판매 항목 고유 번호를 찾을 수 없습니다. 프로그램을 종료합니다.\n", table_line_number);
+                fclose(table_file);
+                return false;
+            }
+        }
+        fclose(table_file);
+    }
+    return true;
+}
 
 // 7.2 판매 항목 선택 입력
 
@@ -622,96 +710,6 @@ static void exitProgram(FILE* foodFile) {
     fclose(foodFile);
     printf("프로그램을 종료합니다.\n");
     exit(0);
-}
-
-// 무결성 검사 함수
-static bool checkDataIntegrity(FILE* foodFile) {
-    int item_ids[100];
-    int item_count = 0;
-    char line[256];
-
-    // 판매 항목 데이터 읽기
-    int line_number = 0;
-    int expected_id = 1;  // 예상되는 ID 값 (1부터 시작)
-    while (fgets(line, sizeof(line), foodFile) && item_count < 100) {
-        line_number++;
-        int first_num, id;
-        char name[50];
-        int price;
-
-        // 줄의 시작부터 첫 번째와 두 번째 숫자를 찾습니다.
-        char* ptr = line;
-        while (*ptr && isspace(*ptr)) ptr++; // 앞쪽 공백 건너뛰기
-        if (sscanf(ptr, "%d", &first_num) != 1) continue;
-        while (*ptr && !isspace(*ptr)) ptr++; // 첫 번째 숫자 건너뛰기
-        while (*ptr && isspace(*ptr)) ptr++; // 중간 공백 건너뛰기
-        if (sscanf(ptr, "%d", &id) != 1) continue;
-
-        // 이름과 가격은 무시하지만, 형식 검증을 위해 파싱합니다.
-        while (*ptr && !isspace(*ptr)) ptr++; // 두 번째 숫자 건너뛰기
-        while (*ptr && isspace(*ptr)) ptr++; // 중간 공백 건너뛰기
-        if (sscanf(ptr, "%s", name) != 1) continue;
-        while (*ptr && !isspace(*ptr)) ptr++; // 이름 건너뛰기
-        while (*ptr && isspace(*ptr)) ptr++; // 중간 공백 건너뛰기
-        if (sscanf(ptr, "%d", &price) != 1) continue;
-
-        // 고유 번호 중복 검사
-        for (int i = 0; i < item_count; i++) {
-            if (item_ids[i] == id) {
-                printf("판매 항목 데이터 파일 %d번째 줄과 %d번째 줄에서 고유 번호 중복이 발생했습니다. 프로그램을 종료합니다.\n", i + 1, line_number);
-                return false;
-            }
-        }
-
-        // 고유 번호 순차적 증가 검사
-        if (id != expected_id) {
-            printf("판매 항목 데이터 파일의 고유 번호가 올바른 순서로 증가하지 않습니다. 프로그램을 종료합니다.\n");
-            return false;
-        }
-
-        item_ids[item_count++] = id;
-        expected_id++;  // 다음 예상 ID 값
-    }
-
-    // 테이블 주문 파일들 검사
-    for (int table = 1; table <= 5; table++) {
-        char table_file_name[256];
-        snprintf(table_file_name, sizeof(table_file_name), "%s/%d.txt", TABLE_FILE_PATH, table);
-
-        FILE* table_file = fopen(table_file_name, "r");
-        if (!table_file) {
-            printf("%d번 테이블 주문 파일을 열 수 없습니다.\n", table);
-            return false;
-        }
-
-        int table_line_number = 0;
-        while (fgets(line, sizeof(line), table_file)) {
-            table_line_number++;
-            int sale_item_id;
-            if (sscanf(line, "%d", &sale_item_id) == 1) {
-                bool found = false;
-                for (int i = 0; i < item_count; i++) {
-                    if (item_ids[i] == sale_item_id) {
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    printf("테이블 데이터 파일의 %d번째 줄의 판매 항목 고유 번호 %d는 올바른 판매 항목 고유 번호가 아닙니다. 프로그램을 종료합니다.\n",
-                        table_line_number, sale_item_id);
-                    fclose(table_file);
-                    return false;
-                }
-            }
-            else {
-                printf("테이블 데이터 파일의 %d번째 줄에서 올바른 형식의 판매 항목 고유 번호를 찾을 수 없습니다. 프로그램을 종료합니다.\n", table_line_number);
-                fclose(table_file);
-                return false;
-            }
-        }
-        fclose(table_file);
-    }
-    return true;
 }
 
 // 프로그램 실행
