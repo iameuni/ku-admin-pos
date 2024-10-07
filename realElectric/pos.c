@@ -131,12 +131,13 @@ void copy_file(const char *src_file, const char *dest_file) {
 }
 
 // 입력 규칙. \n을 제거하기 때문에 따로 입력해 줘야 함.
-static int inputInt() {
+static int inputInt(const char* prompt) {
     char n[MAX_INPUT + 2];
     char* endptr;
     long num;
 
     while (1) {
+        if (prompt != NULL) printf("%s", prompt);
         if (fgets(n, sizeof(n), stdin) == NULL) {
             printf("입력 오류가 발생했습니다. 다시 시도해주세요.\n");
         }
@@ -177,7 +178,6 @@ static int inputInt() {
         }
     }
 }
-
 
 
 
@@ -325,7 +325,7 @@ static char* inputFoodName() {
 static int inputPrice() {
     int price;
     while (1) {
-        price = inputInt();
+        price = inputInt("판매 항목가: ");
         if (price >= 1 && price <= 9999999) {
             return price;
         }
@@ -339,8 +339,7 @@ static int inputPrice() {
 static int inputTableNumber() {
     int tableNumber;
     while (1) {
-        printf("테이블 번호를 입력하세요 (1~5): ");
-        tableNumber = inputInt();
+        tableNumber = inputInt("테이블 번호를 입력하세요 (1~5): ");
         if (tableNumber < 1 || tableNumber >5) {
             printf("오류: 1~5사이의 번호를 입력하세요.\n");
         }
@@ -384,7 +383,6 @@ static void addToFoodList(FILE* foodFile) {
     char* foodName = inputFoodName();
 
     if (foodName != NULL) {
-        printf("판매 항목가: ");
         int price = inputPrice();
 
         fseek(foodFile, 0, SEEK_END);  // 파일의 끝으로 이동
@@ -401,8 +399,7 @@ static void addToFoodList(FILE* foodFile) {
 // 7.7 판매 항목 제거 프롬프트
 static void removeFoodItem(FILE* foodFile) {
     printFoodList(foodFile);  // 현재 항목을 출력
-    printf("제거할 항목 번호를 입력하세요: ");
-    int userChoice = inputInt();  // 사용자가 선택한 항목 번호 (출력 순서)
+    int userChoice = inputInt("제거할 항목 번호를 입력하세요: ");  // 사용자가 선택한 항목 번호 (출력 순서)
 
     FILE* tempFile = fopen("temp.txt", "w");
     if (tempFile == NULL) {
@@ -525,8 +522,8 @@ static void createOrder(FILE* foodFile) {
                 currentMenuIndex++;
                 if (currentMenuIndex == selection) {  // 선택한 메뉴가 맞을 때
                     validSelection = 1;
-                    printf("%s의 수량을 입력하세요: ", foodName);
-                    int quantity = inputInt();  // 수량 입력받기
+                    //printf("%s의 수량을 입력하세요: ", foodName);
+                    int quantity = inputInt("수량을 입력하세요: ");  // 수량 입력받기
 
                     // 입력받은 수량만큼 메뉴 ID를 테이블 파일에 저장
                     for (int i = 0; i < quantity; i++) {
@@ -720,8 +717,7 @@ static int printMain(void) {
         printf("5. 주문 조회\n");
         printf("6. 결제 처리\n");
         printf("7. 종료\n");
-        printf("메뉴 선택: ");
-        s = inputInt();
+        s = inputInt("메뉴 선택: ");
         if (s > 7 || s < 1) {
             printf("1~7 사이의 값을 입력해주세요.\n");
         }
