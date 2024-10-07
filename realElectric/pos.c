@@ -359,22 +359,24 @@ static void createOrder(FILE* foodFile) {
         return;
     }
 
-    // 메뉴 목록 출력
-    char line[100];  // 각 행을 저장할 문자열
+    // // 메뉴 목록 출력
+    // char line[100];  // 각 행을 저장할 문자열
     int firstNum, secondNum, price;
     char foodName[50];  // 음식 이름 저장
-    int line_count = 0;
+    // int line_count = 0;
 
-    printf("\n===== 판매 항목 목록 =====\n");
+    // printf("\n===== 판매 항목 목록 =====\n");
 
-    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
-    while (fgets(line, sizeof(line), foodFile)) {
-        sscanf(line, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price);  // 공백 유지
+    // rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+    // while (fgets(line, sizeof(line), foodFile)) {
+    //     sscanf(line, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price);  // 공백 유지
 
-        if (firstNum == 0) {  // 활성화된 메뉴만 표시
-            printf("%d. %s - %d\n", ++line_count, foodName, price);  // 메뉴 출력
-        }
-    }
+    //     if (firstNum == 0) {  // 활성화된 메뉴만 표시
+    //         printf("%d. %s - %d\n", ++line_count, foodName, price);  // 메뉴 출력
+    //     }
+    // }
+
+    printFoodList(foodFile);  // 메뉴 출력
 
     OrderedItem orderedItems[100];  // 최대 100개의 주문 항목을 저장할 배열
     int orderCount = 0;  // 실제 주문한 항목 개수
