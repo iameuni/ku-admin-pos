@@ -386,6 +386,9 @@ static void addToFoodList(FILE* foodFile) {
         int price = inputPrice();
 
         fseek(foodFile, 0, SEEK_END);  // 파일의 끝으로 이동
+        if (fseek(foodFile, -1, SEEK_END) == 0 && fgetc(foodFile) != '\n') {
+            fprintf(foodFile, "\n");
+        }
         fprintf(foodFile, "%d  %d    %s  %d\n", firstNum, secondNum, foodName, price);  // 공백 2칸, 4칸, 2칸 공백 적용
         printf("%s 이/가 추가되었습니다.\n", foodName);
 
