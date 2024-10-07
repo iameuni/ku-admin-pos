@@ -272,7 +272,7 @@ static bool checkDataIntegrity(FILE* foodFile) {
 // 7.2 판매 항목 선택 입력
 
 // 7.3.1 판매 항목명 입력
-static char* getFoodName() {
+static char* inputFoodName() {
     char* s = (char*)malloc(sizeof(char) * (MAX_INPUT + 2));
     if (s == NULL) {
         fprintf(stderr, "메모리 할당 실패\n");
@@ -318,9 +318,22 @@ static char* getFoodName() {
 }
 
 // 7.3.2 판매 항목가 입력
+static int inputPrice() {
+    int tableNumber;
+    while (1) {
+        printf("테이블 번호를 입력하세요 (1~5): ");
+        tableNumber = getInt();
+        if (tableNumber < 1 || tableNumber >5) {
+            printf("오류: 1~5사이의 번호를 입력하세요.\n");
+        }
+        else {
+            return tableNumber;
+        }
+    }
+}
 
 // 7.4.1 테이블 번호 입력
-static int getTableNumber() {
+static int inputTableNumber() {
     int tableNumber;
     while (1) {
         printf("테이블 번호를 입력하세요 (1~5): ");
@@ -365,7 +378,7 @@ static void addToFoodList(FILE* foodFile) {
     int secondNum = getLastSecondNumber(foodFile) + 1;
 
     printf("\n추가할 판매 항목 정보를 입력하세요(항목명은 알파벳만 허용)\n");
-    char* foodName = getFoodName();
+    char* foodName = inputFoodName();
 
     if (foodName != NULL) {
         printf("판매 항목가: ");
@@ -445,7 +458,7 @@ static void removeFoodItem(FILE* foodFile) {
 
 // 7.8 주문 생성 프롬프트
 static void createOrder(FILE* foodFile) {
-    int tableNumber = getTableNumber();  // 테이블 번호 입력 받기
+    int tableNumber = inputTableNumber();  // 테이블 번호 입력 받기
 
     // 테이블 파일 경로 설정 (테이블 고유 번호에 해당하는 파일 경로 생성)
     char tableFilePath[256];
@@ -548,7 +561,7 @@ static void createOrder(FILE* foodFile) {
 
 // 7.9 주문 조회 프롬프트
 static void printOrder() {
-    int tableNumber = getTableNumber();
+    int tableNumber = inputTableNumber();
 
     // 테이블 파일 경로 
     char tableFilePath[256];
@@ -611,7 +624,7 @@ static void printOrder() {
 
 // 7.10 결제 처리 프롬프트
 static void makePayment() {
-    int tableNumber = getTableNumber();
+    int tableNumber = inputTableNumber();
 
     // 테이블 파일 경로 
     char tableFilePath[256];
