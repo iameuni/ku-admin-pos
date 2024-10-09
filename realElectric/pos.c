@@ -467,7 +467,7 @@ static void removeFoodItem(FILE* foodFile) {
             continue;
         } else {
             fclose(tempFile);
-            fclose(foodFile);
+            fclose(foodFile); // 임시 파일로 교체 전 닫아야 함.
 
             // 원본 파일을 임시 파일로 대체
             remove(FILE_PATH);
@@ -493,29 +493,11 @@ static void createOrder(FILE* foodFile) {
         return;
     }
 
-    // // 메뉴 목록 출력
-    // char line[100];  // 각 행을 저장할 문자열
-    int firstNum, secondNum, price;
-    char foodName[50];  // 음식 이름 저장
-    // int line_count = 0;
+    printFoodList(foodFile);  // 판매 목록 출력
 
-    // printf("\n===== 판매 항목 목록 =====\n");
-
-    // rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
-    // while (fgets(line, sizeof(line), foodFile)) {
-    //     sscanf(line, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price);  // 공백 유지
-
-    //     if (firstNum == 0) {  // 활성화된 메뉴만 표시
-    //         printf("%d. %s - %d\n", ++line_count, foodName, price);  // 메뉴 출력
-    //     }
-    // }
-
-    printFoodList(foodFile);  // 메뉴 출력
-
-    OrderedItem orderedItems[100];  // 최대 100개의 주문 항목을 저장할 배열
+    int selection = -1;  // 판매 항목 선택 변수
     int orderCount = 0;  // 실제 주문한 항목 개수
-    int selection = -1;  // 메뉴 선택 변수
-    int validSelection = 0;  // 유효한 선택 여부
+    OrderedItem orderedItems[100];  // 최대 100개의 주문 항목을 저장할 배열
 
     while (selection != 0) {  // 0을 입력하면 주문이 끝남
         printf("<주문을 끝내려면 0을 입력하세요>\n");
@@ -527,9 +509,12 @@ static void createOrder(FILE* foodFile) {
             break;  // 0 입력 시 주문 종료
         }
 
-        // 메뉴가 유효한지 확인하기 위한 변수
-        int currentMenuIndex = 0;
-        validSelection = 0;  // 유효한 메뉴인지 확인하는 플래그
+        // 변수
+        int currentMenuIndex = 0; // 현재 읽힌 판매 항목 번호
+        int validSelection = 0;  // 유효한 메뉴인지 확인하는 플래그
+        int firstNum, secondNum, price;
+        char foodName[50];  // 음식 이름 저장
+
         rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
 
         // 파일을 다시 읽어 선택한 메뉴의 ID 찾기
@@ -538,7 +523,6 @@ static void createOrder(FILE* foodFile) {
                 currentMenuIndex++;
                 if (currentMenuIndex == selection) {  // 선택한 메뉴가 맞을 때
                     validSelection = 1;
-                    //printf("%s의 수량을 입력하세요: ", foodName);
                     int quantity = inputQuantity(); // 수량 입력받기
 
                     // 입력받은 수량만큼 메뉴 ID를 테이블 파일에 저장
