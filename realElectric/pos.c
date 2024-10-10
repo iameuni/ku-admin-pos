@@ -38,7 +38,7 @@ static void exitProgram() {
     exit(0);
 }
 
-// 고유 번호를 가져오는 함수 (7.6 판매 항목 추가 프롬프트에서 사용)
+// 마지막 판매 항목 고유 번호를 가져오는 함수 (7.6 판매 항목 추가 프롬프트에서 사용)
 int getLastSecondNumber(FILE* file) {
     int firstNum, secondNum, price;
     char foodName[50];
@@ -186,6 +186,91 @@ static int inputInt(const char* prompt, bool allowZero) {
     }
 }
 
+// 마지막 테이블 번호 반환하는 함수
+int getLastTableNumber() {
+    char filename[50];
+    int i = 1;
+
+    while (1) {
+        // 파일 이름 생성 (예: table/1.txt)
+        sprintf(filename, "%s/%d.txt", TABLE_FILE_PATH, i);
+
+        // 파일 오픈 시도
+        FILE *fp = fopen(filename, "r");
+
+        // 파일이 존재하지 않으면 반복 종료
+        if (fp == NULL) {
+            break;
+        } else {
+            fclose(fp); // 파일 닫기
+        }
+
+        i++;
+    }
+
+    // 마지막으로 존재했던 파일 번호 출력 (i는 1부터 시작하므로 1을 빼야 함)
+    //printf("1.txt부터 %d.txt까지 연속적으로 존재합니다.\n", i - 1);
+
+    return (i - 1);
+}
+
+// 테이블 추가 함수
+void createNewTable() {
+    int n = getLastTableNumber() + 1;
+    char filename[20]; // 파일 이름을 저장할 문자 배열
+
+    // 정수를 문자열로 변환하여 파일 이름 생성
+    sprintf(filename, "%s/%d.txt", TABLE_FILE_PATH, n);
+
+    // 파일 열기 (쓰기 모드)
+    FILE *fp = fopen(filename, "w");
+
+    // 파일 열기 실패 시 에러 메시지 출력
+    if (fp == NULL) {
+        printf("파일 생성 실패: %s\n", filename);
+        return;
+    }
+
+    // 파일 닫기
+    fclose(fp);
+}
+
+// 테이블 삭제 함수 (삭제하려는 테이블 데이터 파일이 비었는지 확인 후 삭제)
+int deleteTable(int n) {
+    char filename[20];
+    sprintf(filename, "%s/%d.txt", TABLE_FILE_PATH, n);
+
+    FILE *fp = fopen(filename, "r");
+    if (fp == NULL) {
+        // 파일 열기 실패
+        perror("fopen");
+        return -1;
+    }
+
+    int c;
+    int hasNonSpaceChar = 0;
+    while ((c = fgetc(fp)) != EOF) {
+        if (!isspace(c)) {
+            hasNonSpaceChar = 1;
+            break;
+        }
+    }
+
+    fclose(fp);
+
+    if (hasNonSpaceChar) {
+        // 공백이 아닌 문자가 존재
+        return -1;
+    } else {
+        // 공백만 있거나 아무 내용이 없음
+        if (remove(filename) != 0) {
+            // 파일 삭제 실패
+            perror("remove");
+            return -1;
+        }
+        return 0;
+    }
+}
 
 
 //////////////////// 기획서 기반 프롬프트 ////////////////////
