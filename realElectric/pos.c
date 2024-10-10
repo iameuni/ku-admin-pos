@@ -31,6 +31,13 @@ typedef struct {
 
 //////////////////// 기타 함수 ////////////////////
 
+// 프로그램 종료 기능
+static void exitProgram() {
+    printf("프로그램을 종료합니다.\n");
+    system("PAUSE");
+    exit(0);
+}
+
 // 고유 번호를 가져오는 함수 (7.6 판매 항목 추가 프롬프트에서 사용)
 int getLastSecondNumber(FILE* file) {
     int firstNum, secondNum, price;
@@ -78,7 +85,7 @@ void freeOrderItems(OrderItem* head) {
 
 // 텍스트 파일 특정 범위의 줄을 삭제하는 함수 (7.10 결제 처리 프롬프트에서 사용)
 int deleteLines(const char* filePath, int startLine, int endLine) {
-    FILE *fp_read, *fp_write;
+    FILE* fp_read, * fp_write;
     char line[1024];
     int currentLine = 1;
 
@@ -112,9 +119,9 @@ int deleteLines(const char* filePath, int startLine, int endLine) {
 }
 
 // 텍스트 파일의 내용을 복사해서 옮기는 함수 (7.10 결제 처리 프롬프트에서 사용)
-void copy_file(const char *src_file, const char *dest_file) {
-    FILE *src_fp = fopen(src_file, "r");
-    FILE *dest_fp = fopen(dest_file, "w");
+void copy_file(const char* src_file, const char* dest_file) {
+    FILE* src_fp = fopen(src_file, "r");
+    FILE* dest_fp = fopen(dest_file, "w");
     char buffer[1024];
 
     if (src_fp == NULL || dest_fp == NULL) {
@@ -184,7 +191,16 @@ static int inputInt(const char* prompt, bool allowZero) {
 //////////////////// 기획서 기반 프롬프트 ////////////////////
 
 // 7.1 데이터 파일 무결성 검사
-static bool checkDataIntegrity(FILE* foodFile) {
+static bool checkDataIntegrity() {
+
+    ///// 판매 항목 데이터 파일 열기 /////
+    FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
+    if (foodFile == NULL) {
+        printf("파일을 열 수 없습니다.\n");
+    }
+    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+    /////////////////////////////////////
+
     int item_ids[100];
     int item_count = 0;
     char line[256];
@@ -231,6 +247,7 @@ static bool checkDataIntegrity(FILE* foodFile) {
         item_ids[item_count++] = id;
         expected_id++;  // 다음 예상 ID 값
     }
+    fclose(foodFile);
 
     // 테이블 주문 파일들 검사
     for (int table = 1; table <= 5; table++) {
@@ -279,7 +296,7 @@ static int inputFoodNumber() {
     while (1) {
         foodNumber = inputInt("판매 항목 번호를 입력하세요: ", true);
         return foodNumber;
-        }
+    }
 }
 
 // 7.3.1 판매 항목명 입력
@@ -294,7 +311,8 @@ static char* inputFoodName() {
         printf("판매 항목명: ");
         if (fgets(s, MAX_INPUT + 2, stdin) == NULL) {
             printf("입력 오류 발생\n");
-        } else {
+        }
+        else {
             s[strcspn(s, "\n")] = '\0'; // \n을 제거
 
             // 앞 뒤 공백 제거
@@ -309,7 +327,8 @@ static char* inputFoodName() {
             int len = strlen(s);
             if (len < 1 || len > 20) {
                 printf("경고: 입력은 1이상 20이하이어야 합니다. 다시 입력해주세요.\n");
-            } else {
+            }
+            else {
                 // 알파벳 검사
                 int valid = 1;
                 for (int i = 0; s[i] != '\0'; i++) {
@@ -320,7 +339,8 @@ static char* inputFoodName() {
                 }
                 if (!valid) {
                     printf("경고: 항목명은 알파벳만 입력해야 합니다. 다시 입력해주세요.\n");
-                } else {
+                }
+                else {
                     return s;
                 }
             }
@@ -371,7 +391,17 @@ static int inputQuantity() {
 }
 
 // 7.5 판매 항목 조회 프롬프트
-static void printFoodList(FILE* foodFile) {
+static void printFoodList() {
+
+    ///// 판매 항목 데이터 파일 열기 /////
+    FILE* foodFile = fopen(FILE_PATH, "r"); // 읽기
+    if (foodFile == NULL) {
+        printf("파일을 열 수 없습니다.\n");
+    }
+    checkDataIntegrity(foodFile);
+    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+    /////////////////////////////////////
+
     char line[100]; // 각 행을 저장할 문자열
     int line_count = 0;
     int firstNum, secondNum, price;
@@ -379,7 +409,6 @@ static void printFoodList(FILE* foodFile) {
 
     printf("\n===== 판매 항목 목록 =====\n");
 
-    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
     while (fgets(line, sizeof(line), foodFile)) {
         sscanf(line, "%d  %d    %s  %d", &firstNum, &secondNum, food, &price);  // 공백 2칸, 4칸, 2칸 유지
 
@@ -391,10 +420,22 @@ static void printFoodList(FILE* foodFile) {
     if (line_count == 0) {
         printf("판매 중인 항목이 없습니다.\n");
     }
+
+    fclose(foodFile);
 }
 
 // 7.6 판매 항목 추가 프롬프트
-static void addToFoodList(FILE* foodFile) {
+static void addToFoodList() {
+
+    ///// 판매 항목 데이터 파일 열기 /////
+    FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
+    if (foodFile == NULL) {
+        printf("파일을 열 수 없습니다.\n");
+    }
+    checkDataIntegrity(foodFile);
+    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+    /////////////////////////////////////
+
     int firstNum = 0;
     int secondNum = getLastSecondNumber(foodFile) + 1;
 
@@ -416,14 +457,26 @@ static void addToFoodList(FILE* foodFile) {
     else {
         printf("메모리 할당 실패\n");
     }
+
+    fclose(foodFile);
 }
 
 // 7.7 판매 항목 제거 프롬프트
-static void removeFoodItem(FILE* foodFile) {
+static void removeFoodItem() {
 
-    printFoodList(foodFile);  // 현재 항목을 출력
+    ///// 판매 항목 데이터 파일 열기 /////
+    FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
+    if (foodFile == NULL) {
+        printf("파일을 열 수 없습니다.\n");
+    }
+    checkDataIntegrity(foodFile);
+    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+    /////////////////////////////////////
 
-    while(1){
+    printFoodList(); // 현재 판매 항목을 출력
+
+    while (1) {
+        rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
         FILE* tempFile = fopen("temp.txt", "w");
         if (tempFile == NULL) {
             printf("임시 파일을 열 수 없습니다.\n");
@@ -436,8 +489,6 @@ static void removeFoodItem(FILE* foodFile) {
         char foodName[50];
         int currentZeroIndex = 0;  // 0인 항목만 카운트
         int found = 0;
-
-        rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
 
         // 원본 파일에서 데이터를 읽고, 임시 파일로 복사하면서 상태를 변경
         while (fgets(line, sizeof(line), foodFile)) {
@@ -465,7 +516,8 @@ static void removeFoodItem(FILE* foodFile) {
             printf("해당 번호의 항목이 없습니다.\n");
             fclose(tempFile);
             continue;
-        } else {
+        }
+        else {
             fclose(tempFile);
             fclose(foodFile); // 임시 파일로 교체 전 닫아야 함.
 
@@ -479,7 +531,17 @@ static void removeFoodItem(FILE* foodFile) {
 }
 
 // 7.8 주문 생성 프롬프트
-static void createOrder(FILE* foodFile) {
+static void createOrder() {
+
+    ///// 판매 항목 데이터 파일 열기 /////
+    FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
+    if (foodFile == NULL) {
+        printf("파일을 열 수 없습니다.\n");
+    }
+    checkDataIntegrity(foodFile);
+    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+    /////////////////////////////////////
+
     int tableNumber = inputTableNumber();  // 테이블 번호 입력 받기
 
     // 테이블 파일 경로 설정 (테이블 고유 번호에 해당하는 파일 경로 생성)
@@ -493,7 +555,7 @@ static void createOrder(FILE* foodFile) {
         return;
     }
 
-    printFoodList(foodFile);  // 판매 목록 출력
+    printFoodList();  // 판매 목록 출력
 
     int selection = -1;  // 판매 항목 선택 변수
     int orderCount = 0;  // 실제 주문한 항목 개수
@@ -514,8 +576,6 @@ static void createOrder(FILE* foodFile) {
         int validSelection = 0;  // 유효한 메뉴인지 확인하는 플래그
         int firstNum, secondNum, price;
         char foodName[50];  // 음식 이름 저장
-
-        rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
 
         // 파일을 다시 읽어 선택한 메뉴의 ID 찾기
         while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
@@ -547,6 +607,7 @@ static void createOrder(FILE* foodFile) {
     }
 
     fclose(tableFile);
+    fclose(foodFile);
 
     // 최종 주문 결과 출력
     printf("\n%d번 테이블 ", tableNumber);
@@ -727,42 +788,31 @@ static int printMain(void) {
     }
 }
 
-// 7.11 메인 메뉴 프롬프트의 종료 기능
-static void exitProgram(FILE* foodFile) {
-    fclose(foodFile);
-    printf("프로그램을 종료합니다.\n");
-    exit(0);
-}
-
 // 프로그램 실행
 int main(void) {
-    FILE* foodFile;
-
     while (1) {
-        foodFile = fopen(FILE_PATH, "r+");  // 파일을 읽기 및 쓰기 모드로 열기
-        checkDataIntegrity(foodFile);
-        if (foodFile == NULL) {
-            printf("파일을 열 수 없습니다.\n");
-            return 1;
+
+        if(!checkDataIntegrity()) {
+            exitProgram();
         }
 
         int s = printMain();
         switch (s) {
         case 1:
             // 7.5 판매 항목 조회 프롬프트
-            printFoodList(foodFile);
+            printFoodList();
             break;
         case 2:
             // 7.6 판매 항목 추가 프롬프트
-            addToFoodList(foodFile);
+            addToFoodList();
             break;
         case 3:
             // 7.7 판매 항목 제거 프롬프트
-            removeFoodItem(foodFile);
+            removeFoodItem();
             break;
         case 4:
             // 7.8 주문 생성 프롬프트
-            createOrder(foodFile);
+            createOrder();
             break;
         case 5:
             // 7.9 주문 조회 프롬프트
@@ -774,13 +824,11 @@ int main(void) {
             break;
         case 7:
             // 7.11 메인 메뉴 프롬프트의 종료 기능
-            exitProgram(foodFile);
+            exitProgram();
             break;
         default:
             break;
         }
-
-        fclose(foodFile);
     }
 
     return 0;
