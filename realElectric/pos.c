@@ -21,12 +21,6 @@ typedef struct OrderItem {
     struct OrderItem* next;
 } OrderItem;
 
-// 7.8 주문 생성 프롬프트에서 사용되는 구조체
-typedef struct {
-    char foodName[50];
-    int quantity;
-} OrderedItem;
-
 
 
 //////////////////// 기타 함수 ////////////////////
@@ -617,19 +611,16 @@ static void removeFoodItem() {
 
 // 7.8 주문 생성 프롬프트
 static void createOrder() {
-
-    ///// 판매 항목 데이터 파일 열기 /////
     FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
     if (foodFile == NULL) {
         printf("파일을 열 수 없습니다.\n");
+        return;
     }
-    checkDataIntegrity(foodFile);
     rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
-    /////////////////////////////////////
 
     int tableNumber = inputTableNumber();  // 테이블 번호 입력 받기
 
-    // 테이블 파일 경로 설정 (테이블 고유 번호에 해당하는 파일 경로 생성)
+    // 테이블 파일 경로 설정
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
 
@@ -637,73 +628,90 @@ static void createOrder() {
     FILE* tableFile = fopen(tableFilePath, "a");
     if (tableFile == NULL) {
         printf("테이블 파일을 열 수 없습니다.\n");
+        fclose(foodFile);
         return;
     }
 
     printFoodList();  // 판매 목록 출력
 
     int selection = -1;  // 판매 항목 선택 변수
-    int orderCount = 0;  // 실제 주문한 항목 개수
-    OrderedItem orderedItems[100];  // 최대 100개의 주문 항목을 저장할 배열
+    OrderItem* orderList = NULL;
 
     while (selection != 0) {  // 0을 입력하면 주문이 끝남
         printf("<주문을 끝내려면 0을 입력하세요>\n");
-
         selection = inputFoodNumber();
 
-        // 주문 종료 처리
         if (selection == 0) {
             break;  // 0 입력 시 주문 종료
         }
 
-        // 변수
-        int currentMenuIndex = 0; // 현재 읽힌 판매 항목 번호
-        int validSelection = 0;  // 유효한 메뉴인지 확인하는 플래그
+        int currentMenuIndex = 0;
+        int validSelection = 0;
         int firstNum, secondNum, price;
-        char foodName[50];  // 음식 이름 저장
+        char foodName[50];
 
         // 파일을 다시 읽어 선택한 메뉴의 ID 찾기
         while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
-            if (firstNum == 0) {  // 활성화된 메뉴만 처리
+            if (firstNum == 0) {
                 currentMenuIndex++;
-                if (currentMenuIndex == selection) {  // 선택한 메뉴가 맞을 때
+                if (currentMenuIndex == selection) {
                     validSelection = 1;
                     int quantity = inputQuantity(); // 수량 입력받기
 
-                    // 입력받은 수량만큼 메뉴 ID를 테이블 파일에 저장
+                    // 수량만큼 반복해서 항목 추가
                     for (int i = 0; i < quantity; i++) {
-                        fprintf(tableFile, "%d\n", secondNum);  // 메뉴 ID(판매 항목 고유 번호) 저장
+                        orderList = addOrderItem(orderList, secondNum);
                     }
-
-                    // 주문 항목을 배열에 저장
-                    strcpy(orderedItems[orderCount].foodName, foodName);
-                    orderedItems[orderCount].quantity = quantity;
-                    orderCount++;
 
                     break;
                 }
             }
         }
 
-        // 유효하지 않은 메뉴 번호 처리
         if (!validSelection) {
             printf("해당하는 숫자의 선택지가 없습니다.\n");
         }
     }
 
+    // 주문 리스트를 테이블 파일에 저장
+    OrderItem* current = orderList;
+    while (current != NULL) {
+        for (int i = 0; i < current->quantity; i++) {
+            fprintf(tableFile, "%d\n", current->itemID);  // 메뉴 ID 저장
+        }
+        current = current->next;
+    }
+
     fclose(tableFile);
     fclose(foodFile);
 
-    // 최종 주문 결과 출력
+    // 최종 주문 결과 출력 (OrderItem 사용)
     printf("\n%d번 테이블 ", tableNumber);
-    for (int i = 0; i < orderCount; i++) {
-        printf("%s %d개", orderedItems[i].foodName, orderedItems[i].quantity);
-        if (i < orderCount - 1) {
-            printf(" ");  // 각 항목 사이에 공백 추가
+
+    current = orderList;
+    int itemCount = 0;
+    while (current != NULL) {
+        // 메뉴 정보 찾기
+        rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+        while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
+            if (firstNum == 0 && secondNum == current->itemID) {
+                if (itemCount > 0) {
+                    printf(" ");  // 각 항목 사이에 공백 추가
+                }
+                printf("%s %d개", foodName, current->quantity);
+                itemCount++;
+                break;
+            }
         }
+        current = current->next;
     }
+
     printf(" 주문완료되었습니다.\n");
+
+    // 메모리 해제
+    freeOrderItems(orderList);
 }
+
 
 // 7.9 주문 조회 프롬프트
 static void printOrder() {
