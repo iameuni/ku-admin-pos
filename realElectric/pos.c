@@ -19,33 +19,6 @@ typedef struct OrderItem {
 
 
 
-//////////////////// 프로토타입 선언 ////////////////////
-
-void exitProgram();
-int getLastSecondNumber(FILE* file);
-OrderItem* addOrderItem(OrderItem* head, int itemID);
-void freeOrderItems(OrderItem* head);
-int deleteLines(const char* filePath, int startLine, int endLine);
-int inputInt(const char* prompt, bool allowZero);
-int getLastTableNumber();
-void createNewTable();
-int deleteTable(int n);
-bool checkDataIntegrity();
-int inputFoodNumber();
-char* inputFoodName();
-int inputPrice();
-int inputTableNumber();
-int inputQuantity();
-void printFoodList();
-void addToFoodList();
-void removeFoodItem();
-void createOrder();
-void printOrder();
-void makePayment();
-int printMain();
-
-
-
 //////////////////// 기타 함수 ////////////////////
 
 // 프로그램 종료 기능
@@ -456,7 +429,7 @@ int inputTableNumber() {
     int tableNumber;
     int maxTableNumber = getLastTableNumber();
     while (1) {
-        tableNumber = inputInt("테이블 번호를 입력하세요 (1~5): ", false);
+        tableNumber = inputInt("테이블 번호를 입력하세요: ", false);
         if (tableNumber < 1 || tableNumber > maxTableNumber) {
             printf("오류: 1~%d사이의 번호를 입력하세요.\n", maxTableNumber);
         }
