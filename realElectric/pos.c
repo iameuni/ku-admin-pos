@@ -132,27 +132,11 @@ int deleteLines(const char* filePath, int startLine, int endLine) {
     fclose(fp_read);
     fclose(fp_write);
 
+    remove(filePath);
+    rename("temp.txt", filePath);
+
     printf("%d번째 줄부터 %d번째 줄까지 삭제되었습니다.\n", startLine, endLine);
     return 0;
-}
-
-// 텍스트 파일의 내용을 복사해서 옮기는 함수 (7.10 결제 처리 프롬프트에서 사용)
-void copy_file(const char* src_file, const char* dest_file) {
-    FILE* src_fp = fopen(src_file, "r");
-    FILE* dest_fp = fopen(dest_file, "w");
-    char buffer[1024];
-
-    if (src_fp == NULL || dest_fp == NULL) {
-        fprintf(stderr, "파일 열기 실패\n");
-        return;
-    }
-
-    while (fgets(buffer, sizeof(buffer), src_fp) != NULL) {
-        fputs(buffer, dest_fp);
-    }
-
-    fclose(src_fp);
-    fclose(dest_fp);
 }
 
 // 정수 입력 함수
@@ -743,7 +727,6 @@ void createOrder() {
     fclose(foodFile);
 }
 
-
 // 7.9 주문 조회 프롬프트
 void printOrder() {
     int tableNumber = inputTableNumber();
@@ -874,20 +857,20 @@ void makePayment() {
         current = current->next;
     }
 
+    
+    // 메모리 해제
+    freeOrderItems(orderList);
+    fclose(foodFile);
+    fclose(tableFile);
+
     // 주문 내역 삭제
     deleteLines(tableFilePath, 1, counter);
-    copy_file("temp.txt", tableFilePath);
 
     if (foundItems == 0) {
         printf("\n%d번 테이블은 결제가 불가능합니다.\n", tableNumber);
     }
 
     printf("\n%d번 테이블 %d원 결제완료 되었습니다.\n", tableNumber, totalPrice);
-
-    // 메모리 해제
-    freeOrderItems(orderList);
-    fclose(tableFile);
-    fclose(foodFile);
 }
 
 // 7.11 메인 메뉴 프롬프트
