@@ -639,6 +639,9 @@ static void createOrder() {
     int selection = -1;  // 판매 항목 선택 변수
     OrderItem* orderList = NULL;
 
+    int firstNum, secondNum, price;
+    char foodName[50];
+
     while (selection != 0) {  // 0을 입력하면 주문이 끝남
         printf("<주문을 끝내려면 0을 입력하세요>\n");
         selection = inputFoodNumber();
@@ -649,10 +652,9 @@ static void createOrder() {
 
         int currentMenuIndex = 0;
         int validSelection = 0;
-        int firstNum, secondNum, price;
-        char foodName[50];
 
         // 파일을 다시 읽어 선택한 메뉴의 ID 찾기
+        rewind(foodFile); 
         while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
             if (firstNum == 0) {
                 currentMenuIndex++;
@@ -684,13 +686,11 @@ static void createOrder() {
         current = current->next;
     }
 
-    fclose(tableFile);
-    fclose(foodFile);
-
     // 최종 주문 결과 출력 (OrderItem 사용)
     printf("\n%d번 테이블 ", tableNumber);
 
     current = orderList;
+
     int itemCount = 0;
     while (current != NULL) {
         // 메뉴 정보 찾기
@@ -712,6 +712,10 @@ static void createOrder() {
 
     // 메모리 해제
     freeOrderItems(orderList);
+    freeOrderItems(current);
+
+    fclose(tableFile);
+    fclose(foodFile);
 }
 
 
