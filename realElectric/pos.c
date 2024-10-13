@@ -1,4 +1,4 @@
-﻿#define _CRT_SECURE_NO_WARNINGS
+﻿﻿#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -190,12 +190,13 @@ int getLastTableNumber() {
         sprintf(filename, "%s/%d.txt", TABLE_FILE_PATH, i);
 
         // 파일 오픈 시도
-        FILE *fp = fopen(filename, "r");
+        FILE* fp = fopen(filename, "r");
 
         // 파일이 존재하지 않으면 반복 종료
         if (fp == NULL) {
             break;
-        } else {
+        }
+        else {
             fclose(fp); // 파일 닫기
         }
 
@@ -217,7 +218,7 @@ void createNewTable() {
     sprintf(filename, "%s/%d.txt", TABLE_FILE_PATH, n);
 
     // 파일 열기 (쓰기 모드)
-    FILE *fp = fopen(filename, "w");
+    FILE* fp = fopen(filename, "w");
 
     // 파일 열기 실패 시 에러 메시지 출력
     if (fp == NULL) {
@@ -234,7 +235,7 @@ int deleteTable(int n) {
     char filename[20];
     sprintf(filename, "%s/%d.txt", TABLE_FILE_PATH, n);
 
-    FILE *fp = fopen(filename, "r");
+    FILE* fp = fopen(filename, "r");
     if (fp == NULL) {
         // 파일 열기 실패
         perror("fopen");
@@ -255,7 +256,8 @@ int deleteTable(int n) {
     if (hasNonSpaceChar) {
         // 공백이 아닌 문자가 존재
         return -1;
-    } else {
+    }
+    else {
         // 공백만 있거나 아무 내용이 없음
         if (remove(filename) != 0) {
             // 파일 삭제 실패
@@ -280,15 +282,15 @@ static bool checkDataIntegrity() {
     rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
     /////////////////////////////////////
 
-    int item_ids[100];
-    int item_count = 0;
+    int itemIds[100];
+    int itemCount = 0;
     char line[256];
 
     // 판매 항목 데이터 읽기
-    int line_number = 0;
-    int expected_id = 1;  // 예상되는 ID 값 (1부터 시작)
-    while (fgets(line, sizeof(line), foodFile) && item_count < 100) {
-        line_number++;
+    int lineNumber = 0;
+    int expectedId = 1;  // 예상되는 ID 값 (1부터 시작)
+    while (fgets(line, sizeof(line), foodFile) && itemCount < 100) {
+        lineNumber++;
         int first_num, id;
         char name[50];
         int price;
@@ -310,61 +312,61 @@ static bool checkDataIntegrity() {
         if (sscanf(ptr, "%d", &price) != 1) continue;
 
         // 고유 번호 중복 검사
-        for (int i = 0; i < item_count; i++) {
-            if (item_ids[i] == id) {
-                printf("판매 항목 데이터 파일 %d번째 줄과 %d번째 줄에서 고유 번호 중복이 발생했습니다. 프로그램을 종료합니다.\n", i + 1, line_number);
+        for (int i = 0; i < itemCount; i++) {
+            if (itemIds[i] == id) {
+                printf("판매 항목 데이터 파일 %d번째 줄과 %d번째 줄에서 고유 번호 중복이 발생했습니다. 프로그램을 종료합니다.\n", i + 1, lineNumber);
                 return false;
             }
         }
 
         // 고유 번호 순차적 증가 검사
-        if (id != expected_id) {
+        if (id != expectedId) {
             printf("판매 항목 데이터 파일의 고유 번호가 올바른 순서로 증가하지 않습니다. 프로그램을 종료합니다.\n");
             return false;
         }
 
-        item_ids[item_count++] = id;
-        expected_id++;  // 다음 예상 ID 값
+        itemIds[itemCount++] = id;
+        expectedId++;  // 다음 예상 ID 값
     }
     fclose(foodFile);
 
     // 테이블 주문 파일들 검사
     for (int table = 1; table <= 5; table++) {
-        char table_file_name[256];
-        snprintf(table_file_name, sizeof(table_file_name), "%s/%d.txt", TABLE_FILE_PATH, table);
+        char tableFileName[256];
+        snprintf(tableFileName, sizeof(tableFileName), "%s/%d.txt", TABLE_FILE_PATH, table);
 
-        FILE* table_file = fopen(table_file_name, "r");
-        if (!table_file) {
+        FILE* tableFile = fopen(tableFileName, "r");
+        if (!tableFile) {
             printf("%d번 테이블 주문 파일을 열 수 없습니다.\n", table);
             return false;
         }
 
-        int table_line_number = 0;
-        while (fgets(line, sizeof(line), table_file)) {
-            table_line_number++;
-            int sale_item_id;
-            if (sscanf(line, "%d", &sale_item_id) == 1) {
+        int tableLineNumber = 0;
+        while (fgets(line, sizeof(line), tableFile)) {
+            tableLineNumber++;
+            int saleItemId;
+            if (sscanf(line, "%d", &saleItemId) == 1) {
                 bool found = false;
-                for (int i = 0; i < item_count; i++) {
-                    if (item_ids[i] == sale_item_id) {
+                for (int i = 0; i < itemCount; i++) {
+                    if (itemIds[i] == saleItemId) {
                         found = true;
                         break;
                     }
                 }
                 if (!found) {
                     printf("테이블 데이터 파일의 %d번째 줄의 판매 항목 고유 번호 %d는 올바른 판매 항목 고유 번호가 아닙니다. 프로그램을 종료합니다.\n",
-                        table_line_number, sale_item_id);
-                    fclose(table_file);
+                        tableLineNumber, saleItemId);
+                    fclose(tableFile);
                     return false;
                 }
             }
             else {
-                printf("테이블 데이터 파일의 %d번째 줄에서 올바른 형식의 판매 항목 고유 번호를 찾을 수 없습니다. 프로그램을 종료합니다.\n", table_line_number);
-                fclose(table_file);
+                printf("테이블 데이터 파일의 %d번째 줄에서 올바른 형식의 판매 항목 고유 번호를 찾을 수 없습니다. 프로그램을 종료합니다.\n", tableLineNumber);
+                fclose(tableFile);
                 return false;
             }
         }
-        fclose(table_file);
+        fclose(tableFile);
     }
     return true;
 }
@@ -885,7 +887,7 @@ static int printMain(void) {
 int main(void) {
     while (1) {
 
-        if(!checkDataIntegrity()) {
+        if (!checkDataIntegrity()) {
             exitProgram();
         }
 
