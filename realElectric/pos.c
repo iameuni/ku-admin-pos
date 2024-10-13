@@ -26,7 +26,6 @@ int getLastSecondNumber(FILE* file);
 OrderItem* addOrderItem(OrderItem* head, int itemID);
 void freeOrderItems(OrderItem* head);
 int deleteLines(const char* filePath, int startLine, int endLine);
-void copy_file(const char* src_file, const char* dest_file);
 int inputInt(const char* prompt, bool allowZero);
 int getLastTableNumber();
 void createNewTable();
@@ -455,10 +454,11 @@ int inputPrice() {
 // 7.4.1 테이블 번호 입력
 int inputTableNumber() {
     int tableNumber;
+    int maxTableNumber = getLastTableNumber();
     while (1) {
         tableNumber = inputInt("테이블 번호를 입력하세요 (1~5): ", false);
-        if (tableNumber < 1 || tableNumber >5) {
-            printf("오류: 1~5사이의 번호를 입력하세요.\n");
+        if (tableNumber < 1 || tableNumber > maxTableNumber) {
+            printf("오류: 1~%d사이의 번호를 입력하세요.\n", maxTableNumber);
         }
         else {
             return tableNumber;
