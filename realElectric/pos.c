@@ -291,14 +291,14 @@ static bool checkDataIntegrity() {
     int expectedId = 1;  // 예상되는 ID 값 (1부터 시작)
     while (fgets(line, sizeof(line), foodFile) && itemCount < 100) {
         lineNumber++;
-        int first_num, id;
+        int firstNum, id;
         char name[50];
         int price;
 
         // 줄의 시작부터 첫 번째와 두 번째 숫자를 찾습니다.
         char* ptr = line;
         while (*ptr && isspace(*ptr)) ptr++; // 앞쪽 공백 건너뛰기
-        if (sscanf(ptr, "%d", &first_num) != 1) continue;
+        if (sscanf(ptr, "%d", &firstNum) != 1) continue;
         while (*ptr && !isspace(*ptr)) ptr++; // 첫 번째 숫자 건너뛰기
         while (*ptr && isspace(*ptr)) ptr++; // 중간 공백 건너뛰기
         if (sscanf(ptr, "%d", &id) != 1) continue;
