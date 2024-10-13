@@ -10,11 +10,7 @@
 #define FILE_PATH "foodlist.txt" // 파일 경로 설정
 #define TABLE_FILE_PATH "table" //테이블 폴더 경로 설정
 
-
-
 //////////////////// 구조체 선언 ////////////////////
-
-//주문할 수 있는 개수/판매 항목 목록 개수 제한이 없어서 메모리 할당
 typedef struct OrderItem {
     int itemID;
     int quantity;
@@ -23,10 +19,38 @@ typedef struct OrderItem {
 
 
 
+//////////////////// 프로토타입 선언 ////////////////////
+
+void exitProgram();
+int getLastSecondNumber(FILE* file);
+OrderItem* addOrderItem(OrderItem* head, int itemID);
+void freeOrderItems(OrderItem* head);
+int deleteLines(const char* filePath, int startLine, int endLine);
+void copy_file(const char* src_file, const char* dest_file);
+int inputInt(const char* prompt, bool allowZero);
+int getLastTableNumber();
+void createNewTable();
+int deleteTable(int n);
+bool checkDataIntegrity();
+int inputFoodNumber();
+char* inputFoodName();
+int inputPrice();
+int inputTableNumber();
+int inputQuantity();
+void printFoodList();
+void addToFoodList();
+void removeFoodItem();
+void createOrder();
+void printOrder();
+void makePayment();
+int printMain();
+
+
+
 //////////////////// 기타 함수 ////////////////////
 
 // 프로그램 종료 기능
-static void exitProgram() {
+void exitProgram() {
     printf("프로그램을 종료합니다.\n");
     system("PAUSE");
     exit(0);
@@ -132,7 +156,7 @@ void copy_file(const char* src_file, const char* dest_file) {
 }
 
 // 정수 입력 함수
-static int inputInt(const char* prompt, bool allowZero) {
+int inputInt(const char* prompt, bool allowZero) {
     char n[MAX_INPUT + 2];
     char* endptr;
     long num;
@@ -269,10 +293,11 @@ int deleteTable(int n) {
 }
 
 
+
 //////////////////// 기획서 기반 프롬프트 ////////////////////
 
 // 7.1 데이터 파일 무결성 검사
-static bool checkDataIntegrity() {
+bool checkDataIntegrity() {
 
     ///// 판매 항목 데이터 파일 열기 /////
     FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
@@ -372,7 +397,7 @@ static bool checkDataIntegrity() {
 }
 
 // 7.2 판매 항목 선택 입력 *주의* 이 함수는 의미 규칙을 검사하지 않습니다.
-static int inputFoodNumber() {
+int inputFoodNumber() {
     int foodNumber;
     while (1) {
         foodNumber = inputInt("판매 항목 번호를 입력하세요: ", true);
@@ -381,7 +406,7 @@ static int inputFoodNumber() {
 }
 
 // 7.3.1 판매 항목명 입력
-static char* inputFoodName() {
+char* inputFoodName() {
     char* s = (char*)malloc(sizeof(char) * (MAX_INPUT + 2));
     if (s == NULL) {
         fprintf(stderr, "메모리 할당 실패\n");
@@ -430,7 +455,7 @@ static char* inputFoodName() {
 }
 
 // 7.3.2 판매 항목가 입력
-static int inputPrice() {
+int inputPrice() {
     int price;
     while (1) {
         price = inputInt("판매 항목가: ", false);
@@ -444,7 +469,7 @@ static int inputPrice() {
 }
 
 // 7.4.1 테이블 번호 입력
-static int inputTableNumber() {
+int inputTableNumber() {
     int tableNumber;
     while (1) {
         tableNumber = inputInt("테이블 번호를 입력하세요 (1~5): ", false);
@@ -458,7 +483,7 @@ static int inputTableNumber() {
 }
 
 // 7.4.2 수량 입력
-static int inputQuantity() {
+int inputQuantity() {
     int quantity;
     while (1) {
         quantity = inputInt("수량을 입력하세요: ", false);
@@ -472,7 +497,7 @@ static int inputQuantity() {
 }
 
 // 7.5 판매 항목 조회 프롬프트
-static void printFoodList() {
+void printFoodList() {
 
     ///// 판매 항목 데이터 파일 열기 /////
     FILE* foodFile = fopen(FILE_PATH, "r"); // 읽기
@@ -506,7 +531,7 @@ static void printFoodList() {
 }
 
 // 7.6 판매 항목 추가 프롬프트
-static void addToFoodList() {
+void addToFoodList() {
 
     ///// 판매 항목 데이터 파일 열기 /////
     FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
@@ -543,7 +568,7 @@ static void addToFoodList() {
 }
 
 // 7.7 판매 항목 제거 프롬프트
-static void removeFoodItem() {
+void removeFoodItem() {
 
     ///// 판매 항목 데이터 파일 열기 /////
     FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
@@ -612,7 +637,7 @@ static void removeFoodItem() {
 }
 
 // 7.8 주문 생성 프롬프트
-static void createOrder() {
+void createOrder() {
     FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
     if (foodFile == NULL) {
         printf("파일을 열 수 없습니다.\n");
@@ -720,7 +745,7 @@ static void createOrder() {
 
 
 // 7.9 주문 조회 프롬프트
-static void printOrder() {
+void printOrder() {
     int tableNumber = inputTableNumber();
 
     // 테이블 파일 경로 
@@ -783,7 +808,7 @@ static void printOrder() {
 }
 
 // 7.10 결제 처리 프롬프트
-static void makePayment() {
+void makePayment() {
     int tableNumber = inputTableNumber();
 
     // 테이블 파일 경로 
@@ -866,7 +891,7 @@ static void makePayment() {
 }
 
 // 7.11 메인 메뉴 프롬프트
-static int printMain(void) {
+int printMain() {
     int s;
     while (1) {
         printf("\n메인 메뉴\n");
