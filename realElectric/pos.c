@@ -1,4 +1,4 @@
-﻿﻿#define _CRT_SECURE_NO_WARNINGS
+﻿#define _CRT_SECURE_NO_WARNINGS
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -253,23 +253,7 @@ int deleteTable(int n) {
 //////////////////// 기획서 기반 프롬프트 ////////////////////
 
 // 7.1 데이터 파일 무결성 검사
-bool checkDataIntegrity() {
-
-    ///// 판매 항목 데이터 파일 열기 /////
-    FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
-    if (foodFile == NULL) {
-        printf("파일을 열 수 없습니다.\n");
-    }
-    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
-    /////////////////////////////////////
-
-    int itemIds[100];
-    int itemCount = 0;
-    char line[256];
-
-    // 판매 항목 데이터 읽기
-    int lineNumber = 0;
-    int expectedId = 1;  // 예상되는 ID 값 (1부터 시작)
+static bool foodIntegrity(char* line, FILE* foodFile, int itemCount, int lineNumber, int* itemIds, int expectedId) {
     while (fgets(line, sizeof(line), foodFile) && itemCount < 100) {
         lineNumber++;
         int firstNum, id;
@@ -310,8 +294,9 @@ bool checkDataIntegrity() {
         expectedId++;  // 다음 예상 ID 값
     }
     fclose(foodFile);
-
-    // 테이블 주문 파일들 검사
+    return true;
+}
+static bool tableIntegrity(char* line, int itemCount, int lineNumber, int* itemIds) {
     for (int table = 1; table <= 5; table++) {
         char tableFileName[256];
         snprintf(tableFileName, sizeof(tableFileName), "%s/%d.txt", TABLE_FILE_PATH, table);
@@ -350,6 +335,29 @@ bool checkDataIntegrity() {
         fclose(tableFile);
     }
     return true;
+}
+static bool checkDataIntegrity() {
+
+    ///// 판매 항목 데이터 파일 열기 /////
+    FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
+    if (foodFile == NULL) {
+        printf("파일을 열 수 없습니다.\n");
+    }
+    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+    /////////////////////////////////////
+
+    int itemIds[100];
+    int itemCount = 0;
+    char line[256];
+
+    // 판매 항목 데이터 읽기
+    int lineNumber = 0;
+    int expectedId = 1;  // 예상되는 ID 값 (1부터 시작)
+
+    bool b = foodIntegrity(line, foodFile, itemCount, lineNumber, itemIds, expectedId);
+    // 테이블 주문 파일들 검사
+    b = tableIntegrity(line, itemCount, lineNumber, itemIds);
+    return b;
 }
 
 // 7.2 판매 항목 선택 입력 *주의* 이 함수는 의미 규칙을 검사하지 않습니다.
