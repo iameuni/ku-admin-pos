@@ -594,118 +594,13 @@ void removeFoodItem() {
     }
 }
 
-// 7.8 주문 생성 프롬프트
-void createOrder() {
-    FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
-    if (foodFile == NULL) {
-        printf("파일을 열 수 없습니다.\n");
-        return;
-    }
-    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
 
-    int tableNumber = inputTableNumber();  // 테이블 번호 입력 받기
 
-    // 테이블 파일 경로 설정
-    char tableFilePath[256];
-    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
-
-    // 테이블 파일 열기
-    FILE* tableFile = fopen(tableFilePath, "a");
-    if (tableFile == NULL) {
-        printf("테이블 파일을 열 수 없습니다.\n");
-        fclose(foodFile);
-        return;
-    }
-
-    printFoodList();  // 판매 목록 출력
-
-    int selection = -1;  // 판매 항목 선택 변수
-    OrderItem* orderList = NULL;
-
-    int firstNum, secondNum, price;
-    char foodName[50];
-
-    while (selection != 0) {  // 0을 입력하면 주문이 끝남
-        printf("<주문을 끝내려면 0을 입력하세요>\n");
-        selection = inputFoodNumber();
-
-        if (selection == 0) {
-            break;  // 0 입력 시 주문 종료
-        }
-
-        int currentMenuIndex = 0;
-        int validSelection = 0;
-
-        // 파일을 다시 읽어 선택한 메뉴의 ID 찾기
-        rewind(foodFile); 
-        while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
-            if (firstNum == 0) {
-                currentMenuIndex++;
-                if (currentMenuIndex == selection) {
-                    validSelection = 1;
-                    int quantity = inputQuantity(); // 수량 입력받기
-
-                    // 수량만큼 반복해서 항목 추가
-                    for (int i = 0; i < quantity; i++) {
-                        orderList = addOrderItem(orderList, secondNum);
-                    }
-
-                    break;
-                }
-            }
-        }
-
-        if (!validSelection) {
-            printf("해당하는 숫자의 선택지가 없습니다.\n");
-        }
-    }
-
-    // 주문 리스트를 테이블 파일에 저장
-    OrderItem* current = orderList;
-    while (current != NULL) {
-        for (int i = 0; i < current->quantity; i++) {
-            fprintf(tableFile, "%d\n", current->itemID);  // 메뉴 ID 저장
-        }
-        current = current->next;
-    }
-
-    // 최종 주문 결과 출력 (OrderItem 사용)
-    printf("\n%d번 테이블 ", tableNumber);
-
-    current = orderList;
-
-    int itemCount = 0;
-    while (current != NULL) {
-        // 메뉴 정보 찾기
-        rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
-        while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
-            if (firstNum == 0 && secondNum == current->itemID) {
-                if (itemCount > 0) {
-                    printf(" ");  // 각 항목 사이에 공백 추가
-                }
-                printf("%s %d개", foodName, current->quantity);
-                itemCount++;
-                break;
-            }
-        }
-        current = current->next;
-    }
-
-    printf(" 주문완료되었습니다.\n");
-
-    // 메모리 해제
-    freeOrderItems(orderList);
-    freeOrderItems(current);
-
-    fclose(tableFile);
-    fclose(foodFile);
-}
-
-// 주문 내역이 있는 테이블 조회
-void listTablesWithOrders(int* tablesWithOrders, int* orderCount) {
+// 주문 내역이 있는 테이블 또는 결제 가능한 테이블 조회
+void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* message) {
     *orderCount = 0;
 
-    printf("주문 내역이 있는 테이블 번호: {");
+    printf("%s: {", message); // 메시지 출력
 
     bool first = true;
     for (int table = 1; table <= 5; table++) { // 테이블 증감함수 구현 이후 수정
@@ -801,14 +696,125 @@ void inputMultipleTablesForPayment(int* selectedTables, int* selectedCount, int*
     }
 }
 
+// 7.8 주문 생성 프롬프트
+void createOrder() {
 
+    // 주문 가능한 테이블 목록 표시
+    int tablesWithOrders[5];  // 주문 내역이 있는 테이블을 저장할 배열
+    int orderCount = 0;
+    listTablesWithOrders(tablesWithOrders, &orderCount, "주문 내역이 있는 테이블 번호");  // 주문이 있는 테이블을 확인하고 표시
+
+    FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
+    if (foodFile == NULL) {
+        printf("파일을 열 수 없습니다.\n");
+        return;
+    }
+    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+
+    int tableNumber = inputTableNumber();  // 테이블 번호 입력 받기
+
+    // 테이블 파일 경로 설정
+    char tableFilePath[256];
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+
+    // 테이블 파일 열기
+    FILE* tableFile = fopen(tableFilePath, "a");
+    if (tableFile == NULL) {
+        printf("테이블 파일을 열 수 없습니다.\n");
+        fclose(foodFile);
+        return;
+    }
+
+    printFoodList();  // 판매 목록 출력
+
+    int selection = -1;  // 판매 항목 선택 변수
+    OrderItem* orderList = NULL;
+
+    int firstNum, secondNum, price;
+    char foodName[50];
+
+    while (selection != 0) {  // 0을 입력하면 주문이 끝남
+        printf("<주문을 끝내려면 0을 입력하세요>\n");
+        selection = inputFoodNumber();
+
+        if (selection == 0) {
+            break;  // 0 입력 시 주문 종료
+        }
+
+        int currentMenuIndex = 0;
+        int validSelection = 0;
+
+        // 파일을 다시 읽어 선택한 메뉴의 ID 찾기
+        rewind(foodFile);
+        while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
+            if (firstNum == 0) {
+                currentMenuIndex++;
+                if (currentMenuIndex == selection) {
+                    validSelection = 1;
+                    int quantity = inputQuantity(); // 수량 입력받기
+
+                    // 수량만큼 반복해서 항목 추가
+                    for (int i = 0; i < quantity; i++) {
+                        orderList = addOrderItem(orderList, secondNum);
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        if (!validSelection) {
+            printf("해당하는 숫자의 선택지가 없습니다.\n");
+        }
+    }
+
+    // 주문 리스트를 테이블 파일에 저장
+    OrderItem* current = orderList;
+    while (current != NULL) {
+        for (int i = 0; i < current->quantity; i++) {
+            fprintf(tableFile, "%d\n", current->itemID);  // 메뉴 ID 저장
+        }
+        current = current->next;
+    }
+
+    // 최종 주문 결과 출력 (OrderItem 사용)
+    printf("\n%d번 테이블 ", tableNumber);
+
+    current = orderList;
+
+    int itemCount = 0;
+    while (current != NULL) {
+        // 메뉴 정보 찾기
+        rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+        while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
+            if (firstNum == 0 && secondNum == current->itemID) {
+                if (itemCount > 0) {
+                    printf(" ");  // 각 항목 사이에 공백 추가
+                }
+                printf("%s %d개", foodName, current->quantity);
+                itemCount++;
+                break;
+            }
+        }
+        current = current->next;
+    }
+
+    printf(" 주문완료되었습니다.\n");
+
+    // 메모리 해제
+    freeOrderItems(orderList);
+    freeOrderItems(current);
+
+    fclose(tableFile);
+    fclose(foodFile);
+}
 
 // 7.9 주문 조회 프롬프트
 void printOrder() {
     // 주문 가능한 테이블 목록 표시
     int tablesWithOrders[5];  // 주문 내역이 있는 테이블을 저장할 배열
     int orderCount = 0;
-    listTablesWithOrders(tablesWithOrders, &orderCount);  // 주문이 있는 테이블을 확인하고 표시
+    listTablesWithOrders(tablesWithOrders, &orderCount, "주문 내역이 있는 테이블 번호");  // 주문이 있는 테이블을 확인하고 표시
 
     int tableNumber = inputTableNumber();
 
@@ -879,7 +885,7 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
     int tablesWithOrders[5];  // 주문 내역이 있는 테이블 번호를 저장할 배열
     int orderCount = 0;       // 주문 내역이 있는 테이블 수를 저장할 변수
 
-    listTablesWithOrders(tablesWithOrders, &orderCount);  // 주문 내역이 있는 테이블을 표시하고, 결과를 가져옴
+    listTablesWithOrders(tablesWithOrders, &orderCount, "결제 가능한 테이블 번호");  // 주문 내역이 있는 테이블을 표시하고, 결과를 가져옴
 
     int selectedTables[5];
     int selectedCount = 0;
@@ -962,7 +968,6 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
             printf("\n%d번 테이블은 결제가 불가능합니다.\n", tableNumber);
         }
         else {
-            printf("\n%d번 테이블 %d원 결제 완료되었습니다.\n", tableNumber, totalPrice);
             combinedTotal += totalPrice;  // 결제 금액을 합산
         }
     }
@@ -978,9 +983,13 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
         fgets(input, sizeof(input), stdin);
         int paymentAmount = atoi(input);
 
-        if (paymentAmount <= 0) {
-            printf("오류: 0 또는 음수는 입력할 수 없습니다.\n");
+        if (paymentAmount < 0) {
+            printf("오류: 음수는 입력할 수 없습니다.\n");
             continue;
+        }
+        else if (paymentAmount == 0) {
+            printf("결제 중단.\n");
+            break;
         }
         else if (paymentAmount > remainingBalance) {
             printf("오류: 결제할 금액보다 큽니다.\n");
