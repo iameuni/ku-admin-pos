@@ -744,7 +744,7 @@ void createOrder() {
     }
     rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
 
-    int tableNumber = inputTableNumber(-1);  // 테이블 번호 입력 받기
+    int tableNumber = inputTableNumber(false);  // 테이블 번호 입력 받기
 
     // 테이블 파일 경로 설정
     char tableFilePath[256];
@@ -849,7 +849,7 @@ void printOrder() {
     int orderCount = 0;
     listTablesWithOrders(tablesWithOrders, &orderCount, "주문 내역이 있는 테이블 번호");  // 주문이 있는 테이블을 확인하고 표시
 
-    int tableNumber = inputTableNumber(-1);
+    int tableNumber = inputTableNumber(false);
 
     // 테이블 파일 경로 
     char tableFilePath[256];
