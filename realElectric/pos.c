@@ -1005,6 +1005,7 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
         else {
             printf("%d원 분할 결제 완료되었습니다. 남은 금액: %d원\n", paymentAmount, remainingBalance);
         }
+        int totalPayment = combinedTotal - remainingBalance; // 누적 결제 금액
     }
 
     // 전체 결제가 완료된 후 각 테이블의 주문 내역 삭제
@@ -1015,6 +1016,7 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
             deleteLines(tableFilePath, 1, counters[i]);  // 각 테이블 파일의 모든 줄을 삭제
         }
     }
+    
 }
 
 
