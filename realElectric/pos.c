@@ -610,10 +610,20 @@ void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* me
 
 // 결제할 테이블 번호 입력 프롬프트
 void inputMultipleTablesForPayment(int* selectedTables, int* selectedCount, int* tablesWithOrders, int orderCount) {
+    
     *selectedCount = 0;
 
-    printf("테이블 번호를 입력하세요 {}: ");
     while (true) {
+        // 현재 선택된 테이블 번호 출력
+        printf("테이블 번호를 입력하세요 {");
+        for (int i = 0; i < *selectedCount; i++) {
+            printf("%d", selectedTables[i]);
+            if (i < *selectedCount - 1) {
+                printf(", ");
+            }
+        }
+        printf("}: ");
+
         int tableNumber = inputTableNumber(true); // 결제 처리용으로 호출
 
         // -1을 반환하면 엔터 입력
@@ -659,16 +669,6 @@ void inputMultipleTablesForPayment(int* selectedTables, int* selectedCount, int*
                 (*selectedCount)++;
             }
         }
-
-        // 현재 선택된 테이블 번호 출력
-        printf("선택된 테이블 번호: {");
-        for (int i = 0; i < *selectedCount; i++) {
-            printf("%d", selectedTables[i]);
-            if (i < *selectedCount - 1) {
-                printf(", ");
-            }
-        }
-        printf("}\n테이블 번호를 입력하세요 {}: ");
     }
 }
 
