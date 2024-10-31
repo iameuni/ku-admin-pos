@@ -131,6 +131,12 @@ int inputInt(const char* prompt, bool allowZero) {
                 char* start = n;
                 char* end = n + strlen(n) - 1;
                 while (isspace((unsigned char)*start)) start++;
+
+                // 빈 입력 처리
+                if (*start == '\0') {
+                    return -1; // 엔터가 눌렸을 경우 -1 반환
+                }
+
                 if (*start == '0' && !allowZero) {
                     printf("오류: 0으로 시작하는 수는 입력할 수 없습니다.\n");
                 }
@@ -426,16 +432,43 @@ int inputPrice() {
 }
 
 // 7.4.1 테이블 번호 입력
-int inputTableNumber() {
+int inputTableNumber(bool paymentMode) {
     int tableNumber;
-    int maxTableNumber = getLastTableNumber();
+    int maxTableNumber = getLastTableNumber(); // 최대 테이블 번호를 가져옴
+
     while (1) {
-        tableNumber = inputInt("테이블 번호를 입력하세요: ", false);
-        if (tableNumber < 1 || tableNumber > maxTableNumber) {
-            printf("오류: 1~%d사이의 번호를 입력하세요.\n", maxTableNumber);
+        // 사용자에게 입력 요청
+        if (paymentMode) { // 결제 모드
+            printf("");
+        }
+        else { // 일반 모드
+            printf("테이블 번호를 입력하세요 (1~%d): ", maxTableNumber);
+        }
+
+        char input[10];
+        fgets(input, sizeof(input), stdin);
+        input[strcspn(input, "\n")] = 0; // 개행 문자 제거
+
+        // 결제 모드일 때 엔터 입력 처리
+        if (paymentMode && strcmp(input, "") == 0) {
+            return -1; // 엔터를 눌렀을 경우 -1 반환
+        }
+
+        // 결제 모드일 때 0 입력 처리
+        if (paymentMode && strcmp(input, "0") == 0) {
+            return 0; // 결제용 테이블 입력
+        }
+
+        // 일반 모드에서 입력된 테이블 번호 처리
+        tableNumber = atoi(input);
+        if (!paymentMode && (tableNumber < 1 || tableNumber > maxTableNumber)) {
+            printf("오류: 1~%d 사이의 번호를 입력하세요.\n", maxTableNumber);
+        }
+        else if (paymentMode && (tableNumber < 0 || tableNumber > maxTableNumber)) {
+            printf("오류: 결제 모드에서는 0과 1~%d 사이의 번호만 입력 가능합니다.\n", maxTableNumber);
         }
         else {
-            return tableNumber;
+            return tableNumber; // 유효한 테이블 번호 반환
         }
     }
 }
@@ -631,70 +664,124 @@ void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* me
 
 // 결제할 테이블 번호 입력 프롬프트
 void inputMultipleTablesForPayment(int* selectedTables, int* selectedCount, int* tablesWithOrders, int orderCount) {
-    char input[10];
-    int tableNumber;
     *selectedCount = 0;
 
     printf("테이블 번호를 입력하세요 {}: ");
     while (true) {
-        fgets(input, sizeof(input), stdin);
-        input[strcspn(input, "\n")] = 0;
+        int tableNumber = inputTableNumber(true); // 결제 처리용으로 호출
 
-        if (strcmp(input, "") == 0) {
-            if (*selectedCount > 0) break;
+        // -1을 반환하면 엔터 입력
+        if (tableNumber == -1) {
+            if (*selectedCount > 0) break; // 이미 선택된 테이블이 있다면 종료
             printf("테이블 번호를 입력하세요 {}: ");
             continue;
         }
 
-        if (strcmp(input, "0") == 0) {
+        // 0 입력 시 선택 취소
+        if (tableNumber == 0) {
             printf("선택을 취소하고 메인 메뉴로 돌아갑니다.\n");
-            *selectedCount = 0;
+            *selectedCount = 0; // 선택된 테이블 수를 초기화
             return;
         }
 
-        tableNumber = atoi(input);
-        if (tableNumber < 1 || tableNumber > 5) {  // 테이블 증감 함수 구현 이후 수정
-            printf("오류: 존재하지 않는 테이블 번호입니다.\n");
+        // 유효한 테이블 번호인지 확인
+        bool validOrder = false;
+        for (int i = 0; i < orderCount; i++) {
+            if (tablesWithOrders[i] == tableNumber) {
+                validOrder = true;
+                break;
+            }
+        }
+
+        if (!validOrder) {
+            printf("경고: %d번 테이블에는 주문 내역이 없습니다.\n", tableNumber);
         }
         else {
-            bool validOrder = false;
-            for (int i = 0; i < orderCount; i++) {
-                if (tablesWithOrders[i] == tableNumber) {
-                    validOrder = true;
+            // 이미 선택된 테이블 번호인지 확인
+            bool alreadySelected = false;
+            for (int i = 0; i < *selectedCount; i++) {
+                if (selectedTables[i] == tableNumber) {
+                    printf("경고: 이미 입력한 테이블 번호입니다.\n");
+                    alreadySelected = true;
                     break;
                 }
             }
 
-            if (!validOrder) {
-                printf("경고: %d번 테이블에는 주문 내역이 없습니다.\n", tableNumber);
-            }
-            else {
-                bool alreadySelected = false;
-                for (int i = 0; i < *selectedCount; i++) {
-                    if (selectedTables[i] == tableNumber) {
-                        printf("경고: 이미 입력한 테이블 번호입니다.\n");
-                        alreadySelected = true;
-                        break;
-                    }
-                }
-
-                if (!alreadySelected) {
-                    selectedTables[*selectedCount] = tableNumber;
-                    (*selectedCount)++;
-                }
+            // 새 테이블 번호 추가
+            if (!alreadySelected) {
+                selectedTables[*selectedCount] = tableNumber;
+                (*selectedCount)++;
             }
         }
 
-        printf("테이블 번호를 입력하세요 {");
+        // 현재 선택된 테이블 번호 출력
+        printf("선택된 테이블 번호: {");
         for (int i = 0; i < *selectedCount; i++) {
             printf("%d", selectedTables[i]);
             if (i < *selectedCount - 1) {
                 printf(", ");
             }
         }
-        printf("}: ");
+        printf("}\n테이블 번호를 입력하세요 {}: ");
     }
 }
+
+// 결제 처리
+void processPayment(int combinedTotal, int* selectedTables, int selectedCount, int* counters) {
+    int remainingBalance = combinedTotal; // 남은 결제금액
+    int paymentSuccess = 0; // 결제 성공 여부 체크 변수
+
+    printf("전체 결제 금액: %d원\n", combinedTotal);
+
+    // 전체 금액에 대해 결제 처리
+    while (remainingBalance > 0) {
+        printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
+        int paymentAmount = inputInt(NULL, true); // 정수 입력 함수 사용
+
+        // 입력이 비어있다면 전체 금액 결제
+        if (paymentAmount == -1) { // 엔터키만 입력된 경우
+            printf("전체 금액이 결제 완료되었습니다.\n");
+            remainingBalance = 0; // 결제 완료
+            paymentSuccess = 1;  // 결제가 완료됨을 표시
+            break;
+        }
+
+        // 유효성 검사
+        if (paymentAmount < 0) {
+            printf("오류: 음수는 입력할 수 없습니다.\n");
+            continue;
+        }
+        else if (paymentAmount == 0) { // 0 입력 시 결제 중단
+            printf("결제 중단.\n");
+            break;
+        }
+        else if (paymentAmount > remainingBalance) {
+            printf("오류: 결제할 금액보다 큽니다.\n");
+            continue;
+        }
+
+        remainingBalance -= paymentAmount;
+        if (remainingBalance == 0) {
+            printf("전체 금액이 결제 완료되었습니다.\n");
+            paymentSuccess = 1;  // 결제가 완료됨을 표시
+            break;
+        }
+        else {
+            printf("%d원 분할 결제 완료되었습니다. 남은 금액: %d원\n", paymentAmount, remainingBalance);
+        }
+    }
+
+    // 전체 결제가 완료된 후 각 테이블의 주문 내역 삭제
+    if (paymentSuccess) {
+        for (int i = 0; i < selectedCount; i++) {
+            char tableFilePath[256];
+            snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, selectedTables[i]);
+            deleteLines(tableFilePath, 1, counters[i]);  // 각 테이블 파일의 모든 줄을 삭제
+        }
+    }
+}
+
+
 
 // 7.8 주문 생성 프롬프트
 void createOrder() {
@@ -711,7 +798,7 @@ void createOrder() {
     }
     rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
 
-    int tableNumber = inputTableNumber();  // 테이블 번호 입력 받기
+    int tableNumber = inputTableNumber(-1);  // 테이블 번호 입력 받기
 
     // 테이블 파일 경로 설정
     char tableFilePath[256];
@@ -816,7 +903,7 @@ void printOrder() {
     int orderCount = 0;
     listTablesWithOrders(tablesWithOrders, &orderCount, "주문 내역이 있는 테이블 번호");  // 주문이 있는 테이블을 확인하고 표시
 
-    int tableNumber = inputTableNumber();
+    int tableNumber = inputTableNumber(-1);
 
     // 테이블 파일 경로 
     char tableFilePath[256];
@@ -890,11 +977,7 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
     int selectedTables[5];
     int selectedCount = 0;
 
-    inputMultipleTablesForPayment(selectedTables, &selectedCount, tablesWithOrders, orderCount); // 수정된 함수 호출
-    if (selectedCount == 0) {
-        printf("결제할 테이블이 선택되지 않았습니다. 메인 메뉴로 돌아갑니다.\n");
-        return;
-    }
+    inputMultipleTablesForPayment(selectedTables, &selectedCount, tablesWithOrders, orderCount); // 결제 테이블번호 입력 프롬프트 함수 호출
 
     int combinedTotal = 0;  // 선택된 테이블들의 전체 결제 금액
     int paymentSuccess = 0; // 결제 성공 여부 체크 변수
@@ -972,50 +1055,9 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
         }
     }
 
-    printf("전체 결제 금액: %d원\n", combinedTotal);
-
-    // 전체 금액에 대해 결제 처리
-    int remainingBalance = combinedTotal; // 남은 결제금액(추후 중간 결산때 이용할 수 있는 변수)
-    while (remainingBalance > 0) {
-        printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
-
-        char input[10];
-        fgets(input, sizeof(input), stdin);
-        int paymentAmount = atoi(input);
-
-        if (paymentAmount < 0) {
-            printf("오류: 음수는 입력할 수 없습니다.\n");
-            continue;
-        }
-        else if (paymentAmount == 0) {
-            printf("결제 중단.\n");
-            break;
-        }
-        else if (paymentAmount > remainingBalance) {
-            printf("오류: 결제할 금액보다 큽니다.\n");
-            continue;
-        }
-
-        remainingBalance -= paymentAmount;
-        if (remainingBalance == 0) {
-            printf("전체 금액이 결제 완료되었습니다.\n");
-            paymentSuccess = 1;  // 결제가 완료됨을 표시
-            break;
-        }
-        else {
-            printf("%d원 분할 결제 완료되었습니다. 남은 금액: %d원\n", paymentAmount, remainingBalance);
-        }
-        int totalPayment = combinedTotal - remainingBalance; // 누적 결제 금액
-    }
-
-    // 전체 결제가 완료된 후 각 테이블의 주문 내역 삭제
-    if (paymentSuccess) {
-        for (int i = 0; i < selectedCount; i++) {
-            char tableFilePath[256];
-            snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, selectedTables[i]);
-            deleteLines(tableFilePath, 1, counters[i]);  // 각 테이블 파일의 모든 줄을 삭제
-        }
-    }
+    // 결제 처리 함수 호출
+    processPayment(combinedTotal, selectedTables, selectedCount, counters);
+    
     
 }
 
