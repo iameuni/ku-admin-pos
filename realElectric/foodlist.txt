@@ -1,0 +1,5 @@
+0 1 Lasagna  15000
+0 2 ChocolateCake  500
+0 3 CocaCola  2500
+1 4 Pepsi  3000
+0 5 Bibimbab 12000
