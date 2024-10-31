@@ -377,16 +377,13 @@ int inputPrice() {
 }
 
 // 7.4.1 테이블 번호 입력
-int inputTableNumber(bool paymentMode) {
+int inputTableNumber(bool paymentMode, int* selectedTables, int selectedCount) {
     int tableNumber;
     int maxTableNumber = getLastTableNumber(); // 최대 테이블 번호를 가져옴
 
     while (1) {
         // 사용자에게 입력 요청
-        if (paymentMode) { // 결제 모드
-            printf("");
-        }
-        else { // 일반 모드
+        if (!paymentMode) { // 일반 모드
             printf("테이블 번호를 입력하세요 (1~%d): ", maxTableNumber);
         }
 
@@ -394,14 +391,37 @@ int inputTableNumber(bool paymentMode) {
         fgets(input, sizeof(input), stdin);
         input[strcspn(input, "\n")] = 0; // 개행 문자 제거
 
-        // 결제 모드일 때 엔터 입력 처리
-        if (paymentMode && strcmp(input, "") == 0) {
-            return -1; // 엔터를 눌렀을 경우 -1 반환
+        // 결제 모드일 때 스페이스와 엔터 입력 처리
+        if (paymentMode && (strcmp(input, "") == 0 || strspn(input, " ") == strlen(input))) {
+            return -1; // 엔터를 눌렀거나 스페이스로만 이루어진 경우 -1 반환
         }
 
         // 결제 모드일 때 0 입력 처리
         if (paymentMode && strcmp(input, "0") == 0) {
             return 0; // 결제용 테이블 입력
+        }
+
+        // 숫자인지 체크
+        int isNumeric = 1; // 기본적으로 숫자라고 가정
+        for (int i = 0; input[i] != '\0'; i++) {
+            if (!isdigit(input[i]) && !(paymentMode && (input[i] == '-'))) {
+                isNumeric = 0; // 숫자가 아닌 문자가 발견됨
+                break;
+            }
+        }
+
+        if (!isNumeric) {
+            printf("오류: 숫자만 입력 가능합니다.\n");
+            // 오류 발생 후 현재 선택된 테이블 번호 출력
+            printf("테이블 번호를 입력하세요 {");
+            for (int i = 0; i < selectedCount; i++) {
+                printf("%d", selectedTables[i]);
+                if (i < selectedCount - 1) {
+                    printf(", ");
+                }
+            }
+            printf("}: ");
+            continue; // 입력 오류 발생 시 다시 입력을 받음
         }
 
         // 일반 모드에서 입력된 테이블 번호 처리
@@ -411,6 +431,16 @@ int inputTableNumber(bool paymentMode) {
         }
         else if (paymentMode && (tableNumber < 0 || tableNumber > maxTableNumber)) {
             printf("오류: 결제 모드에서는 0과 1~%d 사이의 번호만 입력 가능합니다.\n", maxTableNumber);
+            // 오류 발생 후 현재 선택된 테이블 번호 출력
+            printf("테이블 번호를 입력하세요 {");
+            for (int i = 0; i < selectedCount; i++) {
+                printf("%d", selectedTables[i]);
+                if (i < selectedCount - 1) {
+                    printf(", ");
+                }
+            }
+            printf("}: ");
+            continue; // 입력 오류 발생 시 다시 입력을 받음
         }
         else {
             return tableNumber; // 유효한 테이블 번호 반환
@@ -624,12 +654,11 @@ void inputMultipleTablesForPayment(int* selectedTables, int* selectedCount, int*
         }
         printf("}: ");
 
-        int tableNumber = inputTableNumber(true); // 결제 처리용으로 호출
+        int tableNumber = inputTableNumber(true, selectedTables, *selectedCount); // 결제 처리용으로 호출
 
         // -1을 반환하면 엔터 입력
         if (tableNumber == -1) {
             if (*selectedCount > 0) break; // 이미 선택된 테이블이 있다면 종료
-            printf("테이블 번호를 입력하세요 {}: ");
             continue;
         }
 
@@ -651,6 +680,7 @@ void inputMultipleTablesForPayment(int* selectedTables, int* selectedCount, int*
 
         if (!validOrder) {
             printf("경고: %d번 테이블에는 주문 내역이 없습니다.\n", tableNumber);
+            continue;
         }
         else {
             // 이미 선택된 테이블 번호인지 확인
@@ -744,7 +774,7 @@ void createOrder() {
     }
     rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
 
-    int tableNumber = inputTableNumber(false);  // 테이블 번호 입력 받기
+    int tableNumber = inputTableNumber(false,NULL,0);  // 테이블 번호 입력 받기
 
     // 테이블 파일 경로 설정
     char tableFilePath[256];
@@ -849,7 +879,7 @@ void printOrder() {
     int orderCount = 0;
     listTablesWithOrders(tablesWithOrders, &orderCount, "주문 내역이 있는 테이블 번호");  // 주문이 있는 테이블을 확인하고 표시
 
-    int tableNumber = inputTableNumber(false);
+    int tableNumber = inputTableNumber(false,NULL,0);
 
     // 테이블 파일 경로 
     char tableFilePath[256];
