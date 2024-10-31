@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="pos.c">
+    <ClCompile Include="..\..\..\..\..\OneDrive\바탕 화면\pos.c">
       <Filter>소스 파일</Filter>
     </ClCompile>
   </ItemGroup>
