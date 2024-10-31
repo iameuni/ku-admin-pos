@@ -697,6 +697,35 @@ void processPayment(int combinedTotal, int* selectedTables, int selectedCount, i
             printf("오류: 음수는 입력할 수 없습니다.\n");
             continue;
         }
+        printf("}\n테이블 번호를 입력하세요 {}: ");
+    }
+}
+
+// 결제 처리
+void processPayment(int combinedTotal, int* selectedTables, int selectedCount, int* counters) {
+    int remainingBalance = combinedTotal; // 남은 결제금액
+    int paymentSuccess = 0; // 결제 성공 여부 체크 변수
+
+    printf("전체 결제 금액: %d원\n", combinedTotal);
+
+    // 전체 금액에 대해 결제 처리
+    while (remainingBalance > 0) {
+        printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
+        int paymentAmount = inputInt(NULL, true); // 정수 입력 함수 사용
+
+        // 입력이 비어있다면 전체 금액 결제
+        if (paymentAmount == -1) { // 엔터키만 입력된 경우
+            printf("전체 금액이 결제 완료되었습니다.\n");
+            remainingBalance = 0; // 결제 완료
+            paymentSuccess = 1;  // 결제가 완료됨을 표시
+            break;
+        }
+
+        // 유효성 검사
+        if (paymentAmount < 0) {
+            printf("오류: 음수는 입력할 수 없습니다.\n");
+            continue;
+        }
         else if (paymentAmount == 0) { // 0 입력 시 결제 중단
             printf("결제 중단.\n");
             break;
