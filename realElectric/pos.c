@@ -112,7 +112,7 @@ int deleteLines(const char* filePath, int startLine, int endLine) {
 }
 
 // 정수 입력 함수
-int inputInt(const char* prompt, bool allowZero) {
+int inputInt(const char* prompt, bool allowZero, int remainingBalance) {
     char n[MAX_INPUT + 2];
     char* endptr;
     long num;
@@ -121,11 +121,16 @@ int inputInt(const char* prompt, bool allowZero) {
         if (prompt != NULL) printf("%s", prompt);
         if (fgets(n, sizeof(n), stdin) == NULL) {
             printf("입력 오류가 발생했습니다. 다시 시도해주세요.\n");
+            if (remainingBalance > 0) printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
+            continue;
         }
+
         else {
             n[strcspn(n, "\n")] = '\0';
             if (strlen(n) > MAX_INPUT) {
                 printf("경고: %d자 이하로 숫자를 입력해주세요.\n", MAX_INPUT);
+                if (remainingBalance > 0) printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
+                continue;
             }
             else {
                 char* start = n;
@@ -137,9 +142,13 @@ int inputInt(const char* prompt, bool allowZero) {
                     return -1; // 엔터가 눌렸을 경우 -1 반환
                 }
 
-                if (*start == '0' && !allowZero) {
+                if (start[0] == '0' && strlen(start) > 1) {
                     printf("오류: 0으로 시작하는 수는 입력할 수 없습니다.\n");
+                    if (remainingBalance > 0) printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
+                    continue;
                 }
+
+
                 else if (*start == '\0') {
                     printf("오류: 입력값이 비어있습니다.\n");
                 }
@@ -151,10 +160,14 @@ int inputInt(const char* prompt, bool allowZero) {
 
                     if (*endptr != '\0') {
                         printf("오류: 음이 아닌 정수를 입력해주세요.\n");
+                        if (remainingBalance > 0) printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
+                        continue;
                     }
                     else {
                         if (num < 0 || num > INT_MAX) {
                             printf("오류: %d 이하의 음이 아닌 정수를 입력해주세요.\n", INT_MAX);
+                            if (remainingBalance > 0) printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
+                            continue;
                         }
                         else {
                             return (int)num;
@@ -308,7 +321,7 @@ bool checkDataIntegrity() {
 int inputFoodNumber() {
     int foodNumber;
     while (1) {
-        foodNumber = inputInt("판매 항목 번호를 입력하세요: ", true);
+        foodNumber = inputInt("판매 항목 번호를 입력하세요: ", true,NULL);
         return foodNumber;
     }
 }
@@ -366,7 +379,7 @@ char* inputFoodName() {
 int inputPrice() {
     int price;
     while (1) {
-        price = inputInt("판매 항목가: ", false);
+        price = inputInt("판매 항목가: ", false,NULL);
         if (price >= 1 && price <= 9999999) {
             return price;
         }
@@ -452,7 +465,7 @@ int inputTableNumber(bool paymentMode, int* selectedTables, int selectedCount) {
 int inputQuantity() {
     int quantity;
     while (1) {
-        quantity = inputInt("수량을 입력하세요: ", false);
+        quantity = inputInt("수량을 입력하세요: ", false,NULL);
         if (quantity < 1 || quantity >99) {
             printf("오류: 1~99사이의 수량을 입력하세요.\n");
         }
@@ -712,7 +725,8 @@ void processPayment(int combinedTotal, int* selectedTables, int selectedCount, i
     // 전체 금액에 대해 결제 처리
     while (remainingBalance > 0) {
         printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
-        int paymentAmount = inputInt(NULL, true); // 정수 입력 함수 사용
+        int paymentAmount = inputInt(NULL, true,remainingBalance); // 정수 입력 함수 사용
+
 
         // 입력이 비어있다면 전체 금액 결제
         if (paymentAmount == -1) { // 엔터키만 입력된 경우
@@ -1319,7 +1333,7 @@ int printMain() {
         printf("6. 결제 처리\n");
         printf("7. 테이블 증감\n");
         printf("8. 종료\n");
-        s = inputInt("메뉴 선택: ", false);
+        s = inputInt("메뉴 선택: ", false,NULL);
         if (s > 8 || s < 1) {
             printf("1~8 사이의 값을 입력해주세요.\n");
         }
