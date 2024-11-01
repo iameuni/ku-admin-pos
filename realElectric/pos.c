@@ -576,8 +576,6 @@ void removeFoodItem() {
     }
 }
 
-
-
 // 주문 내역이 있는 테이블 또는 결제 가능한 테이블 조회
 void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* message) {
     *orderCount = 0;
@@ -610,73 +608,6 @@ void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* me
         }
     }
     printf("}\n");
-}
-
-// 결제할 테이블 번호 입력 프롬프트
-void inputMultipleTablesForPayment(int* selectedTables, int* selectedCount, int* tablesWithOrders, int orderCount) {
-    
-    *selectedCount = 0;
-
-    while (true) {
-        // 현재 선택된 테이블 번호 출력
-        printf("테이블 번호를 입력하세요 {");
-        for (int i = 0; i < *selectedCount; i++) {
-            printf("%d", selectedTables[i]);
-            if (i < *selectedCount - 1) {
-                printf(", ");
-            }
-        }
-        printf("}: ");
-
-        int tableNumber = inputTableNumber(true); // 결제 처리용으로 호출
-
-        // -1을 반환하면 엔터 입력
-        if (tableNumber == -1) {
-            if (*selectedCount > 0) break; // 이미 선택된 테이블이 있다면 종료
-            continue;
-        }
-
-        if (tableNumber < -1) {
-            continue;
-        }
-
-        // 0 입력 시 선택 취소
-        if (tableNumber == 0) {
-            printf("선택을 취소하고 메인 메뉴로 돌아갑니다.\n");
-            *selectedCount = 0; // 선택된 테이블 수를 초기화
-            return;
-        }
-
-        // 유효한 테이블 번호인지 확인
-        bool validOrder = false;
-        for (int i = 0; i < orderCount; i++) {
-            if (tablesWithOrders[i] == tableNumber) {
-                validOrder = true;
-                break;
-            }
-        }
-        if (!validOrder) {
-            printf("경고: %d번 테이블에는 주문 내역이 없습니다.\n", tableNumber);
-            continue;
-        }
-        else {
-            // 이미 선택된 테이블 번호인지 확인
-            bool alreadySelected = false;
-            for (int i = 0; i < *selectedCount; i++) {
-                if (selectedTables[i] == tableNumber) {
-                    printf("경고: 이미 입력한 테이블 번호입니다.\n");
-                    alreadySelected = true;
-                    break;
-                }
-            }
-
-            // 새 테이블 번호 추가
-            if (!alreadySelected) {
-                selectedTables[*selectedCount] = tableNumber;
-                (*selectedCount)++;
-            }
-        }
-    }
 }
 
 // 7.8 주문 생성 프롬프트
@@ -872,11 +803,8 @@ void printOrder() {
     fclose(foodFile);
 }
 
-
-
-
 // 7.10 결제 처리 프롬프트
-void makePayment() { // 테이블 증감함수 구현 후 수정 
+void makePayment() {
     int tablesWithOrders[5];  // 주문 내역이 있는 테이블 번호를 저장할 배열
     int orderCount = 0;       // 주문 내역이 있는 테이블 수를 저장할 변수
 
@@ -885,7 +813,68 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
     int selectedTables[5];
     int selectedCount = 0;
 
-    inputMultipleTablesForPayment(selectedTables, &selectedCount, tablesWithOrders, orderCount); // 결제 테이블번호 입력 프롬프트 함수 호출
+    // inputMultipleTablesForPayment 결제할 테이블 번호들 입력
+    while (true) {
+        // 현재 선택된 테이블 번호 출력
+        printf("테이블 번호를 입력하세요 {");
+        for (int i = 0; i < selectedCount; i++) {
+            printf("%d", selectedTables[i]);
+            if (i < selectedCount - 1) {
+                printf(", ");
+            }
+        }
+        printf("}: ");
+
+        int input = inputTableNumber(true); // 결제 처리용으로 호출
+
+        // -1을 반환하면 엔터 입력
+        if (input == -1) {
+            if (selectedCount > 0) break; // 이미 선택된 테이블이 있다면 종료
+            continue;
+        }
+
+        if (input < -1) {
+            continue;
+        }
+
+        // 0 입력 시 선택 취소
+        if (input == 0) {
+            printf("선택을 취소하고 메인 메뉴로 돌아갑니다.\n");
+            selectedCount = 0; // 선택된 테이블 수를 초기화
+            return;
+        }
+
+        // 유효한 테이블 번호인지 확인
+        bool validOrder = false;
+        for (int i = 0; i < orderCount; i++) {
+            if (tablesWithOrders[i] == input) {
+                validOrder = true;
+                break;
+            }
+        }
+        if (!validOrder) {
+            printf("경고: %d번 테이블에는 주문 내역이 없습니다.\n", input);
+            continue;
+        }
+        else {
+            // 이미 선택된 테이블 번호인지 확인
+            bool alreadySelected = false;
+            for (int i = 0; i < selectedCount; i++) {
+                if (selectedTables[i] == input) {
+                    alreadySelected = true;
+                    break;
+                }
+            }
+            if (alreadySelected) {
+                printf("경고: 이미 선택된 테이블 번호입니다.\n");
+                continue;
+            }
+            else {
+                selectedTables[selectedCount] = input;
+                selectedCount++;
+            }
+        }
+    }
 
     int combinedTotal = 0;  // 선택된 테이블들의 전체 결제 금액
     int counters[5];        // 각 선택된 테이블의 줄 수를 저장할 배열
@@ -962,7 +951,7 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
         }
     }
 
-    // 결제 처리 함수 호출
+    // 결제 처리
     int remainingBalance = combinedTotal; // 남은 결제금액
     int paymentSuccess = 0; // 결제 성공 여부 체크 변수
 
@@ -1017,9 +1006,6 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
 
 
 }
-
-
-
 
 // 7.11 테이블 증감 프롬프트
 // 테이블 데이터 파일 생성 함수
@@ -1283,9 +1269,6 @@ void adjustTables() {
         return;
     }
 }
-
-
-
 
 // 7.12 메인 메뉴 프롬프트
 int printMain() {
