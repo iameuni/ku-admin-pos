@@ -175,7 +175,7 @@ int inputInt(const char* prompt, bool allowZero) {
     }
 }
 
-// 마지막 테이블 번호 반환하는 함수
+// 마지막 (가장 큰) 테이블 번호 반환하는 함수
 int getLastTableNumber() {
     int maxNumber = 0;
     for (int i = 1; i <= 10; i++) {
@@ -193,6 +193,39 @@ int getLastTableNumber() {
     return maxNumber;
 }
 
+// 주문 내역이 있는 테이블 또는 결제 가능한 테이블 출력 함수
+void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* message) {
+    *orderCount = 0;
+
+    printf("%s: {", message); // 메시지 출력
+
+    bool first = true;
+    int maxTableNum = getLastTableNumber();
+    for (int table = 1; table <= maxTableNum; table++) {
+        char tableFileName[256];
+        snprintf(tableFileName, sizeof(tableFileName), "%s\\%d.txt", TABLE_FILE_PATH, table);
+
+        FILE* tableFile = fopen(tableFileName, "r");
+        if (tableFile != NULL) {
+            int c;
+            while ((c = fgetc(tableFile)) != EOF) {
+                if (!isspace(c)) { // If there's an order
+                    if (!first) {
+                        printf(", ");
+                    }
+                    printf("%d", table);
+                    first = false;
+
+                    tablesWithOrders[*orderCount] = table; // Store table number
+                    (*orderCount)++; // Increment order count
+                    break;
+                }
+            }
+            fclose(tableFile);
+        }
+    }
+    printf("}\n");
+}
 
 
 //////////////////// 기획서 기반 프롬프트 ////////////////////
@@ -436,6 +469,43 @@ int inputQuantity() {
     }
 }
 
+// 7.4.3 결제 금액 입력
+int inputPaymentAmount(int remainingBalance) {
+    while (1)
+    {
+        printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
+        int paymentAmount = inputInt(NULL, true); // 정수 입력 함수 사용
+
+        // 입력이 비어있다면 전체 금액 결제
+        if (paymentAmount == -1) { // 엔터키만 입력된 경우
+            printf("전체 금액이 결제 완료되었습니다.\n");
+            remainingBalance = 0; // 전액 결제 완료
+            return remainingBalance;
+        }
+
+        // 유효성 검사
+        if (paymentAmount < -1) {
+            continue;
+        } else if (paymentAmount == 0) { // 0 입력 시 결제 중단
+            printf("결제 중단.\n");
+            return -1;
+        } else if (paymentAmount > remainingBalance) {
+            printf("오류: 결제할 금액보다 큽니다.\n");
+            continue;
+        }
+
+        remainingBalance -= paymentAmount;
+        if (remainingBalance == 0) {
+            printf("전체 금액이 결제 완료되었습니다.\n");
+            remainingBalance = 0; // 전액 결제 완료
+            return remainingBalance;
+        } else {
+            printf("%d원 분할 결제 완료되었습니다. 남은 금액: %d원\n", paymentAmount, remainingBalance);
+            return remainingBalance;
+        }
+    }
+}
+
 // 7.5 판매 항목 조회 프롬프트
 void printFoodList() {
 
@@ -574,40 +644,6 @@ void removeFoodItem() {
             break;
         }
     }
-}
-
-// 주문 내역이 있는 테이블 또는 결제 가능한 테이블 조회
-void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* message) {
-    *orderCount = 0;
-
-    printf("%s: {", message); // 메시지 출력
-
-    bool first = true;
-    int maxTableNum = getLastTableNumber();
-    for (int table = 1; table <= maxTableNum; table++) {
-        char tableFileName[256];
-        snprintf(tableFileName, sizeof(tableFileName), "%s\\%d.txt", TABLE_FILE_PATH, table);
-
-        FILE* tableFile = fopen(tableFileName, "r");
-        if (tableFile != NULL) {
-            int c;
-            while ((c = fgetc(tableFile)) != EOF) {
-                if (!isspace(c)) { // If there's an order
-                    if (!first) {
-                        printf(", ");
-                    }
-                    printf("%d", table);
-                    first = false;
-
-                    tablesWithOrders[*orderCount] = table; // Store table number
-                    (*orderCount)++; // Increment order count
-                    break;
-                }
-            }
-            fclose(tableFile);
-        }
-    }
-    printf("}\n");
 }
 
 // 7.8 주문 생성 프롬프트
@@ -954,41 +990,22 @@ void makePayment() {
     // 결제 처리
     int remainingBalance = combinedTotal; // 남은 결제금액
     int paymentSuccess = 0; // 결제 성공 여부 체크 변수
+    
+    // 남은 결제 금액이 있을 경우 반복
+    while (remainingBalance > 0)
+    {
+        // 사용자로부터 결제 금액 입력 받기
+        remainingBalance = inputPaymentAmount(remainingBalance);
 
-    printf("전체 결제 금액: %d원\n", combinedTotal);
-
-    // 전체 금액에 대해 결제 처리
-    while (remainingBalance > 0) {
-        printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
-        int paymentAmount = inputInt(NULL, true); // 정수 입력 함수 사용
-
-        // 입력이 비어있다면 전체 금액 결제
-        if (paymentAmount == -1) { // 엔터키만 입력된 경우
-            printf("전체 금액이 결제 완료되었습니다.\n");
-            remainingBalance = 0; // 결제 완료
-            paymentSuccess = 1;  // 결제가 완료됨을 표시
+        // 결제 중단 신호가 입력되면 반복 탈출
+        if (remainingBalance == -1) {
             break;
-        }
-
-        // 유효성 검사
-        if (paymentAmount < -1) {
-            continue;
-        } else if (paymentAmount == 0) { // 0 입력 시 결제 중단
-            printf("결제 중단.\n");
+        } 
+        // 결제가 완료되면 성공 표시 후 반복 탈출
+        else if (remainingBalance == 0) {
+            paymentSuccess = 1;
             break;
-        } else if (paymentAmount > remainingBalance) {
-            printf("오류: 결제할 금액보다 큽니다.\n");
-            continue;
-        }
-
-        remainingBalance -= paymentAmount;
-        if (remainingBalance == 0) {
-            printf("전체 금액이 결제 완료되었습니다.\n");
-            paymentSuccess = 1;  // 결제가 완료됨을 표시
-            break;
-        } else {
-            printf("%d원 분할 결제 완료되었습니다. 남은 금액: %d원\n", paymentAmount, remainingBalance);
-        }
+        }   
     }
 
     // 전체 결제가 완료된 후 각 테이블의 주문 내역 삭제
@@ -1007,7 +1024,7 @@ void makePayment() {
 
 }
 
-// 7.11 테이블 증감 프롬프트
+// 7.11 테이블 증감 프롬프트 사용 함수들
 // 테이블 데이터 파일 생성 함수
 void createTableFile(int tableNumber) {
     char tableFilePath[256];
@@ -1209,6 +1226,7 @@ bool handleTableReduction(int reduction) {
     return true;
 }
 
+// 7.11 테이블 증감 프롬프트
 void adjustTables() {
     while (1) {
         int currentTableCount = getCurrentTableCount();
