@@ -679,63 +679,6 @@ void inputMultipleTablesForPayment(int* selectedTables, int* selectedCount, int*
     }
 }
 
-// 결제 처리
-void processPayment(int combinedTotal, int* selectedTables, int selectedCount, int* counters) {
-    int remainingBalance = combinedTotal; // 남은 결제금액
-    int paymentSuccess = 0; // 결제 성공 여부 체크 변수
-
-    printf("전체 결제 금액: %d원\n", combinedTotal);
-
-    // 전체 금액에 대해 결제 처리
-    while (remainingBalance > 0) {
-        printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
-        int paymentAmount = inputInt(NULL, true); // 정수 입력 함수 사용
-
-
-        // 입력이 비어있다면 전체 금액 결제
-        if (paymentAmount == -1) { // 엔터키만 입력된 경우
-            printf("전체 금액이 결제 완료되었습니다.\n");
-            remainingBalance = 0; // 결제 완료
-            paymentSuccess = 1;  // 결제가 완료됨을 표시
-            break;
-        }
-
-        // 유효성 검사
-        if (paymentAmount < -1) {
-            continue;
-        }
-        else if (paymentAmount == 0) { // 0 입력 시 결제 중단
-            printf("결제 중단.\n");
-            break;
-        }
-        else if (paymentAmount > remainingBalance) {
-            printf("오류: 결제할 금액보다 큽니다.\n");
-            continue;
-        }
-
-        remainingBalance -= paymentAmount;
-        if (remainingBalance == 0) {
-            printf("전체 금액이 결제 완료되었습니다.\n");
-            paymentSuccess = 1;  // 결제가 완료됨을 표시
-            break;
-        }
-        else {
-            printf("%d원 분할 결제 완료되었습니다. 남은 금액: %d원\n", paymentAmount, remainingBalance);
-        }
-    }
-
-    // 전체 결제가 완료된 후 각 테이블의 주문 내역 삭제
-    if (paymentSuccess) {
-        for (int i = 0; i < selectedCount; i++) {
-            char tableFilePath[256];
-            snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, selectedTables[i]);
-            deleteLines(tableFilePath, 1, counters[i]);  // 각 테이블 파일의 모든 줄을 삭제
-        }
-    }
-}
-
-
-
 // 7.8 주문 생성 프롬프트
 void createOrder() {
 
@@ -945,7 +888,6 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
     inputMultipleTablesForPayment(selectedTables, &selectedCount, tablesWithOrders, orderCount); // 결제 테이블번호 입력 프롬프트 함수 호출
 
     int combinedTotal = 0;  // 선택된 테이블들의 전체 결제 금액
-    int paymentSuccess = 0; // 결제 성공 여부 체크 변수
     int counters[5];        // 각 선택된 테이블의 줄 수를 저장할 배열
 
     // 각 선택된 테이블의 총 주문액을 계산
@@ -1021,7 +963,57 @@ void makePayment() { // 테이블 증감함수 구현 후 수정
     }
 
     // 결제 처리 함수 호출
-    processPayment(combinedTotal, selectedTables, selectedCount, counters);
+    int remainingBalance = combinedTotal; // 남은 결제금액
+    int paymentSuccess = 0; // 결제 성공 여부 체크 변수
+
+    printf("전체 결제 금액: %d원\n", combinedTotal);
+
+    // 전체 금액에 대해 결제 처리
+    while (remainingBalance > 0) {
+        printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
+        int paymentAmount = inputInt(NULL, true); // 정수 입력 함수 사용
+
+        // 입력이 비어있다면 전체 금액 결제
+        if (paymentAmount == -1) { // 엔터키만 입력된 경우
+            printf("전체 금액이 결제 완료되었습니다.\n");
+            remainingBalance = 0; // 결제 완료
+            paymentSuccess = 1;  // 결제가 완료됨을 표시
+            break;
+        }
+
+        // 유효성 검사
+        if (paymentAmount < -1) {
+            continue;
+        } else if (paymentAmount == 0) { // 0 입력 시 결제 중단
+            printf("결제 중단.\n");
+            break;
+        } else if (paymentAmount > remainingBalance) {
+            printf("오류: 결제할 금액보다 큽니다.\n");
+            continue;
+        }
+
+        remainingBalance -= paymentAmount;
+        if (remainingBalance == 0) {
+            printf("전체 금액이 결제 완료되었습니다.\n");
+            paymentSuccess = 1;  // 결제가 완료됨을 표시
+            break;
+        } else {
+            printf("%d원 분할 결제 완료되었습니다. 남은 금액: %d원\n", paymentAmount, remainingBalance);
+        }
+    }
+
+    // 전체 결제가 완료된 후 각 테이블의 주문 내역 삭제
+    if (paymentSuccess) {
+        for (int i = 0; i < selectedCount; i++) {
+            char tableFilePath[256];
+            snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, selectedTables[i]);
+
+            FILE* tableFile = fopen(tableFilePath, "w");
+            if (tableFile != NULL) {
+                fclose(tableFile);
+            }
+        }
+    }
 
 
 }
