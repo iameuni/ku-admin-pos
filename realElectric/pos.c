@@ -414,27 +414,21 @@ int inputTableNumber(bool paymentMode, int* selectedTables, int selectedCount) {
             return 0; // 결제용 테이블 입력
         }
 
-        // 숫자인지 체크
-        int isNumeric = 1; // 기본적으로 숫자라고 가정
-        for (int i = 0; input[i] != '\0'; i++) {
-            if (!isdigit(input[i]) && !(paymentMode && (input[i] == '-'))) {
-                isNumeric = 0; // 숫자가 아닌 문자가 발견됨
-                break;
-            }
-        }
-
-        if (!isNumeric) {
+        // 숫자 입력 처리
+        if (sscanf(input, "%d", &tableNumber) != 1) {
             printf("오류: 숫자만 입력 가능합니다.\n");
-            // 오류 발생 후 현재 선택된 테이블 번호 출력
-            printf("테이블 번호를 입력하세요 {");
-            for (int i = 0; i < selectedCount; i++) {
-                printf("%d", selectedTables[i]);
-                if (i < selectedCount - 1) {
-                    printf(", ");
+            if (paymentMode) {
+                // 오류 발생 후 현재 선택된 테이블 번호 출력
+                printf("테이블 번호를 입력하세요 {");
+                for (int i = 0; i < selectedCount; i++) {
+                    printf("%d", selectedTables[i]);
+                    if (i < selectedCount - 1) {
+                        printf(", ");
+                    }
                 }
+                printf("}: ");
             }
-            printf("}: ");
-            continue; // 입력 오류 발생 시 다시 입력을 받음
+            continue;
         }
 
         // 일반 모드에서 입력된 테이블 번호 처리
