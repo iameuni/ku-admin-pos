@@ -112,66 +112,62 @@ int deleteLines(const char* filePath, int startLine, int endLine) {
 }
 
 // 정수 입력 함수
-int inputInt(const char* prompt, bool allowZero, int remainingBalance) {
+int inputInt(const char* prompt, bool allowZero) {
     char n[MAX_INPUT + 2];
     char* endptr;
     long num;
 
-    while (1) {
-        if (prompt != NULL) printf("%s", prompt);
-        if (fgets(n, sizeof(n), stdin) == NULL) {
-            printf("입력 오류가 발생했습니다. 다시 시도해주세요.\n");
-            if (remainingBalance > 0) printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
-            continue;
+    if (prompt != NULL) printf("%s", prompt);
+    if (fgets(n, sizeof(n), stdin) == NULL) {
+        printf("입력 오류가 발생했습니다. 다시 시도해주세요.\n");
+    }
+    else {
+        n[strcspn(n, "\n")] = '\0';
+        if (strlen(n) > MAX_INPUT) {
+            printf("경고: %d자 이하로 숫자를 입력해주세요.\n", MAX_INPUT);
+            return -2;
         }
-
         else {
-            n[strcspn(n, "\n")] = '\0';
-            if (strlen(n) > MAX_INPUT) {
-                printf("경고: %d자 이하로 숫자를 입력해주세요.\n", MAX_INPUT);
-                if (remainingBalance > 0) printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
-                continue;
+            char* start = n;
+            char* end = n + strlen(n) - 1;
+            while (isspace((unsigned char)*start)) start++;
+
+            // 빈 입력 처리
+            if (*start == '\0') {
+                return -1; // 엔터가 눌렸을 경우 -1 반환
+            }
+
+            if (start[0] == '0' && strlen(start) > 1) {
+                printf("오류: 0으로 시작하는 수는 입력할 수 없습니다.\n");
+                return -3;
+            }
+
+
+            else if (*start == '\0') {
+                printf("오류: 입력값이 비어있습니다.\n");
+                return -4;
             }
             else {
-                char* start = n;
-                char* end = n + strlen(n) - 1;
-                while (isspace((unsigned char)*start)) start++;
+                while (end > start && isspace((unsigned char)*end)) end--;
+                *(end + 1) = '\0';
 
-                // 빈 입력 처리
-                if (*start == '\0') {
-                    return -1; // 엔터가 눌렸을 경우 -1 반환
-                }
+                num = strtol(start, &endptr, 10);
 
-                if (start[0] == '0' && strlen(start) > 1) {
-                    printf("오류: 0으로 시작하는 수는 입력할 수 없습니다.\n");
-                    if (remainingBalance > 0) printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
-                    continue;
-                }
-
-
-                else if (*start == '\0') {
-                    printf("오류: 입력값이 비어있습니다.\n");
+                if (*endptr != '\0') {
+                    printf("오류: 음이 아닌 정수를 입력해주세요.\n");
+                    return -5;
                 }
                 else {
-                    while (end > start && isspace((unsigned char)*end)) end--;
-                    *(end + 1) = '\0';
-
-                    num = strtol(start, &endptr, 10);
-
-                    if (*endptr != '\0') {
-                        printf("오류: 음이 아닌 정수를 입력해주세요.\n");
-                        if (remainingBalance > 0) printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
-                        continue;
+                    if (num < 0 || num > INT_MAX) {
+                        printf("오류: 음이 아닌 정수를 입력해주세요.\n", INT_MAX);
+                        return -6;
                     }
                     else {
-                        if (num < 0 || num > INT_MAX) {
-                            printf("오류: %d 이하의 음이 아닌 정수를 입력해주세요.\n", INT_MAX);
-                            if (remainingBalance > 0) printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
-                            continue;
+                        if (num == 0 && !allowZero) {
+                            printf("오류: 0은 입력할 수 없습니다.\n");
+                            return -7;
                         }
-                        else {
-                            return (int)num;
-                        }
+                        return (int)num;
                     }
                 }
             }
@@ -321,7 +317,7 @@ bool checkDataIntegrity() {
 int inputFoodNumber() {
     int foodNumber;
     while (1) {
-        foodNumber = inputInt("판매 항목 번호를 입력하세요: ", true,NULL);
+        foodNumber = inputInt("판매 항목 번호를 입력하세요: ", true);
         return foodNumber;
     }
 }
@@ -379,7 +375,7 @@ char* inputFoodName() {
 int inputPrice() {
     int price;
     while (1) {
-        price = inputInt("판매 항목가: ", false,NULL);
+        price = inputInt("판매 항목가: ", false);
         if (price >= 1 && price <= 9999999) {
             return price;
         }
@@ -390,76 +386,47 @@ int inputPrice() {
 }
 
 // 7.4.1 테이블 번호 입력
-int inputTableNumber(bool paymentMode, int* selectedTables, int selectedCount) {
+int inputTableNumber(bool paymentMode) {
     int tableNumber;
     int maxTableNumber = getLastTableNumber(); // 최대 테이블 번호를 가져옴
 
-    while (1) {
         // 사용자에게 입력 요청
         if (!paymentMode) { // 일반 모드
             printf("테이블 번호를 입력하세요 (1~%d): ", maxTableNumber);
-        }
-
-        char input[10];
-        fgets(input, sizeof(input), stdin);
-        input[strcspn(input, "\n")] = 0; // 개행 문자 제거
-
-        // 결제 모드일 때 스페이스와 엔터 입력 처리
-        if (paymentMode && (strcmp(input, "") == 0 || strspn(input, " ") == strlen(input))) {
-            return -1; // 엔터를 눌렀거나 스페이스로만 이루어진 경우 -1 반환
-        }
-
-        // 결제 모드일 때 0 입력 처리
-        if (paymentMode && strcmp(input, "0") == 0) {
-            return 0; // 결제용 테이블 입력
-        }
-
-        // 숫자 입력 처리
-        if (sscanf(input, "%d", &tableNumber) != 1) {
-            printf("오류: 숫자만 입력 가능합니다.\n");
-            if (paymentMode) {
-                // 오류 발생 후 현재 선택된 테이블 번호 출력
-                printf("테이블 번호를 입력하세요 {");
-                for (int i = 0; i < selectedCount; i++) {
-                    printf("%d", selectedTables[i]);
-                    if (i < selectedCount - 1) {
-                        printf(", ");
-                    }
-                }
-                printf("}: ");
-            }
-            continue;
-        }
-
-        // 일반 모드에서 입력된 테이블 번호 처리
-        tableNumber = atoi(input);
-        if (!paymentMode && (tableNumber < 1 || tableNumber > maxTableNumber)) {
-            printf("오류: 1~%d 사이의 번호를 입력하세요.\n", maxTableNumber);
-        }
-        else if (paymentMode && (tableNumber < 0 || tableNumber > maxTableNumber)) {
-            printf("오류: 결제 모드에서는 0과 1~%d 사이의 번호만 입력 가능합니다.\n", maxTableNumber);
-            // 오류 발생 후 현재 선택된 테이블 번호 출력
-            printf("테이블 번호를 입력하세요 {");
-            for (int i = 0; i < selectedCount; i++) {
-                printf("%d", selectedTables[i]);
-                if (i < selectedCount - 1) {
-                    printf(", ");
-                }
-            }
-            printf("}: ");
-            continue; // 입력 오류 발생 시 다시 입력을 받음
+            tableNumber = inputInt(NULL, false);
         }
         else {
-            return tableNumber; // 유효한 테이블 번호 반환
+            tableNumber = inputInt(NULL, true);
         }
-    }
+        
+        // 결제 모드 추가 조건 검사
+        if (paymentMode) {
+            // 엔터나 공백 입력 시 -1 반환
+            if (tableNumber == -1) {
+                return -1;
+            }
+            // 테이블 번호가 0 또는 1~maxTableNumber 범위에 있는지 확인
+            if (tableNumber > maxTableNumber) {
+                printf("오류: 결제 모드에서는 0과 1~%d 사이의 번호만 입력 가능합니다.\n", maxTableNumber);
+                return -2; // 유효하지 않은 번호 시도 시 -2 반환
+            }
+        }
+        else {
+            // 일반 모드에서 유효 범위 확인 (1~maxTableNumber)
+            if (tableNumber > maxTableNumber) {
+                printf("오류: 1~%d 사이의 번호를 입력하세요.\n", maxTableNumber);
+                return -2; // 유효하지 않은 번호 시도 시 -2 반환
+            }
+        }
+
+        return tableNumber; // 유효한 테이블 번호 반환
 }
 
 // 7.4.2 수량 입력
 int inputQuantity() {
     int quantity;
     while (1) {
-        quantity = inputInt("수량을 입력하세요: ", false,NULL);
+        quantity = inputInt("수량을 입력하세요: ", false);
         if (quantity < 1 || quantity >99) {
             printf("오류: 1~99사이의 수량을 입력하세요.\n");
         }
@@ -661,11 +628,15 @@ void inputMultipleTablesForPayment(int* selectedTables, int* selectedCount, int*
         }
         printf("}: ");
 
-        int tableNumber = inputTableNumber(true, selectedTables, *selectedCount); // 결제 처리용으로 호출
+        int tableNumber = inputTableNumber(true); // 결제 처리용으로 호출
 
         // -1을 반환하면 엔터 입력
         if (tableNumber == -1) {
             if (*selectedCount > 0) break; // 이미 선택된 테이블이 있다면 종료
+            continue;
+        }
+
+        if (tableNumber < -1) {
             continue;
         }
 
@@ -684,7 +655,6 @@ void inputMultipleTablesForPayment(int* selectedTables, int* selectedCount, int*
                 break;
             }
         }
-
         if (!validOrder) {
             printf("경고: %d번 테이블에는 주문 내역이 없습니다.\n", tableNumber);
             continue;
@@ -719,7 +689,7 @@ void processPayment(int combinedTotal, int* selectedTables, int selectedCount, i
     // 전체 금액에 대해 결제 처리
     while (remainingBalance > 0) {
         printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
-        int paymentAmount = inputInt(NULL, true,remainingBalance); // 정수 입력 함수 사용
+        int paymentAmount = inputInt(NULL, true); // 정수 입력 함수 사용
 
 
         // 입력이 비어있다면 전체 금액 결제
@@ -731,8 +701,7 @@ void processPayment(int combinedTotal, int* selectedTables, int selectedCount, i
         }
 
         // 유효성 검사
-        if (paymentAmount < 0) {
-            printf("오류: 음수는 입력할 수 없습니다.\n");
+        if (paymentAmount < -1) {
             continue;
         }
         else if (paymentAmount == 0) { // 0 입력 시 결제 중단
@@ -782,7 +751,13 @@ void createOrder() {
     }
     rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
 
-    int tableNumber = inputTableNumber(false,NULL,0);  // 테이블 번호 입력 받기
+    int tableNumber = 0;
+    
+    while (1) {
+        tableNumber = inputTableNumber(false);//테이블 번호 입력받기
+        if (tableNumber < -1) continue;
+        else break;
+    }
 
     // 테이블 파일 경로 설정
     char tableFilePath[256];
@@ -887,8 +862,14 @@ void printOrder() {
     int orderCount = 0;
     listTablesWithOrders(tablesWithOrders, &orderCount, "주문 내역이 있는 테이블 번호");  // 주문이 있는 테이블을 확인하고 표시
 
-    int tableNumber = inputTableNumber(false,NULL,0);
+    int tableNumber = 0;
 
+    while(1){
+        tableNumber = inputTableNumber(false); 
+        if (tableNumber < -1) continue;
+        else break;
+    }
+    
     // 테이블 파일 경로 
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
@@ -1327,8 +1308,8 @@ int printMain() {
         printf("6. 결제 처리\n");
         printf("7. 테이블 증감\n");
         printf("8. 종료\n");
-        s = inputInt("메뉴 선택: ", false,NULL);
-        if (s > 8 || s < 1) {
+        s = inputInt("메뉴 선택: ", false);
+        if (s > 8) {
             printf("1~8 사이의 값을 입력해주세요.\n");
         }
         else {
