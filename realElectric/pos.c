@@ -241,7 +241,7 @@ void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* me
             (*orderCount)++; // Increment order count
         }
     }
-    printf(" }\n");
+    printf(" }\n\n");
 }
 
 // 현재 존재하는 테이블 개수 계산
@@ -687,7 +687,7 @@ void createOrder() {
     // 주문 가능한 테이블 목록 표시
     int tablesWithOrders[MAX_TABLE_NUMBER];  // 주문 내역이 있는 테이블을 저장할 배열
     int orderCount = 0;
-    listTablesWithOrders(tablesWithOrders, &orderCount, "주문 내역이 있는 테이블 번호");  // 주문이 있는 테이블을 확인하고 표시
+    listTablesWithOrders(tablesWithOrders, &orderCount, "\n주문 내역이 있는 테이블 번호");  // 주문이 있는 테이블을 확인하고 표시
 
     FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
     if (foodFile == NULL) {
@@ -725,7 +725,7 @@ void createOrder() {
     char foodName[50];
 
     while (selection != 0) {  // 0을 입력하면 주문이 끝남
-        printf("<주문을 끝내려면 0을 입력하세요>\n");
+        printf("\n<주문을 끝내려면 0을 입력하세요>\n\n");
         selection = inputFoodNumber();
 
         if (selection == 0) {
@@ -805,7 +805,7 @@ void printOrder() {
     // 주문 가능한 테이블 목록 표시
     int tablesWithOrders[MAX_TABLE_NUMBER];  // 주문 내역이 있는 테이블을 저장할 배열
     int orderCount = 0;
-    listTablesWithOrders(tablesWithOrders, &orderCount, "주문 내역이 있는 테이블 번호");  // 주문이 있는 테이블을 확인하고 표시
+    listTablesWithOrders(tablesWithOrders, &orderCount, "\n주문 내역이 있는 테이블 번호");  // 주문이 있는 테이블을 확인하고 표시
 
     int tableNumber = 0;
 
@@ -841,8 +841,8 @@ void printOrder() {
     }
 
     // 주문 정보 출력
-    printf("\n     %d번 테이블 주문 조회     \n", tableNumber);
-    printf("%-10s %-10s %-10s\n", "메뉴", "수량", "금액");
+    printf("\n\t%d번 테이블 주문 조회\t\n\n", tableNumber);
+    printf("%-20s %-10s %-10s\n", "메뉴", "수량", "금액");
 
     int foundItems = 0;
     int firstNum, secondNum, price;
@@ -856,7 +856,7 @@ void printOrder() {
             if (firstNum == 0 && secondNum == current->itemID) {
                 // 일치하는 항목 출력
                 int quantity = current->quantity;
-                printf("%-10s %-10d %-10d\n", foodName, quantity, quantity * price);
+                printf("%-20s %-10d %-10d\n", foodName, quantity, quantity * price);
                 foundItems++;
                 break;
             }
@@ -879,7 +879,7 @@ void makePayment() {
     int tablesWithOrders[MAX_TABLE_NUMBER];  // 주문 내역이 있는 테이블 번호를 저장할 배열
     int orderCount = 0;       // 주문 내역이 있는 테이블 수를 저장할 변수
 
-    listTablesWithOrders(tablesWithOrders, &orderCount, "결제 가능한 테이블 번호");  // 주문 내역이 있는 테이블을 표시하고, 결과를 가져옴
+    listTablesWithOrders(tablesWithOrders, &orderCount, "\n결제 가능한 테이블 번호");  // 주문 내역이 있는 테이블을 표시하고, 결과를 가져옴
 
     int selectedTables[MAX_TABLE_NUMBER];
     int selectedCount = 0;
@@ -950,6 +950,8 @@ void makePayment() {
     int combinedTotal = 0;  // 선택된 테이블들의 전체 결제 금액
     int counters[MAX_TABLE_NUMBER];        // 각 선택된 테이블의 줄 수를 저장할 배열
 
+    printf("\n");
+
     // 각 선택된 테이블의 총 주문액을 계산
     for (int i = 0; i < selectedCount; i++) {
         int tableNumber = selectedTables[i];
@@ -1019,8 +1021,11 @@ void makePayment() {
         }
         else {
             combinedTotal += totalPrice;  // 결제 금액을 합산
+            printf("%d번 테이블 주문액: %d\n", tableNumber, totalPrice);
         }
     }
+
+    printf("\n");
 
     // 결제 처리
     int remainingBalance = combinedTotal; // 남은 결제금액
@@ -1061,7 +1066,7 @@ void adjustTables() {
     while (1) {
         int currentTableCount = getCurrentTableCount();
 
-        printf("증감시킬 테이블 수를 입력하세요 (-9 ~ 9): ");
+        printf("\n증감시킬 테이블 수를 입력하세요 (-9 ~ 9): ");
 
         char input[10];
         fgets(input, sizeof(input), stdin);
