@@ -158,7 +158,8 @@ int inputInt(const char* prompt, bool allowZero) {
                 }
                 else {
                     if (num < 0 || num > INT_MAX) {
-                        printf("오류: 음이 아닌 정수를 입력해주세요.\n", INT_MAX);
+                        //printf("오류: 음이 아닌 정수를 입력해주세요.\n", INT_MAX);
+                        printf("오류: 음이 아닌 정수를 입력해주세요.\n");
                         return -6;
                     }
                     else {
@@ -174,19 +175,24 @@ int inputInt(const char* prompt, bool allowZero) {
     }
 }
 
-// 마지막 (가장 큰) 테이블 번호 반환하는 함수
-int getLastTableNumber() {
-    int maxNumber = 0;
-    for (int i = 1; i <= 10; i++) {
-        char filename[256];
-        snprintf(filename, sizeof(filename), "%s/%d.txt", TABLE_FILE_PATH, i);
+// 테이블 존재 여부 확인 함수
+static bool isTableExist(int tableNumber) {
+    char tableFilePath[256];
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
+    FILE* tableFile = fopen(tableFilePath, "r");
+    if (tableFile != NULL) {
+        fclose(tableFile);
+        return true;
+    }
+    return false;
+}
 
-        FILE* fp = fopen(filename, "r");
-        if (fp != NULL) {
-            if (i > maxNumber) {
-                maxNumber = i;
-            }
-            fclose(fp);
+// 마지막 (가장 큰) 테이블 번호 반환하는 함수
+static int getLastTableNumber() {
+    int maxNumber = 0;
+    for (int i = 1; i <= MAX_TABLE; i++) {
+        if (isTableExist(i) && i > maxNumber) {
+            maxNumber = i;
         }
     }
     return maxNumber;
@@ -225,7 +231,6 @@ void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* me
     }
     printf("}\n");
 }
-
 
 //////////////////// 기획서 기반 프롬프트 ////////////////////
 
@@ -292,7 +297,7 @@ bool checkDataIntegrity() {
     int existingTables[11] = { 0 };  // 존재하는 테이블 번호 체크용 (0번 인덱스는 사용안함)
 
     // 모든 가능한 테이블 파일 검사
-    for (int table = 1; table <= 10; table++) {
+    for (int table = 1; table <= MAX_TABLE; table++) {
         char tableFileName[256];
         snprintf(tableFileName, sizeof(tableFileName), "%s/%d.txt", TABLE_FILE_PATH, table);
 
@@ -337,8 +342,8 @@ bool checkDataIntegrity() {
         printf("테이블이 하나도 존재하지 않습니다. 프로그램을 종료합니다.\n");
         return false;
     }
-    if (tableCount > 10) {
-        printf("테이블이 10개를 초과합니다. 프로그램을 종료합니다.\n");
+    if (tableCount > MAX_TABLE) {
+        printf("테이블이 %d개를 초과합니다. 프로그램을 종료합니다.\n", MAX_TABLE);
         return false;
     }
 
@@ -422,36 +427,36 @@ int inputTableNumber(bool paymentMode) {
     int tableNumber;
     int maxTableNumber = getLastTableNumber(); // 최대 테이블 번호를 가져옴
 
-        // 사용자에게 입력 요청
-        if (!paymentMode) { // 일반 모드
-            printf("테이블 번호를 입력하세요 (1~%d): ", maxTableNumber);
-            tableNumber = inputInt(NULL, false);
-        }
-        else {
-            tableNumber = inputInt(NULL, true);
-        }
-        
-        // 결제 모드 추가 조건 검사
-        if (paymentMode) {
-            // 엔터나 공백 입력 시 -1 반환
-            if (tableNumber == -1) {
-                return -1;
-            }
-            // 테이블 번호가 0 또는 1~maxTableNumber 범위에 있는지 확인
-            if (tableNumber > maxTableNumber) {
-                printf("오류: 결제 모드에서는 0과 1~%d 사이의 번호만 입력 가능합니다.\n", maxTableNumber);
-                return -2; // 유효하지 않은 번호 시도 시 -2 반환
-            }
-        }
-        else {
-            // 일반 모드에서 유효 범위 확인 (1~maxTableNumber)
-            if (tableNumber > maxTableNumber) {
-                printf("오류: 1~%d 사이의 번호를 입력하세요.\n", maxTableNumber);
-                return -2; // 유효하지 않은 번호 시도 시 -2 반환
-            }
-        }
+    // 사용자에게 입력 요청
+    if (!paymentMode) { // 일반 모드
+        printf("테이블 번호를 입력하세요 (1~%d): ", maxTableNumber);
+        tableNumber = inputInt(NULL, false);
+    }
+    else {
+        tableNumber = inputInt(NULL, true);
+    }
 
-        return tableNumber; // 유효한 테이블 번호 반환
+    // 결제 모드 추가 조건 검사
+    if (paymentMode) {
+        // 엔터나 공백 입력 시 -1 반환
+        if (tableNumber == -1) {
+            return -1;
+        }
+        // 테이블 번호가 0 또는 1~maxTableNumber 범위에 있는지 확인
+        if (tableNumber > maxTableNumber) {
+            printf("오류: 결제 모드에서는 0과 1~%d 사이의 번호만 입력 가능합니다.\n", maxTableNumber);
+            return -2; // 유효하지 않은 번호 시도 시 -2 반환
+        }
+    }
+    else {
+        // 일반 모드에서 유효 범위 확인 (1~maxTableNumber)
+        if (tableNumber > maxTableNumber) {
+            printf("오류: 1~%d 사이의 번호를 입력하세요.\n", maxTableNumber);
+            return -2; // 유효하지 않은 번호 시도 시 -2 반환
+        }
+    }
+
+    return tableNumber; // 유효한 테이블 번호 반환
 }
 
 // 7.4.2 수량 입력
@@ -485,10 +490,12 @@ int inputPaymentAmount(int remainingBalance) {
         // 유효성 검사
         if (paymentAmount < -1) {
             continue;
-        } else if (paymentAmount == 0) { // 0 입력 시 결제 중단
+        }
+        else if (paymentAmount == 0) { // 0 입력 시 결제 중단
             printf("결제 중단.\n");
             return -1;
-        } else if (paymentAmount > remainingBalance) {
+        }
+        else if (paymentAmount > remainingBalance) {
             printf("오류: 결제할 금액보다 큽니다.\n");
             continue;
         }
@@ -498,7 +505,8 @@ int inputPaymentAmount(int remainingBalance) {
             printf("전체 금액이 결제 완료되었습니다.\n");
             remainingBalance = 0; // 전액 결제 완료
             return remainingBalance;
-        } else {
+        }
+        else {
             printf("%d원 분할 결제 완료되었습니다. 남은 금액: %d원\n", paymentAmount, remainingBalance);
             return remainingBalance;
         }
@@ -661,7 +669,7 @@ void createOrder() {
     rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
 
     int tableNumber = 0;
-    
+
     while (1) {
         tableNumber = inputTableNumber(false);//테이블 번호 입력받기
         if (tableNumber < -1) continue;
@@ -773,12 +781,12 @@ void printOrder() {
 
     int tableNumber = 0;
 
-    while(1){
-        tableNumber = inputTableNumber(false); 
+    while (1) {
+        tableNumber = inputTableNumber(false);
         if (tableNumber < -1) continue;
         else break;
     }
-    
+
     // 테이블 파일 경로 
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
@@ -989,7 +997,7 @@ void makePayment() {
     // 결제 처리
     int remainingBalance = combinedTotal; // 남은 결제금액
     int paymentSuccess = 0; // 결제 성공 여부 체크 변수
-    
+
     // 남은 결제 금액이 있을 경우 반복
     while (remainingBalance > 0)
     {
@@ -999,12 +1007,12 @@ void makePayment() {
         // 결제 중단 신호가 입력되면 반복 탈출
         if (remainingBalance == -1) {
             break;
-        } 
+        }
         // 결제가 완료되면 성공 표시 후 반복 탈출
         else if (remainingBalance == 0) {
             paymentSuccess = 1;
             break;
-        }   
+        }
     }
 
     // 전체 결제가 완료된 후 각 테이블의 주문 내역 삭제
@@ -1022,7 +1030,7 @@ void makePayment() {
 
 // 7.11 테이블 증감 프롬프트 사용 함수들
 // 테이블 데이터 파일 생성 함수
-void createTableFile(int tableNumber) {
+static void createTableFile(int tableNumber) {
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
     FILE* tableFile = fopen(tableFilePath, "w");
@@ -1032,14 +1040,14 @@ void createTableFile(int tableNumber) {
 }
 
 // 테이블 데이터 파일 삭제 함수
-void deleteTableFile(int tableNumber) {
+static void deleteTableFile(int tableNumber) {
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
     remove(tableFilePath);
 }
 
 // 특정 테이블의 주문 내역 존재 여부 확인 함수
-bool hasOrders(int tableNumber) {
+static bool hasOrders(int tableNumber) {
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
 
@@ -1061,87 +1069,30 @@ bool hasOrders(int tableNumber) {
     return false;
 }
 
-// 주문내역이 없는 가장 큰 테이블 번호 찾기
-int findLargestEmptyTable() {
-    bool exists[11] = { false };  // 존재하는 테이블 체크용 배열
-
-    // 먼저 존재하는 테이블들을 체크
-    for (int i = 1; i <= 10; i++) {
-        char tableFilePath[256];
-        snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, i);
-        FILE* tableFile = fopen(tableFilePath, "r");
-        if (tableFile != NULL) {
-            exists[i] = true;
-            fclose(tableFile);
-        }
-    }
-
-    // 존재하는 테이블 중에서 가장 큰 번호의 빈 테이블 찾기
-    for (int i = 10; i >= 1; i--) {
-        if (exists[i] && !hasOrders(i)) {
-            return i;
-        }
-    }
-
-    return -1; // 삭제 가능한 테이블이 없는 경우
-}
-
 // 현재 존재하는 테이블 목록을 출력하는 디버그용 함수
-void printExistingTables() {
+static void printExistingTables() {
     printf("현재 존재하는 테이블: ");
-    for (int i = 1; i <= 10; i++) {
-        char tableFilePath[256];
-        snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, i);
-        FILE* tableFile = fopen(tableFilePath, "r");
-        if (tableFile != NULL) {
+    for (int i = 1; i <= MAX_TABLE; i++) {
+        if (isTableExist(i)) {
             printf("%d ", i);
-            fclose(tableFile);
         }
     }
     printf("\n");
 }
 
-// 존재하지 않는 가장 작은 테이블 번호 찾기
-int findSmallestAvailableNumber() {
-    bool used[11] = { false };  // 0번 인덱스는 사용하지 않음
-
-    // 현재 존재하는 테이블 번호 체크
-    for (int i = 1; i <= 10; i++) {
-        char tableFilePath[256];
-        snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, i);
-        FILE* tableFile = fopen(tableFilePath, "r");
-        if (tableFile != NULL) {
-            used[i] = true;
-            fclose(tableFile);
-        }
-    }
-
-    // 사용되지 않은 가장 작은 번호 찾기
-    for (int i = 1; i <= 10; i++) {
-        if (!used[i]) {
-            return i;
-        }
-    }
-    return -1;  // 모든 번호가 사용 중
-}
-
 // 현재 존재하는 테이블 개수 계산
-int getCurrentTableCount() {
+static int getCurrentTableCount() {
     int count = 0;
-    for (int i = 1; i <= 10; i++) {
-        char tableFilePath[256];
-        snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, i);
-        FILE* tableFile = fopen(tableFilePath, "r");
-        if (tableFile != NULL) {
+    for (int i = 1; i <= MAX_TABLE; i++) {
+        if (isTableExist(i)) {
             count++;
-            fclose(tableFile);
         }
     }
     return count;
 }
 
 // 제거 가능한 빈 테이블 개수 계산
-int countRemovableTables() {
+static int countRemovableTables() {
     int count = 0;
     int maxTableNum = getLastTableNumber();
 
@@ -1154,78 +1105,21 @@ int countRemovableTables() {
 }
 
 // 현재 존재하는 테이블 중 주문 내역이 없는 테이블의 개수를 반환
-int getEmptyTableCount() {
+static int getEmptyTableCount() {
     int emptyCount = 0;
-    int maxTable = getLastTableNumber();
-
-    for (int i = 1; i <= maxTable; i++) {
-        char tableFilePath[256];
-        snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, i);
-        FILE* tableFile = fopen(tableFilePath, "r");
-
-        if (tableFile != NULL) {
-            // 테이블이 존재하면 주문 내역 확인
-            if (!hasOrders(i)) {
-                emptyCount++;
-            }
-            fclose(tableFile);
+    for (int i = 1; i <= MAX_TABLE; i++) {
+        if (isTableExist(i) && !hasOrders(i)) {
+            emptyCount++;
         }
     }
     return emptyCount;
 }
 
-// 테이블 감소 처리를 위한 함수
-bool handleTableReduction(int reduction) {
-    int currentTableCount = getCurrentTableCount();
-    int emptyTableCount = getEmptyTableCount();
-
-    // Case 1: 현재 테이블 수가 감소시키려는 수보다 적거나 같은 경우
-    if (currentTableCount <= -reduction) {
-        printf("오류: 현재 테이블이 %d개 뿐이라서 %d개를 감소시킬 수 없습니다.\n",
-            currentTableCount, -reduction);
-        return false;
-    }
-
-    // Case 2: 감소 후 테이블 수가 1개 미만이 되는 경우
-    if (currentTableCount + reduction < 1) {
-        printf("오류: 테이블은 최소 1개가 존재해야 합니다.\n");
-        return false;
-    }
-
-    // Case 3: 주문 내역이 없는 테이블이 하나도 없는 경우
-    if (emptyTableCount == 0) {
-        printf("오류: 모든 테이블에 주문 내역이 있어서 감소시킬 수 없습니다.\n");
-        return false;
-    }
-
-    // Case 4: 주문 내역이 없는 테이블 수가 감소시키려는 수보다 적은 경우
-    if (emptyTableCount < -reduction) {
-        printf("오류: 주문 내역이 없는 테이블이 %d개 뿐이라서 %d개를 감소시킬 수 없습니다.\n",
-            emptyTableCount, -reduction);
-        return false;
-    }
-
-    // 모든 조건을 통과했다면 테이블 감소 실행
-    int removed = 0;
-    while (removed < -reduction) {
-        int tableToRemove = findLargestEmptyTable();
-        if (tableToRemove == -1) {
-            // 이 경우는 위의 검증들을 통과했다면 발생하지 않아야 함
-            printf("예기치 않은 오류가 발생했습니다.\n");
-            return false;
-        }
-        deleteTableFile(tableToRemove);
-        printf("%d번 테이블이 제거되었습니다.\n", tableToRemove);
-        removed++;
-    }
-
-    return true;
-}
-
 // 7.11 테이블 증감 프롬프트
-void adjustTables() {
+static void adjustTables() {
     while (1) {
         int currentTableCount = getCurrentTableCount();
+
         printf("증감시킬 테이블 수를 입력하세요 (-9 ~ 9): ");
 
         char input[10];
@@ -1256,26 +1150,96 @@ void adjustTables() {
 
         // 테이블 감소
         if (adjustment < 0) {
-            if (!handleTableReduction(adjustment)) {
-                continue;  // 실패 시 다시 입력 받기
+            // 현재 테이블 수가 감소시키려는 수보다 적거나 같은 경우
+            if (currentTableCount <= -adjustment) {
+                printf("오류: 현재 테이블이 %d개 뿐이라서 %d개를 감소시킬 수 없습니다.\n",
+                    currentTableCount, -adjustment);
+                continue;
+            }
+
+            // 감소 후 테이블 수가 1개 미만이 되는 경우
+            if (currentTableCount + adjustment < 1) {
+                printf("오류: 테이블은 최소 1개가 존재해야 합니다.\n");
+                continue;
+            }
+
+            // 주문 내역이 없는 테이블 수 계산
+            int emptyCount = 0;
+            for (int i = MAX_TABLE; i >= 1; i--) {
+                if (isTableExist(i) && !hasOrders(i)) {
+                    emptyCount++;
+                }
+            }
+
+            // 주문 내역이 없는 테이블이 하나도 없는 경우
+            if (emptyCount == 0) {
+                printf("오류: 모든 테이블에 주문 내역이 있어서 감소시킬 수 없습니다.\n");
+                continue;
+            }
+
+            // 주문 내역이 없는 테이블 수가 감소시키려는 수보다 적은 경우
+            if (emptyCount < -adjustment) {
+                printf("오류: 주문 내역이 없는 테이블이 %d개 뿐이라서 %d개를 감소시킬 수 없습니다.\n",
+                    emptyCount, -adjustment);
+                continue;
+            }
+
+            // 테이블 감소 실행
+            int removed = 0;
+            while (removed < -adjustment) {
+                // 가장 큰 번호의 빈 테이블 찾기
+                int tableToRemove = -1;
+                for (int i = MAX_TABLE; i >= 1; i--) {
+                    if (isTableExist(i) && !hasOrders(i)) {
+                        tableToRemove = i;
+                        break;
+                    }
+                }
+
+                if (tableToRemove == -1) {
+                    printf("예기치 않은 오류가 발생했습니다.\n");
+                    return;
+                }
+
+                char tableFilePath[256];
+                snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableToRemove);
+                remove(tableFilePath);
+                printf("%d번 테이블이 제거되었습니다.\n", tableToRemove);
+                removed++;
             }
         }
         // 테이블 증가
         else {
-            if (currentTableCount + adjustment > 10) {
-                printf("테이블은 최대 10개까지만 존재할 수 있습니다.\n");
+            if (currentTableCount + adjustment > MAX_TABLE) {
+                printf("테이블은 최대 %d개까지만 존재할 수 있습니다.\n", MAX_TABLE);
                 continue;
             }
 
-            // 실제 추가 작업 수행
-            for (int i = 0; i < adjustment; i++) {
-                int newTableNumber = findSmallestAvailableNumber();
+            // 테이블 증가 실행
+            int added = 0;
+            while (added < adjustment) {
+                // 사용 가능한 가장 작은 번호 찾기
+                int newTableNumber = -1;
+                for (int i = 1; i <= MAX_TABLE; i++) {
+                    if (!isTableExist(i)) {
+                        newTableNumber = i;
+                        break;
+                    }
+                }
+
                 if (newTableNumber == -1) {
                     printf("더 이상 추가할 수 있는 테이블 번호가 없습니다.\n");
                     return;
                 }
-                createTableFile(newTableNumber);
-                printf("%d번 테이블이 추가되었습니다.\n", newTableNumber);
+
+                char tableFilePath[256];
+                snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, newTableNumber);
+                FILE* tableFile = fopen(tableFilePath, "w");
+                if (tableFile != NULL) {
+                    fclose(tableFile);
+                    printf("%d번 테이블이 추가되었습니다.\n", newTableNumber);
+                    added++;
+                }
             }
         }
 
