@@ -7,6 +7,7 @@
 #include <stdbool.h>
 
 #define MAX_INPUT 100
+#define MAX_TABLE 10
 #define FILE_PATH "foodlist.txt" // 파일 경로 설정
 #define TABLE_FILE_PATH "table" //테이블 폴더 경로 설정
 
