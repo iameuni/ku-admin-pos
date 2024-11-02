@@ -8,10 +8,10 @@
 
 #define MAX_INPUT 100
 #define MAX_TABLE 10
-#define FILE_PATH "foodlist.txt" // íŒŒì¼ ê²½ë¡œ ì„¤ì •
-#define TABLE_FILE_PATH "table" //í…Œì´ë¸” í´ë” ê²½ë¡œ ì„¤ì •
+#define FILE_PATH "foodlist.txt" // ÆÄÀÏ °æ·Î ¼³Á¤
+#define TABLE_FILE_PATH "table" //Å×ÀÌºí Æú´õ °æ·Î ¼³Á¤
 
-//////////////////// êµ¬ì¡°ì²´ ì„ ì–¸ ////////////////////
+//////////////////// ±¸Á¶Ã¼ ¼±¾ğ ////////////////////
 typedef struct OrderItem {
     int itemID;
     int quantity;
@@ -20,32 +20,32 @@ typedef struct OrderItem {
 
 
 
-//////////////////// ê¸°íƒ€ í•¨ìˆ˜ ////////////////////
+//////////////////// ±âÅ¸ ÇÔ¼ö ////////////////////
 
-// í”„ë¡œê·¸ë¨ ì¢…ë£Œ ê¸°ëŠ¥
+// ÇÁ·Î±×·¥ Á¾·á ±â´É
 void exitProgram() {
-    printf("í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n");
+    printf("ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n");
     system("PAUSE");
     exit(0);
 }
 
-// ë§ˆì§€ë§‰ íŒë§¤ í•­ëª© ê³ ìœ  ë²ˆí˜¸ë¥¼ ê°€ì ¸ì˜¤ëŠ” í•¨ìˆ˜ (7.6 íŒë§¤ í•­ëª© ì¶”ê°€ í”„ë¡¬í”„íŠ¸ì—ì„œ ì‚¬ìš©)
+// ¸¶Áö¸· ÆÇ¸Å Ç×¸ñ °íÀ¯ ¹øÈ£¸¦ °¡Á®¿À´Â ÇÔ¼ö (7.6 ÆÇ¸Å Ç×¸ñ Ãß°¡ ÇÁ·ÒÇÁÆ®¿¡¼­ »ç¿ë)
 int getLastSecondNumber(FILE* file) {
     int firstNum, secondNum, price;
     char foodName[50];
     int lastSecondNum = 0;
 
-    rewind(file);  // íŒŒì¼ í¬ì¸í„°ë¥¼ ì²˜ìŒìœ¼ë¡œ ë˜ëŒë¦¼
-    while (fscanf(file, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {  // ê³µë°± 2ì¹¸, 4ì¹¸, 2ì¹¸ ìœ ì§€
+    rewind(file);  // ÆÄÀÏ Æ÷ÀÎÅÍ¸¦ Ã³À½À¸·Î µÇµ¹¸²
+    while (fscanf(file, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {  // °ø¹é 2Ä­, 4Ä­, 2Ä­ À¯Áö
         lastSecondNum = secondNum;
     }
     return lastSecondNum;
 }
 
-// ì£¼ë¬¸ í•­ëª© ë¦¬ìŠ¤íŠ¸ì— í•­ëª© ì¶”ê°€ (7.9 ì£¼ë¬¸ ì¡°íšŒ í”„ë¡¬í”„íŠ¸. 7.10 ê²°ì œ ì²˜ë¦¬ í”„ë¡¬í”„íŠ¸ì—ì„œ ì‚¬ìš©)
+// ÁÖ¹® Ç×¸ñ ¸®½ºÆ®¿¡ Ç×¸ñ Ãß°¡ (7.9 ÁÖ¹® Á¶È¸ ÇÁ·ÒÇÁÆ®. 7.10 °áÁ¦ Ã³¸® ÇÁ·ÒÇÁÆ®¿¡¼­ »ç¿ë)
 OrderItem* addOrderItem(OrderItem* head, int itemID) {
     OrderItem* current = head;
-    // ì´ë¯¸ ì¡´ì¬í•˜ëŠ” í•­ëª©ì´ë©´ ìˆ˜ëŸ‰ ì¦ê°€
+    // ÀÌ¹Ì Á¸ÀçÇÏ´Â Ç×¸ñÀÌ¸é ¼ö·® Áõ°¡
     while (current != NULL) {
         if (current->itemID == itemID) {
             current->quantity++;
@@ -53,10 +53,10 @@ OrderItem* addOrderItem(OrderItem* head, int itemID) {
         }
         current = current->next;
     }
-    // ìƒˆ í•­ëª© ì¶”ê°€
+    // »õ Ç×¸ñ Ãß°¡
     OrderItem* newItem = (OrderItem*)malloc(sizeof(OrderItem));
     if (newItem == NULL) {
-        printf("ë©”ëª¨ë¦¬ í• ë‹¹ ì‹¤íŒ¨\n");
+        printf("¸Ş¸ğ¸® ÇÒ´ç ½ÇÆĞ\n");
         return head;
     }
     newItem->itemID = itemID;
@@ -65,7 +65,7 @@ OrderItem* addOrderItem(OrderItem* head, int itemID) {
     return newItem;
 }
 
-// ì£¼ë¬¸ í•­ëª© ë¦¬ìŠ¤íŠ¸ í•´ì œí•˜ëŠ” í•¨ìˆ˜ (7.9 ì£¼ë¬¸ ì¡°íšŒ í”„ë¡¬í”„íŠ¸. 7.10 ê²°ì œ ì²˜ë¦¬ í”„ë¡¬í”„íŠ¸ì—ì„œ ì‚¬ìš©)
+// ÁÖ¹® Ç×¸ñ ¸®½ºÆ® ÇØÁ¦ÇÏ´Â ÇÔ¼ö (7.9 ÁÖ¹® Á¶È¸ ÇÁ·ÒÇÁÆ®. 7.10 °áÁ¦ Ã³¸® ÇÁ·ÒÇÁÆ®¿¡¼­ »ç¿ë)
 void freeOrderItems(OrderItem* head) {
     while (head != NULL) {
         OrderItem* temp = head;
@@ -74,13 +74,13 @@ void freeOrderItems(OrderItem* head) {
     }
 }
 
-// í…ìŠ¤íŠ¸ íŒŒì¼ íŠ¹ì • ë²”ìœ„ì˜ ì¤„ì„ ì‚­ì œí•˜ëŠ” í•¨ìˆ˜ (7.10 ê²°ì œ ì²˜ë¦¬ í”„ë¡¬í”„íŠ¸ì—ì„œ ì‚¬ìš©)
+// ÅØ½ºÆ® ÆÄÀÏ Æ¯Á¤ ¹üÀ§ÀÇ ÁÙÀ» »èÁ¦ÇÏ´Â ÇÔ¼ö (7.10 °áÁ¦ Ã³¸® ÇÁ·ÒÇÁÆ®¿¡¼­ »ç¿ë)
 int deleteLines(const char* filePath, int startLine, int endLine) {
     FILE* fp_read, * fp_write;
     char line[1024];
     int currentLine = 1;
 
-    // íŒŒì¼ ì—´ê¸°
+    // ÆÄÀÏ ¿­±â
     fp_read = fopen(filePath, "r");
     if (fp_read == NULL) {
         perror("fopen");
@@ -93,7 +93,7 @@ int deleteLines(const char* filePath, int startLine, int endLine) {
         return -1;
     }
 
-    // íŒŒì¼ ì½ê³  ì“°ê¸°
+    // ÆÄÀÏ ÀĞ°í ¾²±â
     while (fgets(line, sizeof(line), fp_read) != NULL) {
         if (currentLine < startLine || (endLine != -1 && currentLine > endLine)) {
             fputs(line, fp_write);
@@ -101,7 +101,7 @@ int deleteLines(const char* filePath, int startLine, int endLine) {
         currentLine++;
     }
 
-    // íŒŒì¼ ë‹«ê¸°
+    // ÆÄÀÏ ´İ±â
     fclose(fp_read);
     fclose(fp_write);
 
@@ -110,7 +110,7 @@ int deleteLines(const char* filePath, int startLine, int endLine) {
     return 0;
 }
 
-// ì •ìˆ˜ ì…ë ¥ í•¨ìˆ˜
+// Á¤¼ö ÀÔ·Â ÇÔ¼ö
 int inputInt(const char* prompt, bool allowZero) {
     char n[MAX_INPUT + 2];
     char* endptr;
@@ -118,12 +118,12 @@ int inputInt(const char* prompt, bool allowZero) {
 
     if (prompt != NULL) printf("%s", prompt);
     if (fgets(n, sizeof(n), stdin) == NULL) {
-        printf("ì…ë ¥ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤. ë‹¤ì‹œ ì‹œë„í•´ì£¼ì„¸ìš”.\n");
+        printf("ÀÔ·Â ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù. ´Ù½Ã ½ÃµµÇØÁÖ¼¼¿ä.\n");
     }
     else {
         n[strcspn(n, "\n")] = '\0';
         if (strlen(n) > MAX_INPUT) {
-            printf("ê²½ê³ : %dì ì´í•˜ë¡œ ìˆ«ìë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n", MAX_INPUT);
+            printf("°æ°í: %dÀÚ ÀÌÇÏ·Î ¼ıÀÚ¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n", MAX_INPUT);
             return -2;
         }
         else {
@@ -131,19 +131,19 @@ int inputInt(const char* prompt, bool allowZero) {
             char* end = n + strlen(n) - 1;
             while (isspace((unsigned char)*start)) start++;
 
-            // ë¹ˆ ì…ë ¥ ì²˜ë¦¬
+            // ºó ÀÔ·Â Ã³¸®
             if (*start == '\0') {
-                return -1; // ì—”í„°ê°€ ëˆŒë ¸ì„ ê²½ìš° -1 ë°˜í™˜
+                return -1; // ¿£ÅÍ°¡ ´­·ÈÀ» °æ¿ì -1 ¹İÈ¯
             }
 
             if (start[0] == '0' && strlen(start) > 1) {
-                printf("ì˜¤ë¥˜: 0ìœ¼ë¡œ ì‹œì‘í•˜ëŠ” ìˆ˜ëŠ” ì…ë ¥í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+                printf("¿À·ù: 0À¸·Î ½ÃÀÛÇÏ´Â ¼ö´Â ÀÔ·ÂÇÒ ¼ö ¾ø½À´Ï´Ù.\n");
                 return -3;
             }
 
 
             else if (*start == '\0') {
-                printf("ì˜¤ë¥˜: ì…ë ¥ê°’ì´ ë¹„ì–´ìˆìŠµë‹ˆë‹¤.\n");
+                printf("¿À·ù: ÀÔ·Â°ªÀÌ ºñ¾îÀÖ½À´Ï´Ù.\n");
                 return -4;
             }
             else {
@@ -153,17 +153,17 @@ int inputInt(const char* prompt, bool allowZero) {
                 num = strtol(start, &endptr, 10);
 
                 if (*endptr != '\0') {
-                    printf("ì˜¤ë¥˜: ìŒì´ ì•„ë‹Œ ì •ìˆ˜ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
+                    printf("¿À·ù: À½ÀÌ ¾Æ´Ñ Á¤¼ö¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
                     return -5;
                 }
                 else {
                     if (num < 0 || num > INT_MAX) {
-                        printf("ì˜¤ë¥˜: ìŒì´ ì•„ë‹Œ ì •ìˆ˜ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n", INT_MAX);
+                        printf("¿À·ù: À½ÀÌ ¾Æ´Ñ Á¤¼ö¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n", INT_MAX);
                         return -6;
                     }
                     else {
                         if (num == 0 && !allowZero) {
-                            printf("ì˜¤ë¥˜: 0ì€ ì…ë ¥í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+                            printf("¿À·ù: 0Àº ÀÔ·ÂÇÒ ¼ö ¾ø½À´Ï´Ù.\n");
                             return -7;
                         }
                         return (int)num;
@@ -174,7 +174,7 @@ int inputInt(const char* prompt, bool allowZero) {
     }
 }
 
-// ë§ˆì§€ë§‰ (ê°€ì¥ í°) í…Œì´ë¸” ë²ˆí˜¸ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜
+// ¸¶Áö¸· (°¡Àå Å«) Å×ÀÌºí ¹øÈ£ ¹İÈ¯ÇÏ´Â ÇÔ¼ö
 int getLastTableNumber() {
     int maxNumber = 0;
     for (int i = 1; i <= 10; i++) {
@@ -192,11 +192,11 @@ int getLastTableNumber() {
     return maxNumber;
 }
 
-// ì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ” í…Œì´ë¸” ë˜ëŠ” ê²°ì œ ê°€ëŠ¥í•œ í…Œì´ë¸” ì¶œë ¥ í•¨ìˆ˜
+// ÁÖ¹® ³»¿ªÀÌ ÀÖ´Â Å×ÀÌºí ¶Ç´Â °áÁ¦ °¡´ÉÇÑ Å×ÀÌºí Ãâ·Â ÇÔ¼ö
 void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* message) {
     *orderCount = 0;
 
-    printf("%s: {", message); // ë©”ì‹œì§€ ì¶œë ¥
+    printf("%s: {", message); // ¸Ş½ÃÁö Ãâ·Â
 
     bool first = true;
     int maxTableNum = getLastTableNumber();
@@ -227,14 +227,14 @@ void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* me
 }
 
 
-//////////////////// ê¸°íšì„œ ê¸°ë°˜ í”„ë¡¬í”„íŠ¸ ////////////////////
+//////////////////// ±âÈ¹¼­ ±â¹İ ÇÁ·ÒÇÁÆ® ////////////////////
 
-// 7.1 ë°ì´í„° íŒŒì¼ ë¬´ê²°ì„± ê²€ì‚¬
+// 7.1 µ¥ÀÌÅÍ ÆÄÀÏ ¹«°á¼º °Ë»ç
 bool checkDataIntegrity() {
-    ///// íŒë§¤ í•­ëª© ë°ì´í„° íŒŒì¼ ê²€ì‚¬ (ê¸°ì¡´ ì½”ë“œì™€ ë™ì¼) /////
+    ///// ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÆÄÀÏ °Ë»ç (±âÁ¸ ÄÚµå¿Í µ¿ÀÏ) /////
     FILE* foodFile = fopen(FILE_PATH, "r+");
     if (foodFile == NULL) {
-        printf("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
         return false;
     }
 
@@ -242,7 +242,7 @@ bool checkDataIntegrity() {
     int itemCount = 0;
     char line[256];
 
-    // íŒë§¤ í•­ëª© ë°ì´í„° ì½ê¸°
+    // ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÀĞ±â
     int lineNumber = 0;
     int expectedId = 1;
     while (fgets(line, sizeof(line), foodFile) && itemCount < 100) {
@@ -265,19 +265,19 @@ bool checkDataIntegrity() {
         while (*ptr && isspace(*ptr)) ptr++;
         if (sscanf(ptr, "%d", &price) != 1) continue;
 
-        // ê³ ìœ  ë²ˆí˜¸ ì¤‘ë³µ ê²€ì‚¬
+        // °íÀ¯ ¹øÈ£ Áßº¹ °Ë»ç
         for (int i = 0; i < itemCount; i++) {
             if (itemIds[i] == id) {
-                printf("íŒë§¤ í•­ëª© ë°ì´í„° íŒŒì¼ %dë²ˆì§¸ ì¤„ê³¼ %dë²ˆì§¸ ì¤„ì—ì„œ ê³ ìœ  ë²ˆí˜¸ ì¤‘ë³µì´ ë°œìƒí–ˆìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n",
+                printf("ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÆÄÀÏ %d¹øÂ° ÁÙ°ú %d¹øÂ° ÁÙ¿¡¼­ °íÀ¯ ¹øÈ£ Áßº¹ÀÌ ¹ß»ıÇß½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n",
                     i + 1, lineNumber);
                 fclose(foodFile);
                 return false;
             }
         }
 
-        // ê³ ìœ  ë²ˆí˜¸ ìˆœì°¨ì  ì¦ê°€ ê²€ì‚¬
+        // °íÀ¯ ¹øÈ£ ¼øÂ÷Àû Áõ°¡ °Ë»ç
         if (id != expectedId) {
-            printf("íŒë§¤ í•­ëª© ë°ì´í„° íŒŒì¼ì˜ ê³ ìœ  ë²ˆí˜¸ê°€ ì˜¬ë°”ë¥¸ ìˆœì„œë¡œ ì¦ê°€í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n");
+            printf("ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÆÄÀÏÀÇ °íÀ¯ ¹øÈ£°¡ ¿Ã¹Ù¸¥ ¼ø¼­·Î Áõ°¡ÇÏÁö ¾Ê½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n");
             fclose(foodFile);
             return false;
         }
@@ -287,11 +287,11 @@ bool checkDataIntegrity() {
     }
     fclose(foodFile);
 
-    ///// í…Œì´ë¸” ë°ì´í„° íŒŒì¼ ê²€ì‚¬ (ìˆ˜ì •ëœ ë¶€ë¶„) /////
+    ///// Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏ °Ë»ç (¼öÁ¤µÈ ºÎºĞ) /////
     int tableCount = 0;
-    int existingTables[11] = { 0 };  // ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ë²ˆí˜¸ ì²´í¬ìš© (0ë²ˆ ì¸ë±ìŠ¤ëŠ” ì‚¬ìš©ì•ˆí•¨)
+    int existingTables[11] = { 0 };  // Á¸ÀçÇÏ´Â Å×ÀÌºí ¹øÈ£ Ã¼Å©¿ë (0¹ø ÀÎµ¦½º´Â »ç¿ë¾ÈÇÔ)
 
-    // ëª¨ë“  ê°€ëŠ¥í•œ í…Œì´ë¸” íŒŒì¼ ê²€ì‚¬
+    // ¸ğµç °¡´ÉÇÑ Å×ÀÌºí ÆÄÀÏ °Ë»ç
     for (int table = 1; table <= 10; table++) {
         char tableFileName[256];
         snprintf(tableFileName, sizeof(tableFileName), "%s/%d.txt", TABLE_FILE_PATH, table);
@@ -301,7 +301,7 @@ bool checkDataIntegrity() {
             tableCount++;
             existingTables[table] = 1;
 
-            // í…Œì´ë¸” íŒŒì¼ì˜ ë‚´ìš© ê²€ì‚¬
+            // Å×ÀÌºí ÆÄÀÏÀÇ ³»¿ë °Ë»ç
             int tableLineNumber = 0;
             while (fgets(line, sizeof(line), tableFile)) {
                 tableLineNumber++;
@@ -315,14 +315,14 @@ bool checkDataIntegrity() {
                         }
                     }
                     if (!found) {
-                        printf("í…Œì´ë¸” ë°ì´í„° íŒŒì¼ì˜ %dë²ˆì§¸ ì¤„ì˜ íŒë§¤ í•­ëª© ê³ ìœ  ë²ˆí˜¸ %dëŠ” ì˜¬ë°”ë¥¸ íŒë§¤ í•­ëª© ê³ ìœ  ë²ˆí˜¸ê°€ ì•„ë‹™ë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n",
+                        printf("Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏÀÇ %d¹øÂ° ÁÙÀÇ ÆÇ¸Å Ç×¸ñ °íÀ¯ ¹øÈ£ %d´Â ¿Ã¹Ù¸¥ ÆÇ¸Å Ç×¸ñ °íÀ¯ ¹øÈ£°¡ ¾Æ´Õ´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n",
                             tableLineNumber, saleItemId);
                         fclose(tableFile);
                         return false;
                     }
                 }
                 else {
-                    printf("í…Œì´ë¸” ë°ì´í„° íŒŒì¼ì˜ %dë²ˆì§¸ ì¤„ì—ì„œ ì˜¬ë°”ë¥¸ í˜•ì‹ì˜ íŒë§¤ í•­ëª© ê³ ìœ  ë²ˆí˜¸ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n",
+                    printf("Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏÀÇ %d¹øÂ° ÁÙ¿¡¼­ ¿Ã¹Ù¸¥ Çü½ÄÀÇ ÆÇ¸Å Ç×¸ñ °íÀ¯ ¹øÈ£¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n",
                         tableLineNumber);
                     fclose(tableFile);
                     return false;
@@ -332,45 +332,45 @@ bool checkDataIntegrity() {
         }
     }
 
-    // í…Œì´ë¸” ê°œìˆ˜ ì œì•½ ê²€ì‚¬
+    // Å×ÀÌºí °³¼ö Á¦¾à °Ë»ç
     if (tableCount < 1) {
-        printf("í…Œì´ë¸”ì´ í•˜ë‚˜ë„ ì¡´ì¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n");
+        printf("Å×ÀÌºíÀÌ ÇÏ³ªµµ Á¸ÀçÇÏÁö ¾Ê½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n");
         return false;
     }
     if (tableCount > 10) {
-        printf("í…Œì´ë¸”ì´ 10ê°œë¥¼ ì´ˆê³¼í•©ë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n");
+        printf("Å×ÀÌºíÀÌ 10°³¸¦ ÃÊ°úÇÕ´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n");
         return false;
     }
 
     return true;
 }
 
-// 7.2 íŒë§¤ í•­ëª© ì„ íƒ ì…ë ¥ *ì£¼ì˜* ì´ í•¨ìˆ˜ëŠ” ì˜ë¯¸ ê·œì¹™ì„ ê²€ì‚¬í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤.
+// 7.2 ÆÇ¸Å Ç×¸ñ ¼±ÅÃ ÀÔ·Â *ÁÖÀÇ* ÀÌ ÇÔ¼ö´Â ÀÇ¹Ì ±ÔÄ¢À» °Ë»çÇÏÁö ¾Ê½À´Ï´Ù.
 int inputFoodNumber() {
     int foodNumber;
     while (1) {
-        foodNumber = inputInt("íŒë§¤ í•­ëª© ë²ˆí˜¸ë¥¼ ì…ë ¥í•˜ì„¸ìš”: ", true);
+        foodNumber = inputInt("ÆÇ¸Å Ç×¸ñ ¹øÈ£¸¦ ÀÔ·ÂÇÏ¼¼¿ä: ", true);
         return foodNumber;
     }
 }
 
-// 7.3.1 íŒë§¤ í•­ëª©ëª… ì…ë ¥
+// 7.3.1 ÆÇ¸Å Ç×¸ñ¸í ÀÔ·Â
 char* inputFoodName() {
     char* s = (char*)malloc(sizeof(char) * (MAX_INPUT + 2));
     if (s == NULL) {
-        fprintf(stderr, "ë©”ëª¨ë¦¬ í• ë‹¹ ì‹¤íŒ¨\n");
+        fprintf(stderr, "¸Ş¸ğ¸® ÇÒ´ç ½ÇÆĞ\n");
         return NULL;
     }
 
     while (1) {
-        printf("íŒë§¤ í•­ëª©ëª…: ");
+        printf("ÆÇ¸Å Ç×¸ñ¸í: ");
         if (fgets(s, MAX_INPUT + 2, stdin) == NULL) {
-            printf("ì…ë ¥ ì˜¤ë¥˜ ë°œìƒ\n");
+            printf("ÀÔ·Â ¿À·ù ¹ß»ı\n");
         }
         else {
-            s[strcspn(s, "\n")] = '\0'; // \nì„ ì œê±°
+            s[strcspn(s, "\n")] = '\0'; // \nÀ» Á¦°Å
 
-            // ì• ë’¤ ê³µë°± ì œê±°
+            // ¾Õ µÚ °ø¹é Á¦°Å
             char* start = s;
             char* end = s + strlen(s) - 1;
             while (isspace((unsigned char)*start)) start++;
@@ -378,13 +378,13 @@ char* inputFoodName() {
             memmove(s, start, end - start + 1);
             s[end - start + 1] = '\0';
 
-            // ê¸¸ì´ ê²€ì‚¬ (ê³µë°± ì œê±° í›„)
+            // ±æÀÌ °Ë»ç (°ø¹é Á¦°Å ÈÄ)
             int len = strlen(s);
             if (len < 1 || len > 20) {
-                printf("ê²½ê³ : ì…ë ¥ì€ 1ì´ìƒ 20ì´í•˜ì´ì–´ì•¼ í•©ë‹ˆë‹¤. ë‹¤ì‹œ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
+                printf("°æ°í: ÀÔ·ÂÀº 1ÀÌ»ó 20ÀÌÇÏÀÌ¾î¾ß ÇÕ´Ï´Ù. ´Ù½Ã ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
             }
             else {
-                // ì•ŒíŒŒë²³ ê²€ì‚¬
+                // ¾ËÆÄºª °Ë»ç
                 int valid = 1;
                 for (int i = 0; s[i] != '\0'; i++) {
                     if (!isalpha((unsigned char)s[i])) {
@@ -393,7 +393,7 @@ char* inputFoodName() {
                     }
                 }
                 if (!valid) {
-                    printf("ê²½ê³ : í•­ëª©ëª…ì€ ì•ŒíŒŒë²³ë§Œ ì…ë ¥í•´ì•¼ í•©ë‹ˆë‹¤. ë‹¤ì‹œ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
+                    printf("°æ°í: Ç×¸ñ¸íÀº ¾ËÆÄºª¸¸ ÀÔ·ÂÇØ¾ß ÇÕ´Ï´Ù. ´Ù½Ã ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
                 }
                 else {
                     return s;
@@ -403,64 +403,64 @@ char* inputFoodName() {
     }
 }
 
-// 7.3.2 íŒë§¤ í•­ëª©ê°€ ì…ë ¥
+// 7.3.2 ÆÇ¸Å Ç×¸ñ°¡ ÀÔ·Â
 int inputPrice() {
     int price;
     while (1) {
-        price = inputInt("íŒë§¤ í•­ëª©ê°€: ", false);
+        price = inputInt("ÆÇ¸Å Ç×¸ñ°¡: ", false);
         if (price >= 1 && price <= 9999999) {
             return price;
         }
         else {
-            printf("ì˜¤ë¥˜: 1~9999999ì‚¬ì´ì˜ ìˆ˜ë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n");
+            printf("¿À·ù: 1~9999999»çÀÌÀÇ ¼ö¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n");
         }
     }
 }
 
-// 7.4.1 í…Œì´ë¸” ë²ˆí˜¸ ì…ë ¥
+// 7.4.1 Å×ÀÌºí ¹øÈ£ ÀÔ·Â
 int inputTableNumber(bool paymentMode) {
     int tableNumber;
-    int maxTableNumber = getLastTableNumber(); // ìµœëŒ€ í…Œì´ë¸” ë²ˆí˜¸ë¥¼ ê°€ì ¸ì˜´
+    int maxTableNumber = getLastTableNumber(); // ÃÖ´ë Å×ÀÌºí ¹øÈ£¸¦ °¡Á®¿È
 
-        // ì‚¬ìš©ìì—ê²Œ ì…ë ¥ ìš”ì²­
-        if (!paymentMode) { // ì¼ë°˜ ëª¨ë“œ
-            printf("í…Œì´ë¸” ë²ˆí˜¸ë¥¼ ì…ë ¥í•˜ì„¸ìš” (1~%d): ", maxTableNumber);
+        // »ç¿ëÀÚ¿¡°Ô ÀÔ·Â ¿äÃ»
+        if (!paymentMode) { // ÀÏ¹İ ¸ğµå
+            printf("Å×ÀÌºí ¹øÈ£¸¦ ÀÔ·ÂÇÏ¼¼¿ä (1~%d): ", maxTableNumber);
             tableNumber = inputInt(NULL, false);
         }
         else {
             tableNumber = inputInt(NULL, true);
         }
         
-        // ê²°ì œ ëª¨ë“œ ì¶”ê°€ ì¡°ê±´ ê²€ì‚¬
+        // °áÁ¦ ¸ğµå Ãß°¡ Á¶°Ç °Ë»ç
         if (paymentMode) {
-            // ì—”í„°ë‚˜ ê³µë°± ì…ë ¥ ì‹œ -1 ë°˜í™˜
+            // ¿£ÅÍ³ª °ø¹é ÀÔ·Â ½Ã -1 ¹İÈ¯
             if (tableNumber == -1) {
                 return -1;
             }
-            // í…Œì´ë¸” ë²ˆí˜¸ê°€ 0 ë˜ëŠ” 1~maxTableNumber ë²”ìœ„ì— ìˆëŠ”ì§€ í™•ì¸
+            // Å×ÀÌºí ¹øÈ£°¡ 0 ¶Ç´Â 1~maxTableNumber ¹üÀ§¿¡ ÀÖ´ÂÁö È®ÀÎ
             if (tableNumber > maxTableNumber) {
-                printf("ì˜¤ë¥˜: ê²°ì œ ëª¨ë“œì—ì„œëŠ” 0ê³¼ 1~%d ì‚¬ì´ì˜ ë²ˆí˜¸ë§Œ ì…ë ¥ ê°€ëŠ¥í•©ë‹ˆë‹¤.\n", maxTableNumber);
-                return -2; // ìœ íš¨í•˜ì§€ ì•Šì€ ë²ˆí˜¸ ì‹œë„ ì‹œ -2 ë°˜í™˜
+                printf("¿À·ù: °áÁ¦ ¸ğµå¿¡¼­´Â 0°ú 1~%d »çÀÌÀÇ ¹øÈ£¸¸ ÀÔ·Â °¡´ÉÇÕ´Ï´Ù.\n", maxTableNumber);
+                return -2; // À¯È¿ÇÏÁö ¾ÊÀº ¹øÈ£ ½Ãµµ ½Ã -2 ¹İÈ¯
             }
         }
         else {
-            // ì¼ë°˜ ëª¨ë“œì—ì„œ ìœ íš¨ ë²”ìœ„ í™•ì¸ (1~maxTableNumber)
+            // ÀÏ¹İ ¸ğµå¿¡¼­ À¯È¿ ¹üÀ§ È®ÀÎ (1~maxTableNumber)
             if (tableNumber > maxTableNumber) {
-                printf("ì˜¤ë¥˜: 1~%d ì‚¬ì´ì˜ ë²ˆí˜¸ë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n", maxTableNumber);
-                return -2; // ìœ íš¨í•˜ì§€ ì•Šì€ ë²ˆí˜¸ ì‹œë„ ì‹œ -2 ë°˜í™˜
+                printf("¿À·ù: 1~%d »çÀÌÀÇ ¹øÈ£¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n", maxTableNumber);
+                return -2; // À¯È¿ÇÏÁö ¾ÊÀº ¹øÈ£ ½Ãµµ ½Ã -2 ¹İÈ¯
             }
         }
 
-        return tableNumber; // ìœ íš¨í•œ í…Œì´ë¸” ë²ˆí˜¸ ë°˜í™˜
+        return tableNumber; // À¯È¿ÇÑ Å×ÀÌºí ¹øÈ£ ¹İÈ¯
 }
 
-// 7.4.2 ìˆ˜ëŸ‰ ì…ë ¥
+// 7.4.2 ¼ö·® ÀÔ·Â
 int inputQuantity() {
     int quantity;
     while (1) {
-        quantity = inputInt("ìˆ˜ëŸ‰ì„ ì…ë ¥í•˜ì„¸ìš”: ", false);
+        quantity = inputInt("¼ö·®À» ÀÔ·ÂÇÏ¼¼¿ä: ", false);
         if (quantity < 1 || quantity >99) {
-            printf("ì˜¤ë¥˜: 1~99ì‚¬ì´ì˜ ìˆ˜ëŸ‰ì„ ì…ë ¥í•˜ì„¸ìš”.\n");
+            printf("¿À·ù: 1~99»çÀÌÀÇ ¼ö·®À» ÀÔ·ÂÇÏ¼¼¿ä.\n");
         }
         else {
             return quantity;
@@ -468,64 +468,64 @@ int inputQuantity() {
     }
 }
 
-// 7.4.3 ê²°ì œ ê¸ˆì•¡ ì…ë ¥
+// 7.4.3 °áÁ¦ ±İ¾× ÀÔ·Â
 int inputPaymentAmount(int remainingBalance) {
     while (1)
     {
-        printf("ê²°ì œí•  ê¸ˆì•¡ì„ ì…ë ¥í•˜ì„¸ìš” [%dì›]: ", remainingBalance);
-        int paymentAmount = inputInt(NULL, true); // ì •ìˆ˜ ì…ë ¥ í•¨ìˆ˜ ì‚¬ìš©
+        printf("°áÁ¦ÇÒ ±İ¾×À» ÀÔ·ÂÇÏ¼¼¿ä [%d¿ø]: ", remainingBalance);
+        int paymentAmount = inputInt(NULL, true); // Á¤¼ö ÀÔ·Â ÇÔ¼ö »ç¿ë
 
-        // ì…ë ¥ì´ ë¹„ì–´ìˆë‹¤ë©´ ì „ì²´ ê¸ˆì•¡ ê²°ì œ
-        if (paymentAmount == -1) { // ì—”í„°í‚¤ë§Œ ì…ë ¥ëœ ê²½ìš°
-            printf("ì „ì²´ ê¸ˆì•¡ì´ ê²°ì œ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
-            remainingBalance = 0; // ì „ì•¡ ê²°ì œ ì™„ë£Œ
+        // ÀÔ·ÂÀÌ ºñ¾îÀÖ´Ù¸é ÀüÃ¼ ±İ¾× °áÁ¦
+        if (paymentAmount == -1) { // ¿£ÅÍÅ°¸¸ ÀÔ·ÂµÈ °æ¿ì
+            printf("ÀüÃ¼ ±İ¾×ÀÌ °áÁ¦ ¿Ï·áµÇ¾ú½À´Ï´Ù.\n");
+            remainingBalance = 0; // Àü¾× °áÁ¦ ¿Ï·á
             return remainingBalance;
         }
 
-        // ìœ íš¨ì„± ê²€ì‚¬
+        // À¯È¿¼º °Ë»ç
         if (paymentAmount < -1) {
             continue;
-        } else if (paymentAmount == 0) { // 0 ì…ë ¥ ì‹œ ê²°ì œ ì¤‘ë‹¨
-            printf("ê²°ì œ ì¤‘ë‹¨.\n");
+        } else if (paymentAmount == 0) { // 0 ÀÔ·Â ½Ã °áÁ¦ Áß´Ü
+            printf("°áÁ¦ Áß´Ü.\n");
             return -1;
         } else if (paymentAmount > remainingBalance) {
-            printf("ì˜¤ë¥˜: ê²°ì œí•  ê¸ˆì•¡ë³´ë‹¤ í½ë‹ˆë‹¤.\n");
+            printf("¿À·ù: °áÁ¦ÇÒ ±İ¾×º¸´Ù Å®´Ï´Ù.\n");
             continue;
         }
 
         remainingBalance -= paymentAmount;
         if (remainingBalance == 0) {
-            printf("ì „ì²´ ê¸ˆì•¡ì´ ê²°ì œ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
-            remainingBalance = 0; // ì „ì•¡ ê²°ì œ ì™„ë£Œ
+            printf("ÀüÃ¼ ±İ¾×ÀÌ °áÁ¦ ¿Ï·áµÇ¾ú½À´Ï´Ù.\n");
+            remainingBalance = 0; // Àü¾× °áÁ¦ ¿Ï·á
             return remainingBalance;
         } else {
-            printf("%dì› ë¶„í•  ê²°ì œ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤. ë‚¨ì€ ê¸ˆì•¡: %dì›\n", paymentAmount, remainingBalance);
+            printf("%d¿ø ºĞÇÒ °áÁ¦ ¿Ï·áµÇ¾ú½À´Ï´Ù. ³²Àº ±İ¾×: %d¿ø\n", paymentAmount, remainingBalance);
             return remainingBalance;
         }
     }
 }
 
-// 7.5 íŒë§¤ í•­ëª© ì¡°íšŒ í”„ë¡¬í”„íŠ¸
+// 7.5 ÆÇ¸Å Ç×¸ñ Á¶È¸ ÇÁ·ÒÇÁÆ®
 void printFoodList() {
 
-    ///// íŒë§¤ í•­ëª© ë°ì´í„° íŒŒì¼ ì—´ê¸° /////
-    FILE* foodFile = fopen(FILE_PATH, "r"); // ì½ê¸°
+    ///// ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÆÄÀÏ ¿­±â /////
+    FILE* foodFile = fopen(FILE_PATH, "r"); // ÀĞ±â
     if (foodFile == NULL) {
-        printf("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
     }
     checkDataIntegrity(foodFile);
-    rewind(foodFile);  // íŒŒì¼ í¬ì¸í„°ë¥¼ ì²˜ìŒìœ¼ë¡œ ë˜ëŒë¦¼
+    rewind(foodFile);  // ÆÄÀÏ Æ÷ÀÎÅÍ¸¦ Ã³À½À¸·Î µÇµ¹¸²
     /////////////////////////////////////
 
-    char line[100]; // ê° í–‰ì„ ì €ì¥í•  ë¬¸ìì—´
+    char line[100]; // °¢ ÇàÀ» ÀúÀåÇÒ ¹®ÀÚ¿­
     int line_count = 0;
     int firstNum, secondNum, price;
-    char food[50];  // ìŒì‹ ì´ë¦„ ì €ì¥
+    char food[50];  // À½½Ä ÀÌ¸§ ÀúÀå
 
-    printf("\n===== íŒë§¤ í•­ëª© ëª©ë¡ =====\n");
+    printf("\n===== ÆÇ¸Å Ç×¸ñ ¸ñ·Ï =====\n");
 
     while (fgets(line, sizeof(line), foodFile)) {
-        sscanf(line, "%d  %d    %s  %d", &firstNum, &secondNum, food, &price);  // ê³µë°± 2ì¹¸, 4ì¹¸, 2ì¹¸ ìœ ì§€
+        sscanf(line, "%d  %d    %s  %d", &firstNum, &secondNum, food, &price);  // °ø¹é 2Ä­, 4Ä­, 2Ä­ À¯Áö
 
         if (firstNum == 0) {
             printf("%d. %s - %d\n", ++line_count, food, price);
@@ -533,182 +533,182 @@ void printFoodList() {
     }
 
     if (line_count == 0) {
-        printf("íŒë§¤ ì¤‘ì¸ í•­ëª©ì´ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("ÆÇ¸Å ÁßÀÎ Ç×¸ñÀÌ ¾ø½À´Ï´Ù.\n");
     }
 
     fclose(foodFile);
 }
 
-// 7.6 íŒë§¤ í•­ëª© ì¶”ê°€ í”„ë¡¬í”„íŠ¸
+// 7.6 ÆÇ¸Å Ç×¸ñ Ãß°¡ ÇÁ·ÒÇÁÆ®
 void addToFoodList() {
 
-    ///// íŒë§¤ í•­ëª© ë°ì´í„° íŒŒì¼ ì—´ê¸° /////
-    FILE* foodFile = fopen(FILE_PATH, "r+"); // ì½ê¸° ë° í¸ì§‘
+    ///// ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÆÄÀÏ ¿­±â /////
+    FILE* foodFile = fopen(FILE_PATH, "r+"); // ÀĞ±â ¹× ÆíÁı
     if (foodFile == NULL) {
-        printf("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
     }
     checkDataIntegrity(foodFile);
-    rewind(foodFile);  // íŒŒì¼ í¬ì¸í„°ë¥¼ ì²˜ìŒìœ¼ë¡œ ë˜ëŒë¦¼
+    rewind(foodFile);  // ÆÄÀÏ Æ÷ÀÎÅÍ¸¦ Ã³À½À¸·Î µÇµ¹¸²
     /////////////////////////////////////
 
     int firstNum = 0;
     int secondNum = getLastSecondNumber(foodFile) + 1;
 
-    printf("\nì¶”ê°€í•  íŒë§¤ í•­ëª© ì •ë³´ë¥¼ ì…ë ¥í•˜ì„¸ìš”(í•­ëª©ëª…ì€ ì•ŒíŒŒë²³ë§Œ í—ˆìš©)\n");
+    printf("\nÃß°¡ÇÒ ÆÇ¸Å Ç×¸ñ Á¤º¸¸¦ ÀÔ·ÂÇÏ¼¼¿ä(Ç×¸ñ¸íÀº ¾ËÆÄºª¸¸ Çã¿ë)\n");
     char* foodName = inputFoodName();
 
     if (foodName != NULL) {
         int price = inputPrice();
 
-        fseek(foodFile, 0, SEEK_END);  // íŒŒì¼ì˜ ëìœ¼ë¡œ ì´ë™
+        fseek(foodFile, 0, SEEK_END);  // ÆÄÀÏÀÇ ³¡À¸·Î ÀÌµ¿
         if (fseek(foodFile, -1, SEEK_END) == 0 && fgetc(foodFile) != '\n') {
             fprintf(foodFile, "\n");
         }
-        fprintf(foodFile, "%d  %d    %s  %d\n", firstNum, secondNum, foodName, price);  // ê³µë°± 2ì¹¸, 4ì¹¸, 2ì¹¸ ê³µë°± ì ìš©
-        printf("%s ì´/ê°€ ì¶”ê°€ë˜ì—ˆìŠµë‹ˆë‹¤.\n", foodName);
+        fprintf(foodFile, "%d  %d    %s  %d\n", firstNum, secondNum, foodName, price);  // °ø¹é 2Ä­, 4Ä­, 2Ä­ °ø¹é Àû¿ë
+        printf("%s ÀÌ/°¡ Ãß°¡µÇ¾ú½À´Ï´Ù.\n", foodName);
 
         free(foodName);
     }
     else {
-        printf("ë©”ëª¨ë¦¬ í• ë‹¹ ì‹¤íŒ¨\n");
+        printf("¸Ş¸ğ¸® ÇÒ´ç ½ÇÆĞ\n");
     }
 
     fclose(foodFile);
 }
 
-// 7.7 íŒë§¤ í•­ëª© ì œê±° í”„ë¡¬í”„íŠ¸
+// 7.7 ÆÇ¸Å Ç×¸ñ Á¦°Å ÇÁ·ÒÇÁÆ®
 void removeFoodItem() {
 
-    ///// íŒë§¤ í•­ëª© ë°ì´í„° íŒŒì¼ ì—´ê¸° /////
-    FILE* foodFile = fopen(FILE_PATH, "r+"); // ì½ê¸° ë° í¸ì§‘
+    ///// ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÆÄÀÏ ¿­±â /////
+    FILE* foodFile = fopen(FILE_PATH, "r+"); // ÀĞ±â ¹× ÆíÁı
     if (foodFile == NULL) {
-        printf("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
     }
     checkDataIntegrity(foodFile);
-    rewind(foodFile);  // íŒŒì¼ í¬ì¸í„°ë¥¼ ì²˜ìŒìœ¼ë¡œ ë˜ëŒë¦¼
+    rewind(foodFile);  // ÆÄÀÏ Æ÷ÀÎÅÍ¸¦ Ã³À½À¸·Î µÇµ¹¸²
     /////////////////////////////////////
 
-    printFoodList(); // í˜„ì¬ íŒë§¤ í•­ëª©ì„ ì¶œë ¥
+    printFoodList(); // ÇöÀç ÆÇ¸Å Ç×¸ñÀ» Ãâ·Â
 
     while (1) {
-        rewind(foodFile);  // íŒŒì¼ í¬ì¸í„°ë¥¼ ì²˜ìŒìœ¼ë¡œ ë˜ëŒë¦¼
+        rewind(foodFile);  // ÆÄÀÏ Æ÷ÀÎÅÍ¸¦ Ã³À½À¸·Î µÇµ¹¸²
         FILE* tempFile = fopen("temp.txt", "w");
         if (tempFile == NULL) {
-            printf("ì„ì‹œ íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+            printf("ÀÓ½Ã ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
             return;
         }
-        int userChoice = inputFoodNumber();  // ì‚¬ìš©ìê°€ ì„ íƒí•œ í•­ëª© ë²ˆí˜¸ (ì¶œë ¥ ìˆœì„œ)
+        int userChoice = inputFoodNumber();  // »ç¿ëÀÚ°¡ ¼±ÅÃÇÑ Ç×¸ñ ¹øÈ£ (Ãâ·Â ¼ø¼­)
 
         char line[256];
         int firstNum, secondNum, price;
         char foodName[50];
-        int currentZeroIndex = 0;  // 0ì¸ í•­ëª©ë§Œ ì¹´ìš´íŠ¸
+        int currentZeroIndex = 0;  // 0ÀÎ Ç×¸ñ¸¸ Ä«¿îÆ®
         int found = 0;
 
-        // ì›ë³¸ íŒŒì¼ì—ì„œ ë°ì´í„°ë¥¼ ì½ê³ , ì„ì‹œ íŒŒì¼ë¡œ ë³µì‚¬í•˜ë©´ì„œ ìƒíƒœë¥¼ ë³€ê²½
+        // ¿øº» ÆÄÀÏ¿¡¼­ µ¥ÀÌÅÍ¸¦ ÀĞ°í, ÀÓ½Ã ÆÄÀÏ·Î º¹»çÇÏ¸é¼­ »óÅÂ¸¦ º¯°æ
         while (fgets(line, sizeof(line), foodFile)) {
-            // ì •í™•í•œ ê³µë°±ì— ë§ì¶”ì–´ ë°ì´í„°ë¥¼ íŒŒì‹± (2ì¹¸, 4ì¹¸, 2ì¹¸ì˜ ê³µë°±)
+            // Á¤È®ÇÑ °ø¹é¿¡ ¸ÂÃß¾î µ¥ÀÌÅÍ¸¦ ÆÄ½Ì (2Ä­, 4Ä­, 2Ä­ÀÇ °ø¹é)
             sscanf(line, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price);
 
-            // ì²« ë²ˆì§¸ ìˆ«ìê°€ 0ì¸ í•­ëª©ë§Œ ì¹´ìš´íŠ¸ (í™œì„± ìƒíƒœì¸ í•­ëª©ë§Œ)
+            // Ã¹ ¹øÂ° ¼ıÀÚ°¡ 0ÀÎ Ç×¸ñ¸¸ Ä«¿îÆ® (È°¼º »óÅÂÀÎ Ç×¸ñ¸¸)
             if (firstNum == 0) {
-                currentZeroIndex++;  // ì²« ë²ˆì§¸ ìˆ«ìê°€ 0ì¸ í•­ëª©ì— ëŒ€í•´ ì¸ë±ìŠ¤ ì¦ê°€
+                currentZeroIndex++;  // Ã¹ ¹øÂ° ¼ıÀÚ°¡ 0ÀÎ Ç×¸ñ¿¡ ´ëÇØ ÀÎµ¦½º Áõ°¡
 
-                // ì‚¬ìš©ìê°€ ì„ íƒí•œ ìˆœì„œì™€ í˜„ì¬ í•­ëª©ì´ ì¼ì¹˜í•˜ë©´ í•´ë‹¹ í•­ëª© ì œê±° (ìƒíƒœ 1ë¡œ ë³€ê²½)
+                // »ç¿ëÀÚ°¡ ¼±ÅÃÇÑ ¼ø¼­¿Í ÇöÀç Ç×¸ñÀÌ ÀÏÄ¡ÇÏ¸é ÇØ´ç Ç×¸ñ Á¦°Å (»óÅÂ 1·Î º¯°æ)
                 if (currentZeroIndex == userChoice) {
-                    firstNum = 1;  // ì²« ë²ˆì§¸ ìˆ«ìë¥¼ 1ë¡œ ë³€ê²½í•˜ì—¬ ë¹„í™œì„±í™”
+                    firstNum = 1;  // Ã¹ ¹øÂ° ¼ıÀÚ¸¦ 1·Î º¯°æÇÏ¿© ºñÈ°¼ºÈ­
                     found = 1;
                 }
 
             }
 
-            // ë³€ê²½ëœ ë‚´ìš©ì„ ì„ì‹œ íŒŒì¼ì— ê¸°ë¡ (ê³µë°± í˜•ì‹ì„ ìœ ì§€í•˜ì—¬ ê¸°ë¡)
+            // º¯°æµÈ ³»¿ëÀ» ÀÓ½Ã ÆÄÀÏ¿¡ ±â·Ï (°ø¹é Çü½ÄÀ» À¯ÁöÇÏ¿© ±â·Ï)
             fprintf(tempFile, "%d  %d    %s  %d\n", firstNum, secondNum, foodName, price);
         }
 
-        // ëª¨ë“  í•­ëª©ì„ í™•ì¸í•œ í›„ì— í•­ëª©ì„ ì°¾ì§€ ëª»í–ˆì„ ê²½ìš° ì²˜ë¦¬
+        // ¸ğµç Ç×¸ñÀ» È®ÀÎÇÑ ÈÄ¿¡ Ç×¸ñÀ» Ã£Áö ¸øÇßÀ» °æ¿ì Ã³¸®
         if (!found) {
-            printf("í•´ë‹¹ ë²ˆí˜¸ì˜ í•­ëª©ì´ ì—†ìŠµë‹ˆë‹¤.\n");
+            printf("ÇØ´ç ¹øÈ£ÀÇ Ç×¸ñÀÌ ¾ø½À´Ï´Ù.\n");
             fclose(tempFile);
             continue;
         }
         else {
             fclose(tempFile);
-            fclose(foodFile); // ì„ì‹œ íŒŒì¼ë¡œ êµì²´ ì „ ë‹«ì•„ì•¼ í•¨.
+            fclose(foodFile); // ÀÓ½Ã ÆÄÀÏ·Î ±³Ã¼ Àü ´İ¾Æ¾ß ÇÔ.
 
-            // ì›ë³¸ íŒŒì¼ì„ ì„ì‹œ íŒŒì¼ë¡œ ëŒ€ì²´
+            // ¿øº» ÆÄÀÏÀ» ÀÓ½Ã ÆÄÀÏ·Î ´ëÃ¼
             remove(FILE_PATH);
             rename("temp.txt", FILE_PATH);
-            printf("ë©”ë‰´ ë²ˆí˜¸ %dê°€ ì œê±°ë˜ì—ˆìŠµë‹ˆë‹¤.\n", userChoice);
+            printf("¸Ş´º ¹øÈ£ %d°¡ Á¦°ÅµÇ¾ú½À´Ï´Ù.\n", userChoice);
             break;
         }
     }
 }
 
-// 7.8 ì£¼ë¬¸ ìƒì„± í”„ë¡¬í”„íŠ¸
+// 7.8 ÁÖ¹® »ı¼º ÇÁ·ÒÇÁÆ®
 void createOrder() {
 
-    // ì£¼ë¬¸ ê°€ëŠ¥í•œ í…Œì´ë¸” ëª©ë¡ í‘œì‹œ
-    int tablesWithOrders[5];  // ì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ” í…Œì´ë¸”ì„ ì €ì¥í•  ë°°ì—´
+    // ÁÖ¹® °¡´ÉÇÑ Å×ÀÌºí ¸ñ·Ï Ç¥½Ã
+    int tablesWithOrders[5];  // ÁÖ¹® ³»¿ªÀÌ ÀÖ´Â Å×ÀÌºíÀ» ÀúÀåÇÒ ¹è¿­
     int orderCount = 0;
-    listTablesWithOrders(tablesWithOrders, &orderCount, "ì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ” í…Œì´ë¸” ë²ˆí˜¸");  // ì£¼ë¬¸ì´ ìˆëŠ” í…Œì´ë¸”ì„ í™•ì¸í•˜ê³  í‘œì‹œ
+    listTablesWithOrders(tablesWithOrders, &orderCount, "ÁÖ¹® ³»¿ªÀÌ ÀÖ´Â Å×ÀÌºí ¹øÈ£");  // ÁÖ¹®ÀÌ ÀÖ´Â Å×ÀÌºíÀ» È®ÀÎÇÏ°í Ç¥½Ã
 
-    FILE* foodFile = fopen(FILE_PATH, "r+"); // ì½ê¸° ë° í¸ì§‘
+    FILE* foodFile = fopen(FILE_PATH, "r+"); // ÀĞ±â ¹× ÆíÁı
     if (foodFile == NULL) {
-        printf("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
         return;
     }
-    rewind(foodFile);  // íŒŒì¼ í¬ì¸í„°ë¥¼ ì²˜ìŒìœ¼ë¡œ ë˜ëŒë¦¼
+    rewind(foodFile);  // ÆÄÀÏ Æ÷ÀÎÅÍ¸¦ Ã³À½À¸·Î µÇµ¹¸²
 
     int tableNumber = 0;
     
     while (1) {
-        tableNumber = inputTableNumber(false);//í…Œì´ë¸” ë²ˆí˜¸ ì…ë ¥ë°›ê¸°
+        tableNumber = inputTableNumber(false);//Å×ÀÌºí ¹øÈ£ ÀÔ·Â¹Ş±â
         if (tableNumber < -1) continue;
         else break;
     }
 
-    // í…Œì´ë¸” íŒŒì¼ ê²½ë¡œ ì„¤ì •
+    // Å×ÀÌºí ÆÄÀÏ °æ·Î ¼³Á¤
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
 
-    // í…Œì´ë¸” íŒŒì¼ ì—´ê¸°
+    // Å×ÀÌºí ÆÄÀÏ ¿­±â
     FILE* tableFile = fopen(tableFilePath, "a");
     if (tableFile == NULL) {
-        printf("í…Œì´ë¸” íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("Å×ÀÌºí ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
         fclose(foodFile);
         return;
     }
 
-    printFoodList();  // íŒë§¤ ëª©ë¡ ì¶œë ¥
+    printFoodList();  // ÆÇ¸Å ¸ñ·Ï Ãâ·Â
 
-    int selection = -1;  // íŒë§¤ í•­ëª© ì„ íƒ ë³€ìˆ˜
+    int selection = -1;  // ÆÇ¸Å Ç×¸ñ ¼±ÅÃ º¯¼ö
     OrderItem* orderList = NULL;
 
     int firstNum, secondNum, price;
     char foodName[50];
 
-    while (selection != 0) {  // 0ì„ ì…ë ¥í•˜ë©´ ì£¼ë¬¸ì´ ëë‚¨
-        printf("<ì£¼ë¬¸ì„ ëë‚´ë ¤ë©´ 0ì„ ì…ë ¥í•˜ì„¸ìš”>\n");
+    while (selection != 0) {  // 0À» ÀÔ·ÂÇÏ¸é ÁÖ¹®ÀÌ ³¡³²
+        printf("<ÁÖ¹®À» ³¡³»·Á¸é 0À» ÀÔ·ÂÇÏ¼¼¿ä>\n");
         selection = inputFoodNumber();
 
         if (selection == 0) {
-            break;  // 0 ì…ë ¥ ì‹œ ì£¼ë¬¸ ì¢…ë£Œ
+            break;  // 0 ÀÔ·Â ½Ã ÁÖ¹® Á¾·á
         }
 
         int currentMenuIndex = 0;
         int validSelection = 0;
 
-        // íŒŒì¼ì„ ë‹¤ì‹œ ì½ì–´ ì„ íƒí•œ ë©”ë‰´ì˜ ID ì°¾ê¸°
+        // ÆÄÀÏÀ» ´Ù½Ã ÀĞ¾î ¼±ÅÃÇÑ ¸Ş´ºÀÇ ID Ã£±â
         rewind(foodFile);
         while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
             if (firstNum == 0) {
                 currentMenuIndex++;
                 if (currentMenuIndex == selection) {
                     validSelection = 1;
-                    int quantity = inputQuantity(); // ìˆ˜ëŸ‰ ì…ë ¥ë°›ê¸°
+                    int quantity = inputQuantity(); // ¼ö·® ÀÔ·Â¹Ş±â
 
-                    // ìˆ˜ëŸ‰ë§Œí¼ ë°˜ë³µí•´ì„œ í•­ëª© ì¶”ê°€
+                    // ¼ö·®¸¸Å­ ¹İº¹ÇØ¼­ Ç×¸ñ Ãß°¡
                     for (int i = 0; i < quantity; i++) {
                         orderList = addOrderItem(orderList, secondNum);
                     }
@@ -719,34 +719,34 @@ void createOrder() {
         }
 
         if (!validSelection) {
-            printf("í•´ë‹¹í•˜ëŠ” ìˆ«ìì˜ ì„ íƒì§€ê°€ ì—†ìŠµë‹ˆë‹¤.\n");
+            printf("ÇØ´çÇÏ´Â ¼ıÀÚÀÇ ¼±ÅÃÁö°¡ ¾ø½À´Ï´Ù.\n");
         }
     }
 
-    // ì£¼ë¬¸ ë¦¬ìŠ¤íŠ¸ë¥¼ í…Œì´ë¸” íŒŒì¼ì— ì €ì¥
+    // ÁÖ¹® ¸®½ºÆ®¸¦ Å×ÀÌºí ÆÄÀÏ¿¡ ÀúÀå
     OrderItem* current = orderList;
     while (current != NULL) {
         for (int i = 0; i < current->quantity; i++) {
-            fprintf(tableFile, "%d\n", current->itemID);  // ë©”ë‰´ ID ì €ì¥
+            fprintf(tableFile, "%d\n", current->itemID);  // ¸Ş´º ID ÀúÀå
         }
         current = current->next;
     }
 
-    // ìµœì¢… ì£¼ë¬¸ ê²°ê³¼ ì¶œë ¥ (OrderItem ì‚¬ìš©)
-    printf("\n%dë²ˆ í…Œì´ë¸” ", tableNumber);
+    // ÃÖÁ¾ ÁÖ¹® °á°ú Ãâ·Â (OrderItem »ç¿ë)
+    printf("\n%d¹ø Å×ÀÌºí ", tableNumber);
 
     current = orderList;
 
     int itemCount = 0;
     while (current != NULL) {
-        // ë©”ë‰´ ì •ë³´ ì°¾ê¸°
-        rewind(foodFile);  // íŒŒì¼ í¬ì¸í„°ë¥¼ ì²˜ìŒìœ¼ë¡œ ë˜ëŒë¦¼
+        // ¸Ş´º Á¤º¸ Ã£±â
+        rewind(foodFile);  // ÆÄÀÏ Æ÷ÀÎÅÍ¸¦ Ã³À½À¸·Î µÇµ¹¸²
         while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
             if (firstNum == 0 && secondNum == current->itemID) {
                 if (itemCount > 0) {
-                    printf(" ");  // ê° í•­ëª© ì‚¬ì´ì— ê³µë°± ì¶”ê°€
+                    printf(" ");  // °¢ Ç×¸ñ »çÀÌ¿¡ °ø¹é Ãß°¡
                 }
-                printf("%s %dê°œ", foodName, current->quantity);
+                printf("%s %d°³", foodName, current->quantity);
                 itemCount++;
                 break;
             }
@@ -754,9 +754,9 @@ void createOrder() {
         current = current->next;
     }
 
-    printf(" ì£¼ë¬¸ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
+    printf(" ÁÖ¹®¿Ï·áµÇ¾ú½À´Ï´Ù.\n");
 
-    // ë©”ëª¨ë¦¬ í•´ì œ
+    // ¸Ş¸ğ¸® ÇØÁ¦
     freeOrderItems(orderList);
     freeOrderItems(current);
 
@@ -764,12 +764,12 @@ void createOrder() {
     fclose(foodFile);
 }
 
-// 7.9 ì£¼ë¬¸ ì¡°íšŒ í”„ë¡¬í”„íŠ¸
+// 7.9 ÁÖ¹® Á¶È¸ ÇÁ·ÒÇÁÆ®
 void printOrder() {
-    // ì£¼ë¬¸ ê°€ëŠ¥í•œ í…Œì´ë¸” ëª©ë¡ í‘œì‹œ
-    int tablesWithOrders[5];  // ì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ” í…Œì´ë¸”ì„ ì €ì¥í•  ë°°ì—´
+    // ÁÖ¹® °¡´ÉÇÑ Å×ÀÌºí ¸ñ·Ï Ç¥½Ã
+    int tablesWithOrders[5];  // ÁÖ¹® ³»¿ªÀÌ ÀÖ´Â Å×ÀÌºíÀ» ÀúÀåÇÒ ¹è¿­
     int orderCount = 0;
-    listTablesWithOrders(tablesWithOrders, &orderCount, "ì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ” í…Œì´ë¸” ë²ˆí˜¸");  // ì£¼ë¬¸ì´ ìˆëŠ” í…Œì´ë¸”ì„ í™•ì¸í•˜ê³  í‘œì‹œ
+    listTablesWithOrders(tablesWithOrders, &orderCount, "ÁÖ¹® ³»¿ªÀÌ ÀÖ´Â Å×ÀÌºí ¹øÈ£");  // ÁÖ¹®ÀÌ ÀÖ´Â Å×ÀÌºíÀ» È®ÀÎÇÏ°í Ç¥½Ã
 
     int tableNumber = 0;
 
@@ -779,24 +779,24 @@ void printOrder() {
         else break;
     }
     
-    // í…Œì´ë¸” íŒŒì¼ ê²½ë¡œ 
+    // Å×ÀÌºí ÆÄÀÏ °æ·Î 
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
 
-    // í…Œì´ë¸” íŒŒì¼ ì—´ê¸°
+    // Å×ÀÌºí ÆÄÀÏ ¿­±â
     FILE* tableFile = fopen(tableFilePath, "r");
     if (tableFile == NULL) {
-        printf("í…Œì´ë¸” íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("Å×ÀÌºí ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
         return;
     }
-    // íŒë§¤í•­ëª©ëª©ë¡ íŒŒì¼ ì—´ê¸°
+    // ÆÇ¸ÅÇ×¸ñ¸ñ·Ï ÆÄÀÏ ¿­±â
     FILE* foodFile = fopen(FILE_PATH, "r");
     if (foodFile == NULL) {
-        printf("íŒë§¤ í•­ëª© íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("ÆÇ¸Å Ç×¸ñ ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
         fclose(tableFile);
         return;
     }
-    // í…Œì´ë¸” íŒŒì¼ì—ì„œ ê³ ìœ ë²ˆí˜¸ë¥¼ ì½ì–´ ìˆ˜ëŸ‰ ê³„ì‚°
+    // Å×ÀÌºí ÆÄÀÏ¿¡¼­ °íÀ¯¹øÈ£¸¦ ÀĞ¾î ¼ö·® °è»ê
     int itemID;
     OrderItem* orderList = NULL;
 
@@ -804,21 +804,21 @@ void printOrder() {
         orderList = addOrderItem(orderList, itemID);
     }
 
-    // ì£¼ë¬¸ ì •ë³´ ì¶œë ¥
-    printf("\n     %dë²ˆ í…Œì´ë¸” ì£¼ë¬¸ ì¡°íšŒ     \n", tableNumber);
-    printf("%-10s %-10s %-10s\n", "ë©”ë‰´", "ìˆ˜ëŸ‰", "ê¸ˆì•¡");
+    // ÁÖ¹® Á¤º¸ Ãâ·Â
+    printf("\n     %d¹ø Å×ÀÌºí ÁÖ¹® Á¶È¸     \n", tableNumber);
+    printf("%-10s %-10s %-10s\n", "¸Ş´º", "¼ö·®", "±İ¾×");
 
     int foundItems = 0;
     int firstNum, secondNum, price;
     char foodName[50];
 
-    // FILE_PATH íŒŒì¼ì—ì„œ ê³ ìœ ë²ˆí˜¸ì— í•´ë‹¹í•˜ëŠ” í•­ëª© ì •ë³´ ì°¾ê¸°
+    // FILE_PATH ÆÄÀÏ¿¡¼­ °íÀ¯¹øÈ£¿¡ ÇØ´çÇÏ´Â Ç×¸ñ Á¤º¸ Ã£±â
     OrderItem* current = orderList;
     while (current != NULL) {
-        rewind(foodFile);  // íŒŒì¼ í¬ì¸í„°ë¥¼ ì²˜ìŒìœ¼ë¡œ ë˜ëŒë¦¼
+        rewind(foodFile);  // ÆÄÀÏ Æ÷ÀÎÅÍ¸¦ Ã³À½À¸·Î µÇµ¹¸²
         while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
             if (firstNum == 0 && secondNum == current->itemID) {
-                // ì¼ì¹˜í•˜ëŠ” í•­ëª© ì¶œë ¥
+                // ÀÏÄ¡ÇÏ´Â Ç×¸ñ Ãâ·Â
                 int quantity = current->quantity;
                 printf("%-10s %-10d %-10d\n", foodName, quantity, quantity * price);
                 foundItems++;
@@ -829,29 +829,29 @@ void printOrder() {
     }
 
     if (foundItems == 0) {
-        printf("ì£¼ë¬¸í•œ íŒë§¤ í•­ëª©ì´ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("ÁÖ¹®ÇÑ ÆÇ¸Å Ç×¸ñÀÌ ¾ø½À´Ï´Ù.\n");
     }
 
-    // ë©”ëª¨ë¦¬ í•´ì œ
+    // ¸Ş¸ğ¸® ÇØÁ¦
     freeOrderItems(orderList);
     fclose(tableFile);
     fclose(foodFile);
 }
 
-// 7.10 ê²°ì œ ì²˜ë¦¬ í”„ë¡¬í”„íŠ¸
+// 7.10 °áÁ¦ Ã³¸® ÇÁ·ÒÇÁÆ®
 void makePayment() {
-    int tablesWithOrders[5];  // ì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ” í…Œì´ë¸” ë²ˆí˜¸ë¥¼ ì €ì¥í•  ë°°ì—´
-    int orderCount = 0;       // ì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ” í…Œì´ë¸” ìˆ˜ë¥¼ ì €ì¥í•  ë³€ìˆ˜
+    int tablesWithOrders[5];  // ÁÖ¹® ³»¿ªÀÌ ÀÖ´Â Å×ÀÌºí ¹øÈ£¸¦ ÀúÀåÇÒ ¹è¿­
+    int orderCount = 0;       // ÁÖ¹® ³»¿ªÀÌ ÀÖ´Â Å×ÀÌºí ¼ö¸¦ ÀúÀåÇÒ º¯¼ö
 
-    listTablesWithOrders(tablesWithOrders, &orderCount, "ê²°ì œ ê°€ëŠ¥í•œ í…Œì´ë¸” ë²ˆí˜¸");  // ì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ” í…Œì´ë¸”ì„ í‘œì‹œí•˜ê³ , ê²°ê³¼ë¥¼ ê°€ì ¸ì˜´
+    listTablesWithOrders(tablesWithOrders, &orderCount, "°áÁ¦ °¡´ÉÇÑ Å×ÀÌºí ¹øÈ£");  // ÁÖ¹® ³»¿ªÀÌ ÀÖ´Â Å×ÀÌºíÀ» Ç¥½ÃÇÏ°í, °á°ú¸¦ °¡Á®¿È
 
     int selectedTables[5];
     int selectedCount = 0;
 
-    // inputMultipleTablesForPayment ê²°ì œí•  í…Œì´ë¸” ë²ˆí˜¸ë“¤ ì…ë ¥
+    // inputMultipleTablesForPayment °áÁ¦ÇÒ Å×ÀÌºí ¹øÈ£µé ÀÔ·Â
     while (true) {
-        // í˜„ì¬ ì„ íƒëœ í…Œì´ë¸” ë²ˆí˜¸ ì¶œë ¥
-        printf("í…Œì´ë¸” ë²ˆí˜¸ë¥¼ ì…ë ¥í•˜ì„¸ìš” {");
+        // ÇöÀç ¼±ÅÃµÈ Å×ÀÌºí ¹øÈ£ Ãâ·Â
+        printf("Å×ÀÌºí ¹øÈ£¸¦ ÀÔ·ÂÇÏ¼¼¿ä {");
         for (int i = 0; i < selectedCount; i++) {
             printf("%d", selectedTables[i]);
             if (i < selectedCount - 1) {
@@ -860,11 +860,11 @@ void makePayment() {
         }
         printf("}: ");
 
-        int input = inputTableNumber(true); // ê²°ì œ ì²˜ë¦¬ìš©ìœ¼ë¡œ í˜¸ì¶œ
+        int input = inputTableNumber(true); // °áÁ¦ Ã³¸®¿ëÀ¸·Î È£Ãâ
 
-        // -1ì„ ë°˜í™˜í•˜ë©´ ì—”í„° ì…ë ¥
+        // -1À» ¹İÈ¯ÇÏ¸é ¿£ÅÍ ÀÔ·Â
         if (input == -1) {
-            if (selectedCount > 0) break; // ì´ë¯¸ ì„ íƒëœ í…Œì´ë¸”ì´ ìˆë‹¤ë©´ ì¢…ë£Œ
+            if (selectedCount > 0) break; // ÀÌ¹Ì ¼±ÅÃµÈ Å×ÀÌºíÀÌ ÀÖ´Ù¸é Á¾·á
             continue;
         }
 
@@ -872,14 +872,14 @@ void makePayment() {
             continue;
         }
 
-        // 0 ì…ë ¥ ì‹œ ì„ íƒ ì·¨ì†Œ
+        // 0 ÀÔ·Â ½Ã ¼±ÅÃ Ãë¼Ò
         if (input == 0) {
-            printf("ì„ íƒì„ ì·¨ì†Œí•˜ê³  ë©”ì¸ ë©”ë‰´ë¡œ ëŒì•„ê°‘ë‹ˆë‹¤.\n");
-            selectedCount = 0; // ì„ íƒëœ í…Œì´ë¸” ìˆ˜ë¥¼ ì´ˆê¸°í™”
+            printf("¼±ÅÃÀ» Ãë¼ÒÇÏ°í ¸ŞÀÎ ¸Ş´º·Î µ¹¾Æ°©´Ï´Ù.\n");
+            selectedCount = 0; // ¼±ÅÃµÈ Å×ÀÌºí ¼ö¸¦ ÃÊ±âÈ­
             return;
         }
 
-        // ìœ íš¨í•œ í…Œì´ë¸” ë²ˆí˜¸ì¸ì§€ í™•ì¸
+        // À¯È¿ÇÑ Å×ÀÌºí ¹øÈ£ÀÎÁö È®ÀÎ
         bool validOrder = false;
         for (int i = 0; i < orderCount; i++) {
             if (tablesWithOrders[i] == input) {
@@ -888,11 +888,11 @@ void makePayment() {
             }
         }
         if (!validOrder) {
-            printf("ê²½ê³ : %dë²ˆ í…Œì´ë¸”ì—ëŠ” ì£¼ë¬¸ ë‚´ì—­ì´ ì—†ìŠµë‹ˆë‹¤.\n", input);
+            printf("°æ°í: %d¹ø Å×ÀÌºí¿¡´Â ÁÖ¹® ³»¿ªÀÌ ¾ø½À´Ï´Ù.\n", input);
             continue;
         }
         else {
-            // ì´ë¯¸ ì„ íƒëœ í…Œì´ë¸” ë²ˆí˜¸ì¸ì§€ í™•ì¸
+            // ÀÌ¹Ì ¼±ÅÃµÈ Å×ÀÌºí ¹øÈ£ÀÎÁö È®ÀÎ
             bool alreadySelected = false;
             for (int i = 0; i < selectedCount; i++) {
                 if (selectedTables[i] == input) {
@@ -901,7 +901,7 @@ void makePayment() {
                 }
             }
             if (alreadySelected) {
-                printf("ê²½ê³ : ì´ë¯¸ ì„ íƒëœ í…Œì´ë¸” ë²ˆí˜¸ì…ë‹ˆë‹¤.\n");
+                printf("°æ°í: ÀÌ¹Ì ¼±ÅÃµÈ Å×ÀÌºí ¹øÈ£ÀÔ´Ï´Ù.\n");
                 continue;
             }
             else {
@@ -911,10 +911,10 @@ void makePayment() {
         }
     }
 
-    int combinedTotal = 0;  // ì„ íƒëœ í…Œì´ë¸”ë“¤ì˜ ì „ì²´ ê²°ì œ ê¸ˆì•¡
-    int counters[5];        // ê° ì„ íƒëœ í…Œì´ë¸”ì˜ ì¤„ ìˆ˜ë¥¼ ì €ì¥í•  ë°°ì—´
+    int combinedTotal = 0;  // ¼±ÅÃµÈ Å×ÀÌºíµéÀÇ ÀüÃ¼ °áÁ¦ ±İ¾×
+    int counters[5];        // °¢ ¼±ÅÃµÈ Å×ÀÌºíÀÇ ÁÙ ¼ö¸¦ ÀúÀåÇÒ ¹è¿­
 
-    // ê° ì„ íƒëœ í…Œì´ë¸”ì˜ ì´ ì£¼ë¬¸ì•¡ì„ ê³„ì‚°
+    // °¢ ¼±ÅÃµÈ Å×ÀÌºíÀÇ ÃÑ ÁÖ¹®¾×À» °è»ê
     for (int i = 0; i < selectedCount; i++) {
         int tableNumber = selectedTables[i];
         char tableFilePath[256];
@@ -922,19 +922,19 @@ void makePayment() {
 
         FILE* tableFile = fopen(tableFilePath, "r");
         if (!tableFile) {
-            printf("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤: %dë²ˆ í…Œì´ë¸”\n", tableNumber);
+            printf("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù: %d¹ø Å×ÀÌºí\n", tableNumber);
             continue;
         }
 
-        // foodlist íŒŒì¼ì„ ì—´ì–´ ê° í•­ëª©ì˜ ê°€ê²©ì„ í™•ì¸
+        // foodlist ÆÄÀÏÀ» ¿­¾î °¢ Ç×¸ñÀÇ °¡°İÀ» È®ÀÎ
         FILE* foodFile = fopen(FILE_PATH, "r");
         if (!foodFile) {
-            printf("íŒë§¤ í•­ëª© íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+            printf("ÆÇ¸Å Ç×¸ñ ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
             fclose(tableFile);
             continue;
         }
 
-        // ì£¼ë¬¸ í•­ëª©ì˜ ìˆ˜ëŸ‰ ê³„ì‚°
+        // ÁÖ¹® Ç×¸ñÀÇ ¼ö·® °è»ê
         int itemID;
         OrderItem* orderList = NULL;
 
@@ -942,18 +942,18 @@ void makePayment() {
             orderList = addOrderItem(orderList, itemID);
         }
 
-        // ì¤„ ìˆ˜ ê³„ì‚°
-        counters[i] = 0; // ê° í…Œì´ë¸”ì˜ ì¤„ ìˆ˜ë¥¼ ì´ˆê¸°í™”
+        // ÁÙ ¼ö °è»ê
+        counters[i] = 0; // °¢ Å×ÀÌºíÀÇ ÁÙ ¼ö¸¦ ÃÊ±âÈ­
         char c;
         FILE* tableFileForLineCount = fopen(tableFilePath, "r");
         while ((c = fgetc(tableFileForLineCount)) != EOF) {
             if (c == '\n') {
-                counters[i]++; // ê° í…Œì´ë¸”ì˜ ì¤„ ìˆ˜ë¥¼ ì €ì¥
+                counters[i]++; // °¢ Å×ÀÌºíÀÇ ÁÙ ¼ö¸¦ ÀúÀå
             }
         }
         fclose(tableFileForLineCount);
 
-        // ì£¼ë¬¸ í•©ê³„ ê³„ì‚°
+        // ÁÖ¹® ÇÕ°è °è»ê
         int foundItems = 0;
         int firstNum, secondNum, price;
         char foodName[50];
@@ -961,7 +961,7 @@ void makePayment() {
 
         OrderItem* current = orderList;
         while (current != NULL) {
-            rewind(foodFile);  // íŒŒì¼ í¬ì¸í„°ë¥¼ ì²˜ìŒìœ¼ë¡œ ë˜ëŒë¦¼
+            rewind(foodFile);  // ÆÄÀÏ Æ÷ÀÎÅÍ¸¦ Ã³À½À¸·Î µÇµ¹¸²
             while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
                 if (firstNum == 0 && secondNum == current->itemID) {
                     int quantity = current->quantity;
@@ -973,41 +973,41 @@ void makePayment() {
             current = current->next;
         }
 
-        // ë©”ëª¨ë¦¬ í•´ì œ
+        // ¸Ş¸ğ¸® ÇØÁ¦
         freeOrderItems(orderList);
         fclose(foodFile);
         fclose(tableFile);
 
         if (foundItems == 0) {
-            printf("\n%dë²ˆ í…Œì´ë¸”ì€ ê²°ì œê°€ ë¶ˆê°€ëŠ¥í•©ë‹ˆë‹¤.\n", tableNumber);
+            printf("\n%d¹ø Å×ÀÌºíÀº °áÁ¦°¡ ºÒ°¡´ÉÇÕ´Ï´Ù.\n", tableNumber);
         }
         else {
-            combinedTotal += totalPrice;  // ê²°ì œ ê¸ˆì•¡ì„ í•©ì‚°
+            combinedTotal += totalPrice;  // °áÁ¦ ±İ¾×À» ÇÕ»ê
         }
     }
 
-    // ê²°ì œ ì²˜ë¦¬
-    int remainingBalance = combinedTotal; // ë‚¨ì€ ê²°ì œê¸ˆì•¡
-    int paymentSuccess = 0; // ê²°ì œ ì„±ê³µ ì—¬ë¶€ ì²´í¬ ë³€ìˆ˜
+    // °áÁ¦ Ã³¸®
+    int remainingBalance = combinedTotal; // ³²Àº °áÁ¦±İ¾×
+    int paymentSuccess = 0; // °áÁ¦ ¼º°ø ¿©ºÎ Ã¼Å© º¯¼ö
     
-    // ë‚¨ì€ ê²°ì œ ê¸ˆì•¡ì´ ìˆì„ ê²½ìš° ë°˜ë³µ
+    // ³²Àº °áÁ¦ ±İ¾×ÀÌ ÀÖÀ» °æ¿ì ¹İº¹
     while (remainingBalance > 0)
     {
-        // ì‚¬ìš©ìë¡œë¶€í„° ê²°ì œ ê¸ˆì•¡ ì…ë ¥ ë°›ê¸°
+        // »ç¿ëÀÚ·ÎºÎÅÍ °áÁ¦ ±İ¾× ÀÔ·Â ¹Ş±â
         remainingBalance = inputPaymentAmount(remainingBalance);
 
-        // ê²°ì œ ì¤‘ë‹¨ ì‹ í˜¸ê°€ ì…ë ¥ë˜ë©´ ë°˜ë³µ íƒˆì¶œ
+        // °áÁ¦ Áß´Ü ½ÅÈ£°¡ ÀÔ·ÂµÇ¸é ¹İº¹ Å»Ãâ
         if (remainingBalance == -1) {
             break;
         } 
-        // ê²°ì œê°€ ì™„ë£Œë˜ë©´ ì„±ê³µ í‘œì‹œ í›„ ë°˜ë³µ íƒˆì¶œ
+        // °áÁ¦°¡ ¿Ï·áµÇ¸é ¼º°ø Ç¥½Ã ÈÄ ¹İº¹ Å»Ãâ
         else if (remainingBalance == 0) {
             paymentSuccess = 1;
             break;
         }   
     }
 
-    // ì „ì²´ ê²°ì œê°€ ì™„ë£Œëœ í›„ ê° í…Œì´ë¸”ì˜ ì£¼ë¬¸ ë‚´ì—­ ì‚­ì œ
+    // ÀüÃ¼ °áÁ¦°¡ ¿Ï·áµÈ ÈÄ °¢ Å×ÀÌºíÀÇ ÁÖ¹® ³»¿ª »èÁ¦
     if (paymentSuccess) {
         for (int i = 0; i < selectedCount; i++) {
             char tableFilePath[256];
@@ -1020,8 +1020,8 @@ void makePayment() {
 
 }
 
-// 7.11 í…Œì´ë¸” ì¦ê° í”„ë¡¬í”„íŠ¸ ì‚¬ìš© í•¨ìˆ˜ë“¤
-// í…Œì´ë¸” ë°ì´í„° íŒŒì¼ ìƒì„± í•¨ìˆ˜
+// 7.11 Å×ÀÌºí Áõ°¨ ÇÁ·ÒÇÁÆ® »ç¿ë ÇÔ¼öµé
+// Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏ »ı¼º ÇÔ¼ö
 void createTableFile(int tableNumber) {
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
@@ -1031,14 +1031,14 @@ void createTableFile(int tableNumber) {
     }
 }
 
-// í…Œì´ë¸” ë°ì´í„° íŒŒì¼ ì‚­ì œ í•¨ìˆ˜
+// Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏ »èÁ¦ ÇÔ¼ö
 void deleteTableFile(int tableNumber) {
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
     remove(tableFilePath);
 }
 
-// íŠ¹ì • í…Œì´ë¸”ì˜ ì£¼ë¬¸ ë‚´ì—­ ì¡´ì¬ ì—¬ë¶€ í™•ì¸ í•¨ìˆ˜
+// Æ¯Á¤ Å×ÀÌºíÀÇ ÁÖ¹® ³»¿ª Á¸Àç ¿©ºÎ È®ÀÎ ÇÔ¼ö
 bool hasOrders(int tableNumber) {
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
@@ -1048,7 +1048,7 @@ bool hasOrders(int tableNumber) {
         return false;
     }
 
-    // íŒŒì¼ì˜ ì²« ë²ˆì§¸ non-whitespace ë¬¸ìë¥¼ ì°¾ìŒ
+    // ÆÄÀÏÀÇ Ã¹ ¹øÂ° non-whitespace ¹®ÀÚ¸¦ Ã£À½
     int c;
     while ((c = fgetc(tableFile)) != EOF) {
         if (!isspace(c)) {
@@ -1061,11 +1061,11 @@ bool hasOrders(int tableNumber) {
     return false;
 }
 
-// ì£¼ë¬¸ë‚´ì—­ì´ ì—†ëŠ” ê°€ì¥ í° í…Œì´ë¸” ë²ˆí˜¸ ì°¾ê¸°
+// ÁÖ¹®³»¿ªÀÌ ¾ø´Â °¡Àå Å« Å×ÀÌºí ¹øÈ£ Ã£±â
 int findLargestEmptyTable() {
-    bool exists[11] = { false };  // ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ì²´í¬ìš© ë°°ì—´
+    bool exists[11] = { false };  // Á¸ÀçÇÏ´Â Å×ÀÌºí Ã¼Å©¿ë ¹è¿­
 
-    // ë¨¼ì € ì¡´ì¬í•˜ëŠ” í…Œì´ë¸”ë“¤ì„ ì²´í¬
+    // ¸ÕÀú Á¸ÀçÇÏ´Â Å×ÀÌºíµéÀ» Ã¼Å©
     for (int i = 1; i <= 10; i++) {
         char tableFilePath[256];
         snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, i);
@@ -1076,19 +1076,19 @@ int findLargestEmptyTable() {
         }
     }
 
-    // ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ì¤‘ì—ì„œ ê°€ì¥ í° ë²ˆí˜¸ì˜ ë¹ˆ í…Œì´ë¸” ì°¾ê¸°
+    // Á¸ÀçÇÏ´Â Å×ÀÌºí Áß¿¡¼­ °¡Àå Å« ¹øÈ£ÀÇ ºó Å×ÀÌºí Ã£±â
     for (int i = 10; i >= 1; i--) {
         if (exists[i] && !hasOrders(i)) {
             return i;
         }
     }
 
-    return -1; // ì‚­ì œ ê°€ëŠ¥í•œ í…Œì´ë¸”ì´ ì—†ëŠ” ê²½ìš°
+    return -1; // »èÁ¦ °¡´ÉÇÑ Å×ÀÌºíÀÌ ¾ø´Â °æ¿ì
 }
 
-// í˜„ì¬ ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ëª©ë¡ì„ ì¶œë ¥í•˜ëŠ” ë””ë²„ê·¸ìš© í•¨ìˆ˜
+// ÇöÀç Á¸ÀçÇÏ´Â Å×ÀÌºí ¸ñ·ÏÀ» Ãâ·ÂÇÏ´Â µğ¹ö±×¿ë ÇÔ¼ö
 void printExistingTables() {
-    printf("í˜„ì¬ ì¡´ì¬í•˜ëŠ” í…Œì´ë¸”: ");
+    printf("ÇöÀç Á¸ÀçÇÏ´Â Å×ÀÌºí: ");
     for (int i = 1; i <= 10; i++) {
         char tableFilePath[256];
         snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, i);
@@ -1101,11 +1101,11 @@ void printExistingTables() {
     printf("\n");
 }
 
-// ì¡´ì¬í•˜ì§€ ì•ŠëŠ” ê°€ì¥ ì‘ì€ í…Œì´ë¸” ë²ˆí˜¸ ì°¾ê¸°
+// Á¸ÀçÇÏÁö ¾Ê´Â °¡Àå ÀÛÀº Å×ÀÌºí ¹øÈ£ Ã£±â
 int findSmallestAvailableNumber() {
-    bool used[11] = { false };  // 0ë²ˆ ì¸ë±ìŠ¤ëŠ” ì‚¬ìš©í•˜ì§€ ì•ŠìŒ
+    bool used[11] = { false };  // 0¹ø ÀÎµ¦½º´Â »ç¿ëÇÏÁö ¾ÊÀ½
 
-    // í˜„ì¬ ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ë²ˆí˜¸ ì²´í¬
+    // ÇöÀç Á¸ÀçÇÏ´Â Å×ÀÌºí ¹øÈ£ Ã¼Å©
     for (int i = 1; i <= 10; i++) {
         char tableFilePath[256];
         snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, i);
@@ -1116,16 +1116,16 @@ int findSmallestAvailableNumber() {
         }
     }
 
-    // ì‚¬ìš©ë˜ì§€ ì•Šì€ ê°€ì¥ ì‘ì€ ë²ˆí˜¸ ì°¾ê¸°
+    // »ç¿ëµÇÁö ¾ÊÀº °¡Àå ÀÛÀº ¹øÈ£ Ã£±â
     for (int i = 1; i <= 10; i++) {
         if (!used[i]) {
             return i;
         }
     }
-    return -1;  // ëª¨ë“  ë²ˆí˜¸ê°€ ì‚¬ìš© ì¤‘
+    return -1;  // ¸ğµç ¹øÈ£°¡ »ç¿ë Áß
 }
 
-// í˜„ì¬ ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ê°œìˆ˜ ê³„ì‚°
+// ÇöÀç Á¸ÀçÇÏ´Â Å×ÀÌºí °³¼ö °è»ê
 int getCurrentTableCount() {
     int count = 0;
     for (int i = 1; i <= 10; i++) {
@@ -1140,7 +1140,7 @@ int getCurrentTableCount() {
     return count;
 }
 
-// ì œê±° ê°€ëŠ¥í•œ ë¹ˆ í…Œì´ë¸” ê°œìˆ˜ ê³„ì‚°
+// Á¦°Å °¡´ÉÇÑ ºó Å×ÀÌºí °³¼ö °è»ê
 int countRemovableTables() {
     int count = 0;
     int maxTableNum = getLastTableNumber();
@@ -1153,7 +1153,7 @@ int countRemovableTables() {
     return count;
 }
 
-// í˜„ì¬ ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ì¤‘ ì£¼ë¬¸ ë‚´ì—­ì´ ì—†ëŠ” í…Œì´ë¸”ì˜ ê°œìˆ˜ë¥¼ ë°˜í™˜
+// ÇöÀç Á¸ÀçÇÏ´Â Å×ÀÌºí Áß ÁÖ¹® ³»¿ªÀÌ ¾ø´Â Å×ÀÌºíÀÇ °³¼ö¸¦ ¹İÈ¯
 int getEmptyTableCount() {
     int emptyCount = 0;
     int maxTable = getLastTableNumber();
@@ -1164,7 +1164,7 @@ int getEmptyTableCount() {
         FILE* tableFile = fopen(tableFilePath, "r");
 
         if (tableFile != NULL) {
-            // í…Œì´ë¸”ì´ ì¡´ì¬í•˜ë©´ ì£¼ë¬¸ ë‚´ì—­ í™•ì¸
+            // Å×ÀÌºíÀÌ Á¸ÀçÇÏ¸é ÁÖ¹® ³»¿ª È®ÀÎ
             if (!hasOrders(i)) {
                 emptyCount++;
             }
@@ -1174,132 +1174,132 @@ int getEmptyTableCount() {
     return emptyCount;
 }
 
-// í…Œì´ë¸” ê°ì†Œ ì²˜ë¦¬ë¥¼ ìœ„í•œ í•¨ìˆ˜
+// Å×ÀÌºí °¨¼Ò Ã³¸®¸¦ À§ÇÑ ÇÔ¼ö
 bool handleTableReduction(int reduction) {
     int currentTableCount = getCurrentTableCount();
     int emptyTableCount = getEmptyTableCount();
 
-    // Case 1: í˜„ì¬ í…Œì´ë¸” ìˆ˜ê°€ ê°ì†Œì‹œí‚¤ë ¤ëŠ” ìˆ˜ë³´ë‹¤ ì ê±°ë‚˜ ê°™ì€ ê²½ìš°
+    // Case 1: ÇöÀç Å×ÀÌºí ¼ö°¡ °¨¼Ò½ÃÅ°·Á´Â ¼öº¸´Ù Àû°Å³ª °°Àº °æ¿ì
     if (currentTableCount <= -reduction) {
-        printf("ì˜¤ë¥˜: í˜„ì¬ í…Œì´ë¸”ì´ %dê°œ ë¿ì´ë¼ì„œ %dê°œë¥¼ ê°ì†Œì‹œí‚¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n",
+        printf("¿À·ù: ÇöÀç Å×ÀÌºíÀÌ %d°³ »ÓÀÌ¶ó¼­ %d°³¸¦ °¨¼Ò½ÃÅ³ ¼ö ¾ø½À´Ï´Ù.\n",
             currentTableCount, -reduction);
         return false;
     }
 
-    // Case 2: ê°ì†Œ í›„ í…Œì´ë¸” ìˆ˜ê°€ 1ê°œ ë¯¸ë§Œì´ ë˜ëŠ” ê²½ìš°
+    // Case 2: °¨¼Ò ÈÄ Å×ÀÌºí ¼ö°¡ 1°³ ¹Ì¸¸ÀÌ µÇ´Â °æ¿ì
     if (currentTableCount + reduction < 1) {
-        printf("ì˜¤ë¥˜: í…Œì´ë¸”ì€ ìµœì†Œ 1ê°œê°€ ì¡´ì¬í•´ì•¼ í•©ë‹ˆë‹¤.\n");
+        printf("¿À·ù: Å×ÀÌºíÀº ÃÖ¼Ò 1°³°¡ Á¸ÀçÇØ¾ß ÇÕ´Ï´Ù.\n");
         return false;
     }
 
-    // Case 3: ì£¼ë¬¸ ë‚´ì—­ì´ ì—†ëŠ” í…Œì´ë¸”ì´ í•˜ë‚˜ë„ ì—†ëŠ” ê²½ìš°
+    // Case 3: ÁÖ¹® ³»¿ªÀÌ ¾ø´Â Å×ÀÌºíÀÌ ÇÏ³ªµµ ¾ø´Â °æ¿ì
     if (emptyTableCount == 0) {
-        printf("ì˜¤ë¥˜: ëª¨ë“  í…Œì´ë¸”ì— ì£¼ë¬¸ ë‚´ì—­ì´ ìˆì–´ì„œ ê°ì†Œì‹œí‚¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("¿À·ù: ¸ğµç Å×ÀÌºí¿¡ ÁÖ¹® ³»¿ªÀÌ ÀÖ¾î¼­ °¨¼Ò½ÃÅ³ ¼ö ¾ø½À´Ï´Ù.\n");
         return false;
     }
 
-    // Case 4: ì£¼ë¬¸ ë‚´ì—­ì´ ì—†ëŠ” í…Œì´ë¸” ìˆ˜ê°€ ê°ì†Œì‹œí‚¤ë ¤ëŠ” ìˆ˜ë³´ë‹¤ ì ì€ ê²½ìš°
+    // Case 4: ÁÖ¹® ³»¿ªÀÌ ¾ø´Â Å×ÀÌºí ¼ö°¡ °¨¼Ò½ÃÅ°·Á´Â ¼öº¸´Ù ÀûÀº °æ¿ì
     if (emptyTableCount < -reduction) {
-        printf("ì˜¤ë¥˜: ì£¼ë¬¸ ë‚´ì—­ì´ ì—†ëŠ” í…Œì´ë¸”ì´ %dê°œ ë¿ì´ë¼ì„œ %dê°œë¥¼ ê°ì†Œì‹œí‚¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n",
+        printf("¿À·ù: ÁÖ¹® ³»¿ªÀÌ ¾ø´Â Å×ÀÌºíÀÌ %d°³ »ÓÀÌ¶ó¼­ %d°³¸¦ °¨¼Ò½ÃÅ³ ¼ö ¾ø½À´Ï´Ù.\n",
             emptyTableCount, -reduction);
         return false;
     }
 
-    // ëª¨ë“  ì¡°ê±´ì„ í†µê³¼í–ˆë‹¤ë©´ í…Œì´ë¸” ê°ì†Œ ì‹¤í–‰
+    // ¸ğµç Á¶°ÇÀ» Åë°úÇß´Ù¸é Å×ÀÌºí °¨¼Ò ½ÇÇà
     int removed = 0;
     while (removed < -reduction) {
         int tableToRemove = findLargestEmptyTable();
         if (tableToRemove == -1) {
-            // ì´ ê²½ìš°ëŠ” ìœ„ì˜ ê²€ì¦ë“¤ì„ í†µê³¼í–ˆë‹¤ë©´ ë°œìƒí•˜ì§€ ì•Šì•„ì•¼ í•¨
-            printf("ì˜ˆê¸°ì¹˜ ì•Šì€ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.\n");
+            // ÀÌ °æ¿ì´Â À§ÀÇ °ËÁõµéÀ» Åë°úÇß´Ù¸é ¹ß»ıÇÏÁö ¾Ê¾Æ¾ß ÇÔ
+            printf("¿¹±âÄ¡ ¾ÊÀº ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù.\n");
             return false;
         }
         deleteTableFile(tableToRemove);
-        printf("%dë²ˆ í…Œì´ë¸”ì´ ì œê±°ë˜ì—ˆìŠµë‹ˆë‹¤.\n", tableToRemove);
+        printf("%d¹ø Å×ÀÌºíÀÌ Á¦°ÅµÇ¾ú½À´Ï´Ù.\n", tableToRemove);
         removed++;
     }
 
     return true;
 }
 
-// 7.11 í…Œì´ë¸” ì¦ê° í”„ë¡¬í”„íŠ¸
+// 7.11 Å×ÀÌºí Áõ°¨ ÇÁ·ÒÇÁÆ®
 void adjustTables() {
     while (1) {
         int currentTableCount = getCurrentTableCount();
-        printf("ì¦ê°ì‹œí‚¬ í…Œì´ë¸” ìˆ˜ë¥¼ ì…ë ¥í•˜ì„¸ìš” (-9 ~ 9): ");
+        printf("Áõ°¨½ÃÅ³ Å×ÀÌºí ¼ö¸¦ ÀÔ·ÂÇÏ¼¼¿ä (-9 ~ 9): ");
 
         char input[10];
         fgets(input, sizeof(input), stdin);
         input[strcspn(input, "\n")] = 0;
 
-        // ì…ë ¥ê°’ ê²€ì¦
+        // ÀÔ·Â°ª °ËÁõ
         if (strlen(input) == 0 || strlen(input) > 2 ||
             (strlen(input) == 2 && input[0] != '-' && !isdigit(input[1])) ||
             (strlen(input) == 1 && !isdigit(input[0]))) {
-            printf("ì˜¬ë°”ë¥´ì§€ ì•Šì€ ì…ë ¥ì…ë‹ˆë‹¤.\n");
+            printf("¿Ã¹Ù¸£Áö ¾ÊÀº ÀÔ·ÂÀÔ´Ï´Ù.\n");
             continue;
         }
 
         int adjustment = atoi(input);
 
-        // '0' ì…ë ¥ ì‹œ ì·¨ì†Œ
+        // '0' ÀÔ·Â ½Ã Ãë¼Ò
         if (adjustment == 0) {
-            printf("í…Œì´ë¸” ì¦ê° ì‘ì—…ì´ ì·¨ì†Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
+            printf("Å×ÀÌºí Áõ°¨ ÀÛ¾÷ÀÌ Ãë¼ÒµÇ¾ú½À´Ï´Ù.\n");
             return;
         }
 
-        // ë²”ìœ„ ê²€ì¦ (-9 ~ 9)
+        // ¹üÀ§ °ËÁõ (-9 ~ 9)
         if (adjustment < -9 || adjustment > 9) {
-            printf("ì˜¬ë°”ë¥´ì§€ ì•Šì€ ì…ë ¥ì…ë‹ˆë‹¤.\n");
+            printf("¿Ã¹Ù¸£Áö ¾ÊÀº ÀÔ·ÂÀÔ´Ï´Ù.\n");
             continue;
         }
 
-        // í…Œì´ë¸” ê°ì†Œ
+        // Å×ÀÌºí °¨¼Ò
         if (adjustment < 0) {
             if (!handleTableReduction(adjustment)) {
-                continue;  // ì‹¤íŒ¨ ì‹œ ë‹¤ì‹œ ì…ë ¥ ë°›ê¸°
+                continue;  // ½ÇÆĞ ½Ã ´Ù½Ã ÀÔ·Â ¹Ş±â
             }
         }
-        // í…Œì´ë¸” ì¦ê°€
+        // Å×ÀÌºí Áõ°¡
         else {
             if (currentTableCount + adjustment > 10) {
-                printf("í…Œì´ë¸”ì€ ìµœëŒ€ 10ê°œê¹Œì§€ë§Œ ì¡´ì¬í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.\n");
+                printf("Å×ÀÌºíÀº ÃÖ´ë 10°³±îÁö¸¸ Á¸ÀçÇÒ ¼ö ÀÖ½À´Ï´Ù.\n");
                 continue;
             }
 
-            // ì‹¤ì œ ì¶”ê°€ ì‘ì—… ìˆ˜í–‰
+            // ½ÇÁ¦ Ãß°¡ ÀÛ¾÷ ¼öÇà
             for (int i = 0; i < adjustment; i++) {
                 int newTableNumber = findSmallestAvailableNumber();
                 if (newTableNumber == -1) {
-                    printf("ë” ì´ìƒ ì¶”ê°€í•  ìˆ˜ ìˆëŠ” í…Œì´ë¸” ë²ˆí˜¸ê°€ ì—†ìŠµë‹ˆë‹¤.\n");
+                    printf("´õ ÀÌ»ó Ãß°¡ÇÒ ¼ö ÀÖ´Â Å×ÀÌºí ¹øÈ£°¡ ¾ø½À´Ï´Ù.\n");
                     return;
                 }
                 createTableFile(newTableNumber);
-                printf("%dë²ˆ í…Œì´ë¸”ì´ ì¶”ê°€ë˜ì—ˆìŠµë‹ˆë‹¤.\n", newTableNumber);
+                printf("%d¹ø Å×ÀÌºíÀÌ Ãß°¡µÇ¾ú½À´Ï´Ù.\n", newTableNumber);
             }
         }
 
-        // ì„±ê³µì ìœ¼ë¡œ ì²˜ë¦¬ëœ ê²½ìš° í•¨ìˆ˜ ì¢…ë£Œ
+        // ¼º°øÀûÀ¸·Î Ã³¸®µÈ °æ¿ì ÇÔ¼ö Á¾·á
         return;
     }
 }
 
-// 7.12 ë©”ì¸ ë©”ë‰´ í”„ë¡¬í”„íŠ¸
+// 7.12 ¸ŞÀÎ ¸Ş´º ÇÁ·ÒÇÁÆ®
 int printMain() {
     int s;
     while (1) {
-        printf("\në©”ì¸ ë©”ë‰´\n");
-        printf("1. íŒë§¤ í•­ëª© ì¡°íšŒ\n");
-        printf("2. íŒë§¤ í•­ëª© ì¶”ê°€\n");
-        printf("3. íŒë§¤ í•­ëª© ì œê±°\n");
-        printf("4. ì£¼ë¬¸ ìƒì„±\n");
-        printf("5. ì£¼ë¬¸ ì¡°íšŒ\n");
-        printf("6. ê²°ì œ ì²˜ë¦¬\n");
-        printf("7. í…Œì´ë¸” ì¦ê°\n");
-        printf("8. ì¢…ë£Œ\n");
-        s = inputInt("ë©”ë‰´ ì„ íƒ: ", false);
+        printf("\n¸ŞÀÎ ¸Ş´º\n");
+        printf("1. ÆÇ¸Å Ç×¸ñ Á¶È¸\n");
+        printf("2. ÆÇ¸Å Ç×¸ñ Ãß°¡\n");
+        printf("3. ÆÇ¸Å Ç×¸ñ Á¦°Å\n");
+        printf("4. ÁÖ¹® »ı¼º\n");
+        printf("5. ÁÖ¹® Á¶È¸\n");
+        printf("6. °áÁ¦ Ã³¸®\n");
+        printf("7. Å×ÀÌºí Áõ°¨\n");
+        printf("8. Á¾·á\n");
+        s = inputInt("¸Ş´º ¼±ÅÃ: ", false);
         if (s > 8) {
-            printf("1~8 ì‚¬ì´ì˜ ê°’ì„ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
+            printf("1~8 »çÀÌÀÇ °ªÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
         }
         else {
             return s;
@@ -1307,7 +1307,7 @@ int printMain() {
     }
 }
 
-// í”„ë¡œê·¸ë¨ ì‹¤í–‰
+// ÇÁ·Î±×·¥ ½ÇÇà
 int main(void) {
     while (1) {
 
@@ -1318,35 +1318,35 @@ int main(void) {
         int s = printMain();
         switch (s) {
         case 1:
-            // 7.5 íŒë§¤ í•­ëª© ì¡°íšŒ í”„ë¡¬í”„íŠ¸
+            // 7.5 ÆÇ¸Å Ç×¸ñ Á¶È¸ ÇÁ·ÒÇÁÆ®
             printFoodList();
             break;
         case 2:
-            // 7.6 íŒë§¤ í•­ëª© ì¶”ê°€ í”„ë¡¬í”„íŠ¸
+            // 7.6 ÆÇ¸Å Ç×¸ñ Ãß°¡ ÇÁ·ÒÇÁÆ®
             addToFoodList();
             break;
         case 3:
-            // 7.7 íŒë§¤ í•­ëª© ì œê±° í”„ë¡¬í”„íŠ¸
+            // 7.7 ÆÇ¸Å Ç×¸ñ Á¦°Å ÇÁ·ÒÇÁÆ®
             removeFoodItem();
             break;
         case 4:
-            // 7.8 ì£¼ë¬¸ ìƒì„± í”„ë¡¬í”„íŠ¸
+            // 7.8 ÁÖ¹® »ı¼º ÇÁ·ÒÇÁÆ®
             createOrder();
             break;
         case 5:
-            // 7.9 ì£¼ë¬¸ ì¡°íšŒ í”„ë¡¬í”„íŠ¸
+            // 7.9 ÁÖ¹® Á¶È¸ ÇÁ·ÒÇÁÆ®
             printOrder();
             break;
         case 6:
-            // 7.10 ê²°ì œ ì²˜ë¦¬ í”„ë¡¬í”„íŠ¸
+            // 7.10 °áÁ¦ Ã³¸® ÇÁ·ÒÇÁÆ®
             makePayment();
             break;
         case 7:
-            // 7.11 í…Œì´ë¸” ì¦ê° í”„ë¡¬í”„íŠ¸
+            // 7.11 Å×ÀÌºí Áõ°¨ ÇÁ·ÒÇÁÆ®
             adjustTables();
             break;
         case 8:
-            // 7.12 ë©”ì¸ ë©”ë‰´ í”„ë¡¬í”„íŠ¸ì˜ ì¢…ë£Œ ê¸°ëŠ¥
+            // 7.12 ¸ŞÀÎ ¸Ş´º ÇÁ·ÒÇÁÆ®ÀÇ Á¾·á ±â´É
             exitProgram();
             break;
         default:
