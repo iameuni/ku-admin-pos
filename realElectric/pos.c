@@ -133,8 +133,8 @@ int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
             
             // 스페이스바는 허용, 탭은 오류 처리
             while (*start == ' ') start++;  // 스페이스바는 허용
-            if (strchr(n, '\t') != NULL) { // 입력에 탭이 포함되면 오류 반환
-                printf("오류: 탭 문자는 입력할 수 없습니다.\n");
+            if (strchr(n, '\t') != NULL || strchr(n, '\v') != NULL || strchr(n, '\f') != NULL || strchr(n, '\r') != NULL) { // 입력에 탭이 포함되면 오류 반환
+                printf("오류: 입력에 허용되지 않는 공백 문자가 포함되어 있습니다.\n");
                 return -28; // 탭 문자 오류
             }
 
