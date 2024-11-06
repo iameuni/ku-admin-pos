@@ -151,6 +151,10 @@ int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
                 return -23;
             }
 
+            if (start[0] == '-' && start[1] == '0') {
+                printf("오류: 0으로 시작하는 수는 입력할 수 없습니다.\n");
+                return -29;
+            }
 
             else if (*start == '\0'&&!allowMinus) {
                 printf("오류: 입력값이 비어있습니다.\n");
