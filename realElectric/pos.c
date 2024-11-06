@@ -8,6 +8,7 @@
 
 #define MAX_INPUT 100
 #define MAX_TABLE_NUMBER 10
+#define MAX_TABLE_ADJUST 9 // 테이블 증감 최대 절댓값
 #define FILE_PATH "foodlist.txt" // 파일 경로 설정
 #define TABLE_FILE_PATH "table" //테이블 폴더 경로 설정
 
@@ -1073,7 +1074,7 @@ void adjustTables() {
     while (1) {
         int currentTableCount = getCurrentTableCount();
 
-        printf("\n증감시킬 테이블 수를 입력하세요 (-9 ~ 9): ");
+        printf("\n증감시킬 테이블 수를 입력하세요 (-%d ~ %d): ",MAX_TABLE_ADJUST, MAX_TABLE_ADJUST);
 
        
         int adjustment = inputInt(NULL, true, true);
@@ -1084,8 +1085,8 @@ void adjustTables() {
             return;
         }
 
-        // 범위 검증 (-9 ~ 9)
-        if (adjustment < -9 || adjustment > 9) {
+        // 범위 검증 (-MAX_TABLE_ADJUST ~ MAX_TABLE_ADJUST)
+        if (adjustment < -MAX_TABLE_ADJUST || adjustment > MAX_TABLE_ADJUST) {
             printf("올바르지 않은 입력입니다.\n");
             continue;
         }
