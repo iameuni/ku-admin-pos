@@ -1044,10 +1044,12 @@ void makePayment() {
     // 결제 처리
     int remainingBalance = combinedTotal; // 남은 결제금액
     int paymentSuccess = 0; // 결제 성공 여부 체크 변수
+    int paidAmount = 0;
 
     // 남은 결제 금액이 있을 경우 반복
     while (remainingBalance > 0)
     {
+        paidAmount = combinedTotal - remainingBalance;
         // 사용자로부터 결제 금액 입력 받기
         remainingBalance = inputPaymentAmount(remainingBalance);
 
@@ -1060,6 +1062,7 @@ void makePayment() {
             paymentSuccess = 1;
             break;
         }
+        
     }
 
     // 전체 결제가 완료된 후 각 테이블의 주문 내역 삭제
