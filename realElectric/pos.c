@@ -11,6 +11,7 @@
 #define MAX_TABLE_ADJUST 9 // 테이블 증감 최대 절댓값
 #define FILE_PATH "foodlist.txt" // 파일 경로 설정
 #define TABLE_FILE_PATH "table" //테이블 폴더 경로 설정
+#define MAX_INT 2,147,483,647
 
 //////////////////// 구조체 선언 ////////////////////
 typedef struct OrderItem {
@@ -125,7 +126,7 @@ int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
         n[strcspn(n, "\n")] = '\0';
         if (strlen(n) > MAX_INPUT) {
             printf("경고: %d자 이하로 숫자를 입력해주세요.\n", MAX_INPUT);
-            return -22;
+            return -MAX_INT;
         }
         else {
             char* start = n;
@@ -137,7 +138,7 @@ int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
             while (*start == ' ') start++;  // 스페이스바는 허용
             if (strchr(n, '\t') != NULL || strchr(n, '\v') != NULL || strchr(n, '\f') != NULL || strchr(n, '\r') != NULL) { // 입력에 탭이 포함되면 오류 반환
                 printf("오류: 입력에 허용되지 않는 공백 문자가 포함되어 있습니다.\n");
-                return -28; // 탭 문자 오류
+                return -MAX_INT+1; // 탭 문자 오류
             }
 
             // 빈 입력 처리
@@ -148,17 +149,17 @@ int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
 
             if (start[0] == '0' && strlen(start) > 1) {
                 printf("오류: 0으로 시작하는 수는 입력할 수 없습니다.\n");
-                return -23;
+                return -MAX_INT+2;
             }
 
             if (start[0] == '-' && start[1] == '0') {
                 printf("오류: 0으로 시작하는 수는 입력할 수 없습니다.\n");
-                return -29;
+                return -MAX_INT+3;
             }
 
             else if (*start == '\0'&&!allowMinus) {
                 printf("오류: 입력값이 비어있습니다.\n");
-                return -24;
+                return -MAX_INT+4;
             }
             else {
                 while (end > start && *end == ' ') end--; // 스페이스바는 허용
@@ -168,17 +169,17 @@ int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
 
                 if (*endptr != '\0') {
                     printf("오류: 음이 아닌 정수를 입력해주세요.\n");
-                    return -25;
+                    return -MAX_INT+6;
                 }
                 else {
                     if ((!allowMinus && num < 0) || num > INT_MAX) {
                         printf("오류: 음이 아닌 정수를 입력해주세요.\n");
-                        return -26;
+                        return -MAX_INT + 7;
                     }
                     else {
                         if (num == 0 && !allowZero) {
                             printf("오류: 0은 입력할 수 없습니다.\n");
-                            return -27;
+                            return -MAX_INT + 8;
                         }
                         return (int)num;
                     }
