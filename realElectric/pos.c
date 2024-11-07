@@ -269,6 +269,24 @@ int getCurrentTableCount() {
     return count;
 }
 
+// 테이블 변경 함수 (테이블 변경이 가능한 테이블 고유 번호인지는 사전에 검사해서 넘겨주어야 한다.)
+void changetable(int prevTableNum, int newTableNum) {
+    // 이전 테이블 파일 경로 설정
+    char oldFilePath[256];
+    snprintf(oldFilePath, sizeof(oldFilePath), "%s/%d.txt", TABLE_FILE_PATH, prevTableNum);
+
+    // 새로운 테이블 파일 경로 설정
+    char newFilePath[256];
+    snprintf(newFilePath, sizeof(newFilePath), "%s/%d.txt", TABLE_FILE_PATH, newTableNum);
+
+    // 파일 이름 변경
+    if (rename(oldFilePath, newFilePath) != 0) {
+        perror("테이블 변경 실패.");
+    } else {
+        printf("%d번 테이블이 %d번 테이블로 변경되었습니다.\n", prevTableNum, newTableNum);
+    }
+}
+
 
 
 //////////////////// 기획서 기반 프롬프트 ////////////////////
