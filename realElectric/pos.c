@@ -270,7 +270,7 @@ int getCurrentTableCount() {
 }
 
 // 테이블 변경 함수 (테이블 변경이 가능한 테이블 고유 번호인지는 사전에 검사해서 넘겨주어야 한다.)
-void changetable(int prevTableNum, int newTableNum) {
+void changeTable(int prevTableNum, int newTableNum) {
     // 이전 테이블 파일 경로 설정
     char oldFilePath[256];
     snprintf(oldFilePath, sizeof(oldFilePath), "%s/%d.txt", TABLE_FILE_PATH, prevTableNum);
