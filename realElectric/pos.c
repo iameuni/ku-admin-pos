@@ -145,7 +145,7 @@ int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
             if (*start == '\0'&&!allowMinus) {
                 return -1; // 엔터가 눌렸을 경우 -1 반환
             } 
-            if (*start == '\0' && allowMinus) return -30;
+            if (*start == '\0' && allowMinus) return -MAX_INT + 9;
 
             if (start[0] == '0' && strlen(start) > 1) {
                 printf("오류: 0으로 시작하는 수는 입력할 수 없습니다.\n");
