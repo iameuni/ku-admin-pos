@@ -3,3 +3,4 @@
 0 3 CocaCola  2500
 1 4 Pepsi  3000
 0 5 Bibimbab 12000
+0  6    asdfasf  213

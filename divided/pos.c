@@ -135,7 +135,7 @@ void printFoodList() {
     if (foodFile == NULL) {
         printf("파일을 열 수 없습니다.\n");
     }
-    checkDataIntegrity(foodFile);
+    checkDataIntegrity();
     rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
     /////////////////////////////////////
 
@@ -169,7 +169,7 @@ void addToFoodList() {
     if (foodFile == NULL) {
         printf("파일을 열 수 없습니다.\n");
     }
-    checkDataIntegrity(foodFile);
+    checkDataIntegrity();
     rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
     /////////////////////////////////////
 
@@ -206,7 +206,7 @@ void removeFoodItem() {
     if (foodFile == NULL) {
         printf("파일을 열 수 없습니다.\n");
     }
-    checkDataIntegrity(foodFile);
+    checkDataIntegrity();
     rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
     /////////////////////////////////////
 
@@ -292,8 +292,8 @@ void createOrder() {
 
     // 테이블 파일 경로 설정
     char tableFilePath[256];
-    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
-
+    // snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
     // 테이블 파일 열기
     FILE* tableFile = fopen(tableFilePath, "a");
     if (tableFile == NULL) {
@@ -403,8 +403,8 @@ void printOrder() {
 
     // 테이블 파일 경로 
     char tableFilePath[256];
-    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
-
+    // snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
     // 테이블 파일 열기
     FILE* tableFile = fopen(tableFilePath, "r");
     if (tableFile == NULL) {
@@ -542,7 +542,8 @@ void makePayment() {
     for (int i = 0; i < selectedCount; i++) {
         int tableNumber = selectedTables[i];
         char tableFilePath[256];
-        snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+        // snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+                snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
 
         FILE* tableFile = fopen(tableFilePath, "r");
         if (!tableFile) {
@@ -641,7 +642,8 @@ void makePayment() {
     if (paymentSuccess) {
         for (int i = 0; i < selectedCount; i++) {
             char tableFilePath[256];
-            snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, selectedTables[i]);
+            // snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, selectedTables[i]);
+                        snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, selectedTables[i]);
 
             deleteLines(tableFilePath, 0, -1);
         }
