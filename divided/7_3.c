@@ -2,7 +2,7 @@
 
 // 7.3.1 판매 항목명 입력
 char* inputFoodName() {
-    char* s = (char*)malloc(sizeof(char) * (MAX_INPUT + 2));
+    char* s = (char*)malloc(sizeof(char) * (MAX_INPUT_NUM + 2));
     if (s == NULL) {
         fprintf(stderr, "메모리 할당 실패\n");
         return NULL;
@@ -10,7 +10,7 @@ char* inputFoodName() {
 
     while (1) {
         printf("판매 항목명: ");
-        if (fgets(s, MAX_INPUT + 2, stdin) == NULL) {
+        if (fgets(s, MAX_INPUT_NUM + 2, stdin) == NULL) {
             printf("입력 오류 발생\n");
         }
         else {

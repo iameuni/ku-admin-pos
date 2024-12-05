@@ -81,6 +81,10 @@ int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
                 return -MAX_INT+1; // 탭 문자 오류
             }
 
+            if (*start == '.') {
+                return -MAX_INT + 9;
+            }
+
             // 빈 입력 처리
             if (*start == '\0'&&!allowMinus) {
                 return -1; // 엔터가 눌렸을 경우 -1 반환
@@ -127,4 +131,5 @@ int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
             }
         }
     }
+    return -MAX_INT;
 }

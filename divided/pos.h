@@ -11,12 +11,12 @@
 #include <limits.h> 
 
 // 매크로 정의
-#define MAX_INPUT 100
+#define MAX_INPUT_NUM 100
 #define MAX_TABLE_NUMBER 10
 #define MAX_TABLE_ADJUST 9 // 테이블 증감 최대 절댓값
-#define FILE_PATH "./foodlist.txt" // 파일 경로 설정
-#define TABLE_FILE_PATH "./table" //테이블 폴더 경로 설정
-#define MAX_INT 2,147,483,647
+#define FILE_PATH ".\\foodlist.txt" // 파일 경로 설정
+#define TABLE_FILE_PATH ".\\table" //테이블 폴더 경로 설정
+#define MAX_INT 2147483647
 
 //////////////////// 구조체 선언 ////////////////////
 typedef struct OrderItem {
@@ -55,5 +55,35 @@ void printOrder();
 void makePayment();
 void adjustTables();
 int printMain();
+
+// 2차 요구 사항
+// 구조체 선언에 추가
+typedef struct {
+    int tables[MAX_TABLE_NUMBER];
+    int tableCount;
+    int* partialPayments;
+    int paymentCount;
+} PaymentUnit;
+
+// 함수 선언에 추가
+PaymentUnit* getPaymentUnit(int tableNumber);
+void moveTable();
+void cancelPayment();
+void executeCancelPayments(PaymentUnit* unit, int* selectedPayments, int selectedCount);
+bool isValidDestinationTable(int destTable, int* destTables, int destCount, PaymentUnit* sourceUnit);
+void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount);
+void listTablesWithPartialPayments(int* tables, int* count, const char* message);
+bool isPaymentSelected(int payment, int* selectedPayments, int selectedCount);
+bool isValidPartialPayment(int amount, PaymentUnit* unit, int* selectedPayments, int selectedCount);
+
+void updatePaymentRecord(int tableNumber, int paymentAmount);
+void updatePaymentUnit(int primaryTable, int* unitTables, int unitCount);
+
+typedef struct {
+    int tableNumbers[MAX_TABLE_NUMBER];
+    int tableCount;
+} PaymentContext;
+
+PaymentContext currentContext;  // 전역 변수로 선언
 
 #endif // POS_H

@@ -64,60 +64,154 @@ bool checkDataIntegrity() {
     int tableCount = 0;
     int existingTables[11] = { 0 };  // 존재하는 테이블 번호 체크용 (0번 인덱스는 사용안함)
 
-    // 모든 가능한 테이블 파일 검사
+    // 테이블 데이터 파일 검사 부분 수정
     for (int table = 1; table <= MAX_TABLE_NUMBER; table++) {
         char tableFileName[256];
-        snprintf(tableFileName, sizeof(tableFileName), "%s/%d.txt", TABLE_FILE_PATH, table);
+        snprintf(tableFileName, sizeof(tableFileName), "%s\\%d.txt", TABLE_FILE_PATH, table);
 
         FILE* tableFile = fopen(tableFileName, "r");
-        if (tableFile) {
-            tableCount++;
-            existingTables[table] = 1;
+        if (!tableFile) continue;
 
-            // 테이블 파일의 내용 검사
-            int tableLineNumber = 0;
-            while (fgets(line, sizeof(line), tableFile)) {
-                tableLineNumber++;
-                int saleItemId;
-                if (sscanf(line, "%d", &saleItemId) == 1) {
-                    bool found = false;
-                    for (int i = 0; i < itemCount; i++) {
-                        if (itemIds[i] == saleItemId) {
-                            found = true;
-                            break;
-                        }
-                    }
-                    if (!found) {
-                        printf("테이블 데이터 파일의 %d번째 줄의 판매 항목 고유 번호 %d는 올바른 판매 항목 고유 번호가 아닙니다. 프로그램을 종료합니다.\n",
-                            tableLineNumber, saleItemId);
+        int tableLineNumber = 0;
+        char line[256];
+        int paymentUnitTables[MAX_TABLE_NUMBER] = {0};
+        int paymentUnitCount = 0;
+        int totalPartialPayments = 0;
+        
+        while (fgets(line, sizeof(line), tableFile)) {
+            tableLineNumber++;
+            line[strcspn(line, "\n")] = 0;  // 개행 문자 제거
+
+            if (line[0] == '#') {
+                if (line[1] == '#') {
+                    // ## 부분 결제 금액 검사
+                    char* paymentStr = line + 2;
+                    while (*paymentStr == ' ') paymentStr++;  // 앞쪽 공백 제거
+                    
+                    // 0으로 시작하는지 검사
+                    if (paymentStr[0] == '0' && strlen(paymentStr) > 1) {
+                        printf("테이블 데이터 파일 %d번째 줄: 부분 결제 금액이 0으로 시작할 수 없습니다. 프로그램을 종료합니다.\n", tableLineNumber);
                         fclose(tableFile);
                         return false;
                     }
+
+                    // 숫자만 포함하는지 검사
+                    for (int i = 0; paymentStr[i]; i++) {
+                        if (!isdigit(paymentStr[i])) {
+                            printf("테이블 데이터 파일 %d번째 줄: 부분 결제 금액이 올바르지 않습니다. 프로그램을 종료합니다.\n", tableLineNumber);
+                            fclose(tableFile);
+                            return false;
+                        }
+                    }
+
+                    int payment = atoi(paymentStr);
+                    if (payment <= 0) {
+                        printf("테이블 데이터 파일 %d번째 줄: 부분 결제 금액이 양의 정수가 아닙니다. 프로그램을 종료합니다.\n", tableLineNumber);
+                        fclose(tableFile);
+                        return false;
+                    }
+                    totalPartialPayments += payment;
                 }
                 else {
-                    printf("테이블 데이터 파일의 %d번째 줄에서 올바른 형식의 판매 항목 고유 번호를 찾을 수 없습니다. 프로그램을 종료합니다.\n",
-                        tableLineNumber);
+                    // # 결제 단위 테이블 번호 검사
+                    char* tableStr = line + 1;
+                    while (*tableStr == ' ') tableStr++;  // 앞쪽 공백 제거
+                    
+                    // 숫자만 포함하는지 검사
+                    for (int i = 0; tableStr[i]; i++) {
+                        if (!isdigit(tableStr[i])) {
+                            printf("테이블 데이터 파일 %d번째 줄: 결제 단위 테이블 번호가 올바르지 않습니다. 프로그램을 종료합니다.\n", tableLineNumber);
+                            fclose(tableFile);
+                            return false;
+                        }
+                    }
+
+                    int unitTable = atoi(tableStr);
+                    if (unitTable < 1 || unitTable > MAX_TABLE_NUMBER || !isTableExist(unitTable)) {
+                        printf("테이블 데이터 파일 %d번째 줄: 올바르지 않은 결제 단위 테이블 번호입니다. 프로그램을 종료합니다.\n", tableLineNumber);
+                        fclose(tableFile);
+                        return false;
+                    }
+
+                    // 결제 단위에 추가
+                    paymentUnitTables[paymentUnitCount++] = unitTable;
+                }
+            }
+            else {
+                int saleItemId;
+                if (sscanf(line, "%d", &saleItemId) != 1) {
+                    printf("테이블 데이터 파일의 %d번째 줄에서 올바른 형식의 판매 항목 고유 번호를 찾을 수 없습니다. 프로그램을 종료합니다.\n", tableLineNumber);
+                    fclose(tableFile);
+                    return false;
+                }
+                
+                // 판매 항목 데이터 파일에 존재하는 번호인지 확인
+                bool found = false;
+                for (int i = 0; i < itemCount; i++) {
+                    if (itemIds[i] == saleItemId) {
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    printf("테이블 데이터 파일의 %d번째 줄의 판매 항목 고유 번호 %d는 올바른 판매 항목 고유 번호가 아닙니다. 프로그램을 종료합니다.\n", tableLineNumber, saleItemId);
                     fclose(tableFile);
                     return false;
                 }
             }
-            fclose(tableFile);
         }
-    }
 
-    // 테이블 개수 제약 검사
-    if (tableCount < 1) {
-        printf("테이블이 하나도 존재하지 않습니다. 프로그램을 종료합니다.\n");
-        return false;
-    }
-    if (tableCount > MAX_TABLE_NUMBER) {
-        printf("테이블이 %d개를 초과합니다. 프로그램을 종료합니다.\n", MAX_TABLE_NUMBER);
-        return false;
+        // 결제 단위 상호 참조 검사
+        if (paymentUnitCount > 0) {
+            for (int i = 0; i < paymentUnitCount; i++) {
+                int unitTable = paymentUnitTables[i];
+                char unitFileName[256];
+                snprintf(unitFileName, sizeof(unitFileName), "%s\\%d.txt", TABLE_FILE_PATH, unitTable);
+                
+                FILE* unitFile = fopen(unitFileName, "r");
+                if (!unitFile) {
+                    printf("결제 단위로 묶인 테이블 %d의 파일을 찾을 수 없습니다. 프로그램을 종료합니다.\n", unitTable);
+                    fclose(tableFile);
+                    return false;
+                }
+
+                // 결제 단위 테이블들이 서로를 참조하는지 검사
+                bool foundAllReferences = true;
+                for (int j = 0; j < paymentUnitCount; j++) {
+                    bool foundReference = false;
+                    rewind(unitFile);
+                    
+                    while (fgets(line, sizeof(line), unitFile)) {
+                        if (line[0] == '#' && line[1] != '#') {
+                            int refTable = atoi(line + 1);
+                            if (refTable == paymentUnitTables[j]) {
+                                foundReference = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (!foundReference) {
+                        foundAllReferences = false;
+                        break;
+                    }
+                }
+
+                fclose(unitFile);
+                
+                if (!foundAllReferences) {
+                    printf("결제 단위로 묶인 테이블들의 상호 참조가 올바르지 않습니다. 프로그램을 종료합니다.\n");
+                    fclose(tableFile);
+                    return false;
+                }
+            }
+        }
+
+        fclose(tableFile);
     }
 
     return true;
 }
-
 // 7.2 판매 항목 선택 입력 *주의* 이 함수는 의미 규칙을 검사하지 않습니다.
 int inputFoodNumber() {
     int foodNumber;
@@ -269,72 +363,77 @@ void removeFoodItem() {
 
 // 7.8 주문 생성 프롬프트
 void createOrder() {
-
-    // 주문 가능한 테이블 목록 표시
-    int tablesWithOrders[MAX_TABLE_NUMBER];  // 주문 내역이 있는 테이블을 저장할 배열
+    int tablesWithOrders[MAX_TABLE_NUMBER];  
     int orderCount = 0;
-    listTablesWithOrders(tablesWithOrders, &orderCount, "\n주문 내역이 있는 테이블 번호");  // 주문이 있는 테이블을 확인하고 표시
+    listTablesWithOrders(tablesWithOrders, &orderCount, "\n주문 내역이 있는 테이블 번호");  
 
-    FILE* foodFile = fopen(FILE_PATH, "r+"); // 읽기 및 편집
+    FILE* foodFile = fopen(FILE_PATH, "r+");
     if (foodFile == NULL) {
         printf("파일을 열 수 없습니다.\n");
         return;
     }
-    rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+    rewind(foodFile);
 
     int tableNumber = 0;
-
     while (1) {
-        tableNumber = inputTableNumber(false);//테이블 번호 입력받기
+        tableNumber = inputTableNumber(false);
         if (tableNumber < -1) continue;
         else break;
     }
 
-    // 테이블 파일 경로 설정
     char tableFilePath[256];
-    // snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
-    snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
-    // 테이블 파일 열기
-    FILE* tableFile = fopen(tableFilePath, "a");
-    if (tableFile == NULL) {
-        printf("테이블 파일을 열 수 없습니다.\n");
-        fclose(foodFile);
-        return;
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+    
+    // 빈 테이블인지 확인
+    bool isEmptyTable = true;
+    FILE* checkFile = fopen(tableFilePath, "r");
+    if (checkFile) {
+        char line[256];
+        while (fgets(line, sizeof(line), checkFile)) {
+            if (!isspace((unsigned char)line[0])) {
+                isEmptyTable = false;
+                break;
+            }
+        }
+        fclose(checkFile);
     }
-
+    
     printFoodList();  // 판매 목록 출력
 
-    int selection = -1;  // 판매 항목 선택 변수
+    int selection = -1;  
     OrderItem* orderList = NULL;
-
     int firstNum, secondNum, price;
     char foodName[50];
+    bool orderMade = false;  // 실제 주문이 발생했는지 추적하는 플래그
 
-    while (selection != 0) {  // 0을 입력하면 주문이 끝남
+    while (selection != 0) {  
         printf("\n<주문을 끝내려면 0을 입력하세요>\n\n");
         selection = inputFoodNumber();
 
         if (selection == 0) {
-            break;  // 0 입력 시 주문 종료
+            break;  
         }
 
         int currentMenuIndex = 0;
         int validSelection = 0;
 
-        // 파일을 다시 읽어 선택한 메뉴의 ID 찾기
         rewind(foodFile);
         while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
             if (firstNum == 0) {
                 currentMenuIndex++;
                 if (currentMenuIndex == selection) {
                     validSelection = 1;
-                    int quantity = inputQuantity(); // 수량 입력받기
+                    int quantity = inputQuantity();
+
+                    // 최초 주문인 경우, 결제 단위 정보는 나중에 쓸 것임
+                    if (isEmptyTable) {
+                        orderMade = true;
+                    }
 
                     // 수량만큼 반복해서 항목 추가
                     for (int i = 0; i < quantity; i++) {
                         orderList = addOrderItem(orderList, secondNum);
                     }
-
                     break;
                 }
             }
@@ -345,47 +444,97 @@ void createOrder() {
         }
     }
 
-    // 주문 리스트를 테이블 파일에 저장
-    OrderItem* current = orderList;
-    while (current != NULL) {
-        for (int i = 0; i < current->quantity; i++) {
-            fprintf(tableFile, "%d\n", current->itemID);  // 메뉴 ID 저장
-        }
-        current = current->next;
-    }
-
-    // 최종 주문 결과 출력 (OrderItem 사용)
-    printf("\n%d번 테이블 ", tableNumber);
-
-    current = orderList;
-
-    int itemCount = 0;
-    while (current != NULL) {
-        // 메뉴 정보 찾기
-        rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
-        while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
-            if (firstNum == 0 && secondNum == current->itemID) {
-                if (itemCount > 0) {
-                    printf(" ");  // 각 항목 사이에 공백 추가
+    // 실제 주문이 발생한 경우에만 파일에 저장
+    if (orderMade || orderList != NULL) {
+        FILE* tempFile = fopen("temp.txt", "w");
+        if (tempFile) {
+            // 1. 기존 주문 내역 복사
+            if (!isEmptyTable) {
+                FILE* existingFile = fopen(tableFilePath, "r");
+                if (existingFile) {
+                    char line[256];
+                    while (fgets(line, sizeof(line), existingFile)) {
+                        if (line[0] != '#') {  // 순수 주문 내역만 복사
+                            fprintf(tempFile, "%s", line);
+                        }
+                    }
+                    fclose(existingFile);
                 }
-                printf("%s %d개", foodName, current->quantity);
-                itemCount++;
-                break;
             }
-        }
-        current = current->next;
-    }
 
-    printf(" 주문완료되었습니다.\n");
+            // 2. 새로운 주문 추가
+            OrderItem* current = orderList;
+            while (current != NULL) {
+                for (int i = 0; i < current->quantity; i++) {
+                    fprintf(tempFile, "%d\n", current->itemID);
+                }
+                current = current->next;
+            }
+
+            // 3. 결제 단위 정보 (#) 추가
+            if (isEmptyTable && orderMade) {
+                // 새로운 테이블의 경우 결제 단위 설정
+                fprintf(tempFile, "#%d\n", tableNumber);
+            } else if (!isEmptyTable) {
+                // 기존 결제 단위 정보 복사
+                FILE* existingFile = fopen(tableFilePath, "r");
+                if (existingFile) {
+                    char line[256];
+                    while (fgets(line, sizeof(line), existingFile)) {
+                        if (line[0] == '#' && line[1] != '#') {
+                            fprintf(tempFile, "%s", line);
+                        }
+                    }
+                    fclose(existingFile);
+                }
+            }
+
+            // 4. 부분 결제 정보 (##) 복사
+            if (!isEmptyTable) {
+                FILE* existingFile = fopen(tableFilePath, "r");
+                if (existingFile) {
+                    char line[256];
+                    while (fgets(line, sizeof(line), existingFile)) {
+                        if (line[0] == '#' && line[1] == '#') {
+                            fprintf(tempFile, "%s", line);
+                        }
+                    }
+                    fclose(existingFile);
+                }
+            }
+
+            fclose(tempFile);
+
+            // 임시 파일을 원래 파일로 교체
+            remove(tableFilePath);
+            rename("temp.txt", tableFilePath);
+
+            // 주문 결과 출력
+            printf("\n%d번 테이블 ", tableNumber);
+            current = orderList;
+            int itemCount = 0;
+            while (current != NULL) {
+                rewind(foodFile);
+                while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
+                    if (firstNum == 0 && secondNum == current->itemID) {
+                        if (itemCount > 0) {
+                            printf(" ");
+                        }
+                        printf("%s %d개", foodName, current->quantity);
+                        itemCount++;
+                        break;
+                    }
+                }
+                current = current->next;
+            }
+            printf(" 주문완료되었습니다.\n");
+        }
+    }
 
     // 메모리 해제
     freeOrderItems(orderList);
-    freeOrderItems(current);
-
-    fclose(tableFile);
     fclose(foodFile);
 }
-
 // 7.9 주문 조회 프롬프트
 void printOrder() {
     // 주문 가능한 테이블 목록 표시
@@ -404,7 +553,7 @@ void printOrder() {
     // 테이블 파일 경로 
     char tableFilePath[256];
     // snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
-    snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
     // 테이블 파일 열기
     FILE* tableFile = fopen(tableFilePath, "r");
     if (tableFile == NULL) {
@@ -460,48 +609,76 @@ void printOrder() {
     fclose(foodFile);
 }
 
+int calculateTotalAmount(PaymentContext* context) {
+    int total = 0;
+    FILE* foodFile = fopen(FILE_PATH, "r");
+    if (!foodFile) return 0;
+
+    for (int i = 0; i < context->tableCount; i++) {
+        char tablePath[256];
+        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, context->tableNumbers[i]);
+        FILE* tableFile = fopen(tablePath, "r");
+        if (!tableFile) continue;
+
+        char line[256];
+        while (fgets(line, sizeof(line), tableFile)) {
+            if (line[0] != '#') {  // 주문 내역만 처리
+                int itemId;
+                if (sscanf(line, "%d", &itemId) == 1) {
+                    // 해당 아이템의 가격 찾기
+                    rewind(foodFile);
+                    int firstNum, secondNum, price;
+                    char foodName[50];
+                    while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
+                        if (firstNum == 0 && secondNum == itemId) {
+                            total += price;
+                            break;
+                        }
+                    }
+                }
+            }
+            else if (line[0] == '#' && line[1] == '#') {  // 부분 결제 내역 처리
+                int payment;
+                if (sscanf(line + 2, "%d", &payment) == 1) {
+                    total -= payment;
+                }
+            }
+        }
+        fclose(tableFile);
+    }
+    fclose(foodFile);
+    return total;
+}
+
 // 7.10 결제 처리 프롬프트
 void makePayment() {
-    int tablesWithOrders[MAX_TABLE_NUMBER];  // 주문 내역이 있는 테이블 번호를 저장할 배열
-    int orderCount = 0;       // 주문 내역이 있는 테이블 수를 저장할 변수
+    int tablesWithOrders[MAX_TABLE_NUMBER];
+    int orderCount = 0;
+    listTablesWithOrders(tablesWithOrders, &orderCount, "\n결제 가능한 테이블 번호");
 
-    listTablesWithOrders(tablesWithOrders, &orderCount, "\n결제 가능한 테이블 번호");  // 주문 내역이 있는 테이블을 표시하고, 결과를 가져옴
+    currentContext.tableCount = 0;  // 전역 PaymentContext 초기화
+    int primarySelectedTable = -1;
 
-    int selectedTables[MAX_TABLE_NUMBER];
-    int selectedCount = 0;
-
-    // inputMultipleTablesForPayment 결제할 테이블 번호들 입력
+    // 결제할 테이블 선택
     while (true) {
-        // 현재 선택된 테이블 번호 출력
         printf("테이블 번호를 입력하세요 {");
-        for (int i = 0; i < selectedCount; i++) {
-            printf("%d", selectedTables[i]);
-            if (i < selectedCount - 1) {
-                printf(", ");
-            }
+        for (int i = 0; i < currentContext.tableCount; i++) {
+            printf("%d", currentContext.tableNumbers[i]);
+            if (i < currentContext.tableCount - 1) printf(", ");
         }
         printf("}: ");
 
-        int input = inputTableNumber(true); // 결제 처리용으로 호출
-
-        // -1을 반환하면 엔터 입력
+        int input = inputTableNumber(true);
         if (input == -1) {
-            if (selectedCount > 0) break; // 이미 선택된 테이블이 있다면 종료
+            if (currentContext.tableCount > 0) break;
             continue;
         }
-
-        if (input < -1) {
-            continue;
-        }
-
-        // 0 입력 시 선택 취소
         if (input == 0) {
-            printf("선택을 취소하고 메인 메뉴로 돌아갑니다.\n");
-            selectedCount = 0; // 선택된 테이블 수를 초기화
+            printf("결제가 종료됩니다.\n");
             return;
         }
 
-        // 유효한 테이블 번호인지 확인
+        // 주문 내역 있는지 확인
         bool validOrder = false;
         for (int i = 0; i < orderCount; i++) {
             if (tablesWithOrders[i] == input) {
@@ -510,148 +687,158 @@ void makePayment() {
             }
         }
         if (!validOrder) {
-            printf("경고: %d번 테이블에는 주문 내역이 없습니다.\n", input);
+            printf("주문 내역이 없는 테이블입니다.\n");
             continue;
         }
-        else {
-            // 이미 선택된 테이블 번호인지 확인
-            bool alreadySelected = false;
-            for (int i = 0; i < selectedCount; i++) {
-                if (selectedTables[i] == input) {
-                    alreadySelected = true;
-                    break;
+
+        // 이미 선택된 테이블인지 확인
+        bool alreadySelected = false;
+        for (int i = 0; i < currentContext.tableCount; i++) {
+            if (currentContext.tableNumbers[i] == input) {
+                alreadySelected = true;
+                break;
+            }
+        }
+        if (alreadySelected) {
+            printf("이미 입력한 테이블 번호입니다.\n");
+            continue;
+        }
+
+        if (primarySelectedTable == -1) {
+            primarySelectedTable = input;
+        }
+        
+        PaymentUnit* unit = getPaymentUnit(input);
+        if (unit->tableCount > 0) {
+            // 결제 단위에 속한 테이블들 추가
+            for (int i = 0; i < unit->tableCount; i++) {
+                bool exists = false;
+                for (int j = 0; j < currentContext.tableCount; j++) {
+                    if (currentContext.tableNumbers[j] == unit->tables[i]) {
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    currentContext.tableNumbers[currentContext.tableCount++] = unit->tables[i];
                 }
             }
-            if (alreadySelected) {
-                printf("경고: 이미 선택된 테이블 번호입니다.\n");
-                continue;
-            }
-            else {
-                selectedTables[selectedCount] = input;
-                selectedCount++;
-            }
+        } else {
+            currentContext.tableNumbers[currentContext.tableCount++] = input;
         }
+        free(unit->partialPayments);
+        free(unit);
     }
 
-    int combinedTotal = 0;  // 선택된 테이블들의 전체 결제 금액
-    int counters[MAX_TABLE_NUMBER];        // 각 선택된 테이블의 줄 수를 저장할 배열
-
+    // 각 테이블의 주문액 계산 및 출력
     printf("\n");
+    int totalOrderAmount = 0;
+    int totalPartialPayments = 0;
 
-    // 각 선택된 테이블의 총 주문액을 계산
-    for (int i = 0; i < selectedCount; i++) {
-        int tableNumber = selectedTables[i];
-        char tableFilePath[256];
-        // snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
-                snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
+    for (int i = 0; i < currentContext.tableCount; i++) {
+        int tableNumber = currentContext.tableNumbers[i];
+        char tablePath[256];
+        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
 
-        FILE* tableFile = fopen(tableFilePath, "r");
-        if (!tableFile) {
-            printf("파일을 열 수 없습니다: %d번 테이블\n", tableNumber);
-            continue;
-        }
+        FILE* tableFile = fopen(tablePath, "r");
+        if (!tableFile) continue;
 
-        // foodlist 파일을 열어 각 항목의 가격을 확인
         FILE* foodFile = fopen(FILE_PATH, "r");
         if (!foodFile) {
-            printf("판매 항목 파일을 열 수 없습니다.\n");
             fclose(tableFile);
             continue;
         }
 
-        // 주문 항목의 수량 계산
-        int itemID;
+        // 주문 내역 집계
         OrderItem* orderList = NULL;
-
-        while (fscanf(tableFile, "%d", &itemID) == 1) {
-            orderList = addOrderItem(orderList, itemID);
-        }
-
-        // 줄 수 계산
-        counters[i] = 0; // 각 테이블의 줄 수를 초기화
-        char c;
-        FILE* tableFileForLineCount = fopen(tableFilePath, "r");
-        while ((c = fgetc(tableFileForLineCount)) != EOF) {
-            if (c == '\n') {
-                counters[i]++; // 각 테이블의 줄 수를 저장
+        int itemID;
+        char line[256];
+        while (fgets(line, sizeof(line), tableFile)) {
+            if (line[0] != '#') {
+                if (sscanf(line, "%d", &itemID) == 1) {
+                    orderList = addOrderItem(orderList, itemID);
+                }
+            }
+            else if (line[0] == '#' && line[1] == '#') {
+                int payment;
+                if (sscanf(line + 2, "%d", &payment) == 1) {
+                    totalPartialPayments += payment;
+                }
             }
         }
-        fclose(tableFileForLineCount);
 
-        // 주문 합계 계산
-        int foundItems = 0;
-        int firstNum, secondNum, price;
-        char foodName[50];
-        int totalPrice = 0;
-
+        // 주문 금액 계산
+        int tableTotal = 0;
         OrderItem* current = orderList;
         while (current != NULL) {
-            rewind(foodFile);  // 파일 포인터를 처음으로 되돌림
+            rewind(foodFile);
+            int firstNum, secondNum, price;
+            char foodName[50];
             while (fscanf(foodFile, "%d  %d    %s  %d", &firstNum, &secondNum, foodName, &price) == 4) {
                 if (firstNum == 0 && secondNum == current->itemID) {
-                    int quantity = current->quantity;
-                    totalPrice += quantity * price;
-                    foundItems++;
+                    tableTotal += price * current->quantity;
                     break;
                 }
             }
             current = current->next;
         }
 
-        // 메모리 해제
+        printf("%d번 테이블 주문액: %d\n", tableNumber, tableTotal);
+        totalOrderAmount += tableTotal;
+
         freeOrderItems(orderList);
         fclose(foodFile);
         fclose(tableFile);
-
-        if (foundItems == 0) {
-            printf("\n%d번 테이블은 결제가 불가능합니다.\n", tableNumber);
-        }
-        else {
-            combinedTotal += totalPrice;  // 결제 금액을 합산
-            printf("%d번 테이블 주문액: %d\n", tableNumber, totalPrice);
-        }
     }
 
-    printf("\n");
+    // 남은 결제 금액 계산
+    int remainingBalance = totalOrderAmount - totalPartialPayments;
+    if (remainingBalance <= 0) {
+        printf("이미 전액 결제되었습니다.\n");
+        return;
+    }
+
+    printf("총 주문액: %d원\n", totalOrderAmount);
+    printf("기존 부분 결제액: %d원\n", totalPartialPayments);
+    printf("남은 결제액: %d원\n\n", remainingBalance);
 
     // 결제 처리
-    int remainingBalance = combinedTotal; // 남은 결제금액
-    int paymentSuccess = 0; // 결제 성공 여부 체크 변수
-    int paidAmount = 0;
-
-    // 남은 결제 금액이 있을 경우 반복
-    while (remainingBalance > 0)
-    {
-        paidAmount = combinedTotal - remainingBalance;
-        // 사용자로부터 결제 금액 입력 받기
-        remainingBalance = inputPaymentAmount(remainingBalance);
-
-        // 결제 중단 신호가 입력되면 반복 탈출
-        if (remainingBalance == -1) {
-            break;
-        }
-        // 결제가 완료되면 성공 표시 후 반복 탈출
-        else if (remainingBalance == 0) {
-            paymentSuccess = 1;
+    while (remainingBalance > 0) {
+        int payment = inputPaymentAmount(remainingBalance);
+        
+        if (payment == -1) {  // 결제 취소 (0 입력)
             break;
         }
         
-    }
+        if (payment == -2) {  // 부분 결제 (. 입력)
+            updatePaymentUnit(primarySelectedTable, currentContext.tableNumbers, currentContext.tableCount);
+            break;
+        }
 
-    // 전체 결제가 완료된 후 각 테이블의 주문 내역 삭제
-    if (paymentSuccess) {
-        for (int i = 0; i < selectedCount; i++) {
-            char tableFilePath[256];
-            // snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, selectedTables[i]);
-                        snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, selectedTables[i]);
+        // 결제 기록 업데이트
+        updatePaymentRecord(primarySelectedTable, remainingBalance - payment);
+        remainingBalance = payment;
 
-            deleteLines(tableFilePath, 0, -1);
+        if (remainingBalance == 0) {
+            printf("테이블을 비우시겠습니까?: ");
+            char input[10];
+            fgets(input, sizeof(input), stdin);
+            if (input[0] != '.') {
+                // 모든 선택된 테이블 비우기
+                for (int i = 0; i < currentContext.tableCount; i++) {
+                    char tablePath[256];
+                    snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, currentContext.tableNumbers[i]);
+                    FILE* file = fopen(tablePath, "w");
+                    if (file) fclose(file);
+                }
+                printf("전액 결제된 테이블을 비웠습니다.\n");
+            } else {
+                printf("테이블을 비우지 않습니다.\n");
+            }
+            break;
         }
     }
-
-
 }
-
 // 7.11 테이블 증감 프롬프트
 void adjustTables() {
     while (1) {
@@ -728,7 +915,7 @@ void adjustTables() {
                 }
 
                 char tableFilePath[256];
-                snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableToRemove);
+                snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableToRemove);
                 remove(tableFilePath);
                 printf("%d번 테이블이 제거되었습니다.\n", tableToRemove);
                 removed++;
@@ -759,7 +946,7 @@ void adjustTables() {
                 }
 
                 char tableFilePath[256];
-                snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, newTableNumber);
+                snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, newTableNumber);
                 FILE* tableFile = fopen(tableFilePath, "w");
                 if (tableFile != NULL) {
                     fclose(tableFile);
@@ -774,6 +961,219 @@ void adjustTables() {
     }
 }
 
+// 테이블 이동 함수 수정
+void moveTable() {
+    int tablesWithOrders[MAX_TABLE_NUMBER];
+    int orderCount = 0;
+    listTablesWithOrders(tablesWithOrders, &orderCount, "\n주문이 있는 테이블 번호");
+
+    // 출발 테이블 선택
+    printf("이동시킬 테이블을 입력하세요: ");
+    int sourceTable = inputInt(NULL, false, false);
+    if (sourceTable < 0) return;
+
+    // 결제 단위 확인
+    PaymentUnit* sourceUnit = getPaymentUnit(sourceTable);
+    if (sourceUnit->tableCount == 0) {
+        sourceUnit->tables[0] = sourceTable;
+        sourceUnit->tableCount = 1;
+    }
+    
+    printf("{");
+    for (int i = 0; i < sourceUnit->tableCount; i++) {
+        printf("%d", sourceUnit->tables[i]);
+        if (i < sourceUnit->tableCount - 1) printf(", ");
+    }
+    printf("}번 테이블을 이동할 테이블을 입력하세요{}: ");
+
+    // 목적지 테이블들 선택
+    int destTables[MAX_TABLE_NUMBER];
+    int destCount = 0;
+    
+    while (1) {
+        if (destCount > 0) {
+            printf("{");
+            for (int i = 0; i < sourceUnit->tableCount; i++) {
+                printf("%d", sourceUnit->tables[i]);
+                if (i < sourceUnit->tableCount - 1) printf(", ");
+            }
+            printf("}번 테이블을 이동할 테이블을 입력하세요{");
+            for (int i = 0; i < destCount; i++) {
+                printf("%d", destTables[i]);
+                if (i < destCount - 1) printf(", ");
+            }
+            printf("}: ");
+        }
+
+        int destTable = inputTableNumber(true);
+        if (destTable == -1) {
+            if (destCount > 0) break;
+            continue;
+        }
+        if (destTable == 0) {
+            printf("이동이 취소되었습니다.\n");
+            free(sourceUnit->partialPayments);
+            free(sourceUnit);
+            return;
+        }
+
+        // 유효성 검사
+        if (!isTableExist(destTable)) {
+            printf("존재하지 않는 테이블 번호입니다.\n");
+            continue;
+        }
+
+        // 이미 선택된 테이블인지 확인
+        bool alreadySelected = false;
+        for (int i = 0; i < destCount; i++) {
+            if (destTables[i] == destTable) {
+                printf("이미 선택된 테이블입니다.\n");
+                alreadySelected = true;
+                break;
+            }
+        }
+        if (alreadySelected) continue;
+
+        // 출발 테이블과 동일한 테이블 허용
+        bool isSourceTable = false;
+        for (int i = 0; i < sourceUnit->tableCount; i++) {
+            if (sourceUnit->tables[i] == destTable) {
+                isSourceTable = true;
+                break;
+            }
+        }
+
+        // 선택된 테이블 추가 (결제 단위와 상관없이 선택된 테이블만)
+        destTables[destCount++] = destTable;
+    }
+
+    // 테이블 이동 실행
+    if (destCount > 0) {
+        executeTableMove(sourceUnit, destTables, destCount);
+    }
+
+    free(sourceUnit->partialPayments);
+    free(sourceUnit);
+}
+
+
+// 결제 취소 함수
+void cancelPayment() {
+    int tablesWithPayments[MAX_TABLE_NUMBER];
+    int paymentCount = 0;
+    listTablesWithPartialPayments(tablesWithPayments, &paymentCount, 
+        "\n부분결제 항목이 있는 테이블 번호");
+    
+    if (paymentCount == 0) {
+        printf("부분 결제 항목이 있는 테이블이 없습니다.\n");
+        return;
+    }
+
+    int tableNumber = inputTableNumber(false);
+    if (tableNumber < 0) return;
+
+    PaymentUnit* unit = getPaymentUnit(tableNumber);
+    if (unit->paymentCount == 0) {
+        printf("취소할 부분결제 내역이 없습니다.\n");
+        free(unit->partialPayments);
+        free(unit);
+        return;
+    }
+
+    // 모든 결제단위 테이블의 부분결제 내역 수집
+    typedef struct {
+        int amount;
+        int count;
+    } PaymentInfo;
+    
+    PaymentInfo payments[100] = {0};  // 충분히 큰 크기로 설정
+    int uniquePaymentCount = 0;
+
+    for (int t = 0; t < unit->tableCount; t++) {
+        char tablePath[256];
+        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, unit->tables[t]);
+        FILE* tableFile = fopen(tablePath, "r");
+        if (!tableFile) continue;
+
+        char line[256];
+        while (fgets(line, sizeof(line), tableFile)) {
+            if (line[0] == '#' && line[1] == '#') {
+                int amount;
+                sscanf(line + 2, "%d", &amount);
+                
+                // 이미 있는 금액인지 확인
+                bool found = false;
+                for (int i = 0; i < uniquePaymentCount; i++) {
+                    if (payments[i].amount == amount) {
+                        payments[i].count++;
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    payments[uniquePaymentCount].amount = amount;
+                    payments[uniquePaymentCount].count = 1;
+                    uniquePaymentCount++;
+                }
+            }
+        }
+        fclose(tableFile);
+    }
+
+    int selectedPayments[100] = {0};
+    int selectedCount = 0;
+
+    while (1) {
+        printf("결제 취소할 부분결제 항목을 고르시오 [");
+        bool first = true;
+        for (int i = 0; i < uniquePaymentCount; i++) {
+            if (payments[i].count > 0) {
+                if (!first) printf(", ");
+                // 같은 금액이 여러 번 있으면 그만큼 반복 출력
+                for (int j = 0; j < payments[i].count; j++) {
+                    if (j > 0) printf(", ");
+                    printf("%d", payments[i].amount);
+                }
+                first = false;
+            }
+        }
+        printf("]: ");
+
+        int amount = inputInt(NULL, true, false);
+        if (amount == 0) {
+            printf("결제 취소가 종료됩니다.\n");
+            break;
+        }
+        if (amount == -1) {
+            if (selectedCount == 0) {
+                printf("취소할 액수가 없습니다. 취소 작업을 중단하려면 0을 입력하세요\n");
+                continue;
+            }
+            executeCancelPayments(unit, selectedPayments, selectedCount);
+            break;
+        }
+
+        // 입력된 금액이 유효한지 확인
+        bool valid = false;
+        for (int i = 0; i < uniquePaymentCount; i++) {
+            if (payments[i].amount == amount && payments[i].count > 0) {
+                valid = true;
+                selectedPayments[selectedCount++] = amount;
+                payments[i].count--;  // 선택된 금액의 남은 개수 감소
+                break;
+            }
+        }
+        
+        if (!valid) {
+            printf("해당하는 부분 결제 금액이 없습니다.\n");
+        }
+    }
+
+    free(unit->partialPayments);
+    free(unit);
+}
+
+
 // 7.12 메인 메뉴 프롬프트
 int printMain() {
     int s;
@@ -786,10 +1186,12 @@ int printMain() {
         printf("5. 주문 조회\n");
         printf("6. 결제 처리\n");
         printf("7. 테이블 증감\n");
-        printf("8. 종료\n");
+        printf("8. 테이블 이동\n");
+        printf("9. 결제 취소\n");
+        printf("10. 종료\n");
         s = inputInt("메뉴 선택: ", false, false);
-        if (s > 8) {
-            printf("1~8 사이의 값을 입력해주세요.\n");
+        if (s > 10) {
+            printf("1~10 사이의 값을 입력해주세요.\n");
         }
         else {
             return s;
@@ -836,7 +1238,15 @@ int main(void) {
             adjustTables();
             break;
         case 8:
-            // 7.12 메인 메뉴 프롬프트의 종료 기능
+            // 7.12 테이블 이동 프롬프트
+            moveTable();
+            break;
+        case 9:
+            // 7.13 결제 취소 프롬프트
+            cancelPayment();
+            break;
+        case 10:
+            // 7.14 메인 메뉴 프롬프트의 종료 기능
             exitProgram();
             break;
         default:

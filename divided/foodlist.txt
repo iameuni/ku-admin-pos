@@ -4,3 +4,4 @@
 1  4    Pepsi  3000
 0  5    Bibimbab  12000
 1  6    asdfasf  213
+0  7    asdfsd  1243

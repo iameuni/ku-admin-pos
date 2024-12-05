@@ -57,40 +57,50 @@ int inputQuantity() {
 
 // 7.4.3 결제 금액 입력
 int inputPaymentAmount(int remainingBalance) {
-    while (1)
-    {
-        printf("결제할 금액을 입력하세요 [%d원]: ", remainingBalance);
-        int paymentAmount = inputInt(NULL, true, false); // 정수 입력 함수 사용
+    static int hasPartialPayment = 0;  // 부분 결제 여부를 추적
 
-        // 입력이 비어있다면 전체 금액 결제
-        if (paymentAmount == -1) { // 엔터키만 입력된 경우
-            printf("전체 금액이 결제 완료되었습니다.\n");
-            remainingBalance = 0; // 전액 결제 완료
-            return remainingBalance;
+    while (1) {
+        printf("결제할 금액을 입력하세요 [%d]: ", remainingBalance);
+        int paymentAmount = inputInt(NULL, true, false);
+
+        if (paymentAmount == (-MAX_INT + 9)) {  // '.' 입력 시
+            if (!hasPartialPayment) {
+                printf("부분 결제 없이 새 결제 단위를 생성했습니다.\n");
+            } else {
+                printf("부분결제 되었습니다.\n");
+            }
+            hasPartialPayment = 0;  // 상태 초기화
+            return -2;
         }
 
-        // 유효성 검사
-        if (paymentAmount < -1) {
-            continue;
+        if (paymentAmount == -1) {  // 엔터 입력 시
+            printf("%d원 결제 완료되었습니다.\n", remainingBalance);
+            hasPartialPayment = 0;  // 상태 초기화
+            return 0;
         }
-        else if (paymentAmount == 0) { // 0 입력 시 결제 중단
+
+        if (paymentAmount == 0) {  // '0' 입력 시
             printf("결제 중단.\n");
+            hasPartialPayment = 0;  // 상태 초기화
             return -1;
         }
-        else if (paymentAmount > remainingBalance) {
+
+        if (paymentAmount < -1) continue;
+
+        if (paymentAmount > remainingBalance) {
             printf("오류: 결제할 금액보다 큽니다.\n");
             continue;
         }
 
+        hasPartialPayment = 1;  // 유효한 결제 금액 입력 시 상태 설정
         remainingBalance -= paymentAmount;
+        printf("%d원 중 %d원 분할 결제 되었습니다.\n", remainingBalance + paymentAmount, paymentAmount);
+        
         if (remainingBalance == 0) {
-            printf("전체 금액이 결제 완료되었습니다.\n");
-            remainingBalance = 0; // 전액 결제 완료
-            return remainingBalance;
+            printf("%d원 결제 완료되었습니다.\n", paymentAmount);
+            hasPartialPayment = 0;
         }
-        else {
-            printf("%d원 분할 결제 완료되었습니다. 남은 금액: %d원\n", paymentAmount, remainingBalance);
-            return remainingBalance;
-        }
+        
+        return remainingBalance;
     }
 }
