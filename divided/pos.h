@@ -14,8 +14,8 @@
 #define MAX_INPUT_NUM 100
 #define MAX_TABLE_NUMBER 10
 #define MAX_TABLE_ADJUST 9 // 테이블 증감 최대 절댓값
-#define FILE_PATH ".\\foodlist.txt" // 파일 경로 설정
-#define TABLE_FILE_PATH ".\\table" //테이블 폴더 경로 설정
+#define FILE_PATH "./foodlist.txt" // 파일 경로 설정
+#define TABLE_FILE_PATH "./table" //테이블 폴더 경로 설정
 #define MAX_INT 2147483647
 
 //////////////////// 구조체 선언 ////////////////////

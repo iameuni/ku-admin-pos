@@ -7,7 +7,7 @@ PaymentUnit* getPaymentUnit(int tableNumber) {
     unit->partialPayments = NULL;
     
     char tablePath[256];
-    snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+    snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
     FILE* file = fopen(tablePath, "r");
     if (!file) return unit;
 
@@ -35,7 +35,7 @@ void executeCancelPayments(PaymentUnit* unit, int* selectedPayments, int selecte
     for (int t = 0; t < unit->tableCount; t++) {
         int tableNum = unit->tables[t];
         char tablePath[256];
-        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNum);
+        snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, tableNum);
         
         FILE* tempFile = fopen("temp.txt", "w");
         FILE* tableFile = fopen(tablePath, "r");
@@ -140,7 +140,7 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
     for (int i = 0; i < sourceUnit->tableCount; i++) {
         int tableNum = sourceUnit->tables[i];
         char tablePath[256];
-        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNum);
+        snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, tableNum);
         
         FILE* file = fopen(tablePath, "r");
         if (file) {
@@ -169,7 +169,7 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         if (contents[tableNum].hasContent) continue;  // 이미 저장된 경우 스킵
         
         char tablePath[256];
-        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNum);
+        snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, tableNum);
         
         FILE* file = fopen(tablePath, "r");
         if (file) {
@@ -196,7 +196,7 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
     for (int i = 0; i < destCount; i++) {
         int tableNum = destTables[i];
         char tablePath[256];
-        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNum);
+        snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, tableNum);
         
         FILE* file = fopen(tablePath, "w");
         if (!file) continue;
@@ -273,7 +273,7 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         
         if (!isDestination) {
             char tablePath[256];
-            snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNum);
+            snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, tableNum);
             remove(tablePath);  // 파일 완전히 삭제
             FILE* file = fopen(tablePath, "w");  // 빈 파일로 새로 생성
             if (file) fclose(file);
@@ -302,7 +302,7 @@ void listTablesWithPartialPayments(int* tables, int* count, const char* message)
         if (!isTableExist(i)) continue;
 
         char tablePath[256];
-        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, i);
+        snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, i);
         FILE* file = fopen(tablePath, "r");
         if (!file) continue;
 
@@ -356,7 +356,7 @@ void updatePaymentUnit(int primaryTable, int* unitTables, int unitCount) {
     // 결제 단위에 속한 모든 테이블에 대해 처리
     for (int i = 0; i < unitCount; i++) {
         char tablePath[256];
-        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, unitTables[i]);
+        snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, unitTables[i]);
         
         // 임시 파일 생성
         FILE* tempFile = fopen("temp.txt", "w");
@@ -400,7 +400,7 @@ void updatePaymentUnit(int primaryTable, int* unitTables, int unitCount) {
 // updatePaymentRecord 함수 수정
 void updatePaymentRecord(int tableNumber, int paymentAmount) {
     char tablePath[256];
-    snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+    snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
     
     FILE* tempFile = fopen("temp.txt", "w");
     if (!tempFile) return;

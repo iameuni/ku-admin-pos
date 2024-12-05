@@ -67,7 +67,7 @@ bool checkDataIntegrity() {
     // 테이블 데이터 파일 검사 부분 수정
     for (int table = 1; table <= MAX_TABLE_NUMBER; table++) {
         char tableFileName[256];
-        snprintf(tableFileName, sizeof(tableFileName), "%s\\%d.txt", TABLE_FILE_PATH, table);
+        snprintf(tableFileName, sizeof(tableFileName), "%s/%d.txt", TABLE_FILE_PATH, table);
 
         FILE* tableFile = fopen(tableFileName, "r");
         if (!tableFile) continue;
@@ -166,7 +166,7 @@ bool checkDataIntegrity() {
             for (int i = 0; i < paymentUnitCount; i++) {
                 int unitTable = paymentUnitTables[i];
                 char unitFileName[256];
-                snprintf(unitFileName, sizeof(unitFileName), "%s\\%d.txt", TABLE_FILE_PATH, unitTable);
+                snprintf(unitFileName, sizeof(unitFileName), "%s/%d.txt", TABLE_FILE_PATH, unitTable);
                 
                 FILE* unitFile = fopen(unitFileName, "r");
                 if (!unitFile) {
@@ -382,7 +382,7 @@ void createOrder() {
     }
 
     char tableFilePath[256];
-    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
     
     // 빈 테이블인지 확인
     bool isEmptyTable = true;
@@ -552,8 +552,7 @@ void printOrder() {
 
     // 테이블 파일 경로 
     char tableFilePath[256];
-    // snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
-    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
     // 테이블 파일 열기
     FILE* tableFile = fopen(tableFilePath, "r");
     if (tableFile == NULL) {
@@ -616,7 +615,7 @@ int calculateTotalAmount(PaymentContext* context) {
 
     for (int i = 0; i < context->tableCount; i++) {
         char tablePath[256];
-        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, context->tableNumbers[i]);
+        snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, context->tableNumbers[i]);
         FILE* tableFile = fopen(tablePath, "r");
         if (!tableFile) continue;
 
@@ -738,7 +737,7 @@ void makePayment() {
     for (int i = 0; i < currentContext.tableCount; i++) {
         int tableNumber = currentContext.tableNumbers[i];
         char tablePath[256];
-        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+        snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
 
         FILE* tableFile = fopen(tablePath, "r");
         if (!tableFile) continue;
@@ -827,7 +826,7 @@ void makePayment() {
                 // 모든 선택된 테이블 비우기
                 for (int i = 0; i < currentContext.tableCount; i++) {
                     char tablePath[256];
-                    snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, currentContext.tableNumbers[i]);
+                    snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, currentContext.tableNumbers[i]);
                     FILE* file = fopen(tablePath, "w");
                     if (file) fclose(file);
                 }
@@ -915,7 +914,7 @@ void adjustTables() {
                 }
 
                 char tableFilePath[256];
-                snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableToRemove);
+                snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableToRemove);
                 remove(tableFilePath);
                 printf("%d번 테이블이 제거되었습니다.\n", tableToRemove);
                 removed++;
@@ -946,7 +945,7 @@ void adjustTables() {
                 }
 
                 char tableFilePath[256];
-                snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, newTableNumber);
+                snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, newTableNumber);
                 FILE* tableFile = fopen(tableFilePath, "w");
                 if (tableFile != NULL) {
                     fclose(tableFile);
@@ -1091,7 +1090,7 @@ void cancelPayment() {
 
     for (int t = 0; t < unit->tableCount; t++) {
         char tablePath[256];
-        snprintf(tablePath, sizeof(tablePath), "%s\\%d.txt", TABLE_FILE_PATH, unit->tables[t]);
+        snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, unit->tables[t]);
         FILE* tableFile = fopen(tablePath, "r");
         if (!tableFile) continue;
 

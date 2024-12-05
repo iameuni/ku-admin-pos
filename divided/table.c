@@ -3,7 +3,7 @@
 // 테이블 존재 여부 확인 함수
 bool isTableExist(int tableNumber) {
     char tableFilePath[256];
-    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
     FILE* tableFile = fopen(tableFilePath, "r");
     if (tableFile != NULL) {
         fclose(tableFile);
@@ -26,7 +26,7 @@ int getLastTableNumber() {
 // 특정 테이블의 주문 내역 존재 여부 확인 함수
 bool hasOrders(int tableNumber) {
     char tableFilePath[256];
-    snprintf(tableFilePath, sizeof(tableFilePath), "%s\\%d.txt", TABLE_FILE_PATH, tableNumber);
+    snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
 
     FILE* tableFile = fopen(tableFilePath, "r");
     if (tableFile == NULL) {
@@ -81,9 +81,9 @@ int getCurrentTableCount() {
 // 테이블 변경 함수 (테이블 변경이 가능한 테이블 고유 번호인지는 사전에 검사해서 넘겨주어야 한다.)
 void changeTable(int prevTableNum, int newTableNum) {
     char oldFilePath[256];
-    snprintf(oldFilePath, sizeof(oldFilePath), "%s\\%d.txt", TABLE_FILE_PATH, prevTableNum);
+    snprintf(oldFilePath, sizeof(oldFilePath), "%s/%d.txt", TABLE_FILE_PATH, prevTableNum);
     char newFilePath[256];
-    snprintf(newFilePath, sizeof(newFilePath), "%s\\%d.txt", TABLE_FILE_PATH, newTableNum);
+    snprintf(newFilePath, sizeof(newFilePath), "%s/%d.txt", TABLE_FILE_PATH, newTableNum);
 
     if (rename(oldFilePath, newFilePath) != 0) {
         perror("테이블 변경 실패");
