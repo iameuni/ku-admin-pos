@@ -1,6 +1,6 @@
 #include "pos.h"
 
-// í…Œì´ë¸” ì¡´ì¬ ì—¬ë¶€ í™•ì¸ í•¨ìˆ˜
+// Å×ÀÌºí Á¸Àç ¿©ºÎ È®ÀÎ ÇÔ¼ö
 bool isTableExist(int tableNumber) {
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
@@ -12,7 +12,7 @@ bool isTableExist(int tableNumber) {
     return false;
 }
 
-// ë§ˆì§€ë§‰ (ê°€ì¥ í°) í…Œì´ë¸” ë²ˆí˜¸ ë°˜í™˜í•˜ëŠ” í•¨ìˆ˜
+// ¸¶Áö¸· (°¡Àå Å«) Å×ÀÌºí ¹øÈ£ ¹İÈ¯ÇÏ´Â ÇÔ¼ö
 int getLastTableNumber() {
     int maxNumber = 0;
     for (int i = 1; i <= MAX_TABLE_NUMBER; i++) {
@@ -23,7 +23,7 @@ int getLastTableNumber() {
     return maxNumber;
 }
 
-// íŠ¹ì • í…Œì´ë¸”ì˜ ì£¼ë¬¸ ë‚´ì—­ ì¡´ì¬ ì—¬ë¶€ í™•ì¸ í•¨ìˆ˜
+// Æ¯Á¤ Å×ÀÌºíÀÇ ÁÖ¹® ³»¿ª Á¸Àç ¿©ºÎ È®ÀÎ ÇÔ¼ö
 bool hasOrders(int tableNumber) {
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
@@ -45,7 +45,7 @@ bool hasOrders(int tableNumber) {
     return false;
 }
 
-// ì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ” í…Œì´ë¸” ë˜ëŠ” ê²°ì œ ê°€ëŠ¥í•œ í…Œì´ë¸” ì¶œë ¥ í•¨ìˆ˜
+// ÁÖ¹® ³»¿ªÀÌ ÀÖ´Â Å×ÀÌºí ¶Ç´Â °áÁ¦ °¡´ÉÇÑ Å×ÀÌºí Ãâ·Â ÇÔ¼ö
 void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* message) {
     *orderCount = 0;
     printf("%s: { ", message);
@@ -67,7 +67,7 @@ void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* me
     printf(" }\n\n");
 }
 
-// í˜„ì¬ ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ê°œìˆ˜ ê³„ì‚°
+// ÇöÀç Á¸ÀçÇÏ´Â Å×ÀÌºí °³¼ö °è»ê
 int getCurrentTableCount() {
     int count = 0;
     for (int i = 1; i <= MAX_TABLE_NUMBER; i++) {
@@ -78,7 +78,7 @@ int getCurrentTableCount() {
     return count;
 }
 
-// í…Œì´ë¸” ë³€ê²½ í•¨ìˆ˜ (í…Œì´ë¸” ë³€ê²½ì´ ê°€ëŠ¥í•œ í…Œì´ë¸” ê³ ìœ  ë²ˆí˜¸ì¸ì§€ëŠ” ì‚¬ì „ì— ê²€ì‚¬í•´ì„œ ë„˜ê²¨ì£¼ì–´ì•¼ í•œë‹¤.)
+// Å×ÀÌºí º¯°æ ÇÔ¼ö (Å×ÀÌºí º¯°æÀÌ °¡´ÉÇÑ Å×ÀÌºí °íÀ¯ ¹øÈ£ÀÎÁö´Â »çÀü¿¡ °Ë»çÇØ¼­ ³Ñ°ÜÁÖ¾î¾ß ÇÑ´Ù.)
 void changeTable(int prevTableNum, int newTableNum) {
     char oldFilePath[256];
     snprintf(oldFilePath, sizeof(oldFilePath), "%s/%d.txt", TABLE_FILE_PATH, prevTableNum);
@@ -86,8 +86,8 @@ void changeTable(int prevTableNum, int newTableNum) {
     snprintf(newFilePath, sizeof(newFilePath), "%s/%d.txt", TABLE_FILE_PATH, newTableNum);
 
     if (rename(oldFilePath, newFilePath) != 0) {
-        perror("í…Œì´ë¸” ë³€ê²½ ì‹¤íŒ¨");
+        perror("Å×ÀÌºí º¯°æ ½ÇÆĞ");
     } else {
-        printf("%dë²ˆ í…Œì´ë¸”ì´ %dë²ˆ í…Œì´ë¸”ë¡œ ë³€ê²½ë˜ì—ˆìŠµë‹ˆë‹¤.\n", prevTableNum, newTableNum);
+        printf("%d¹ø Å×ÀÌºíÀÌ %d¹ø Å×ÀÌºí·Î º¯°æµÇ¾ú½À´Ï´Ù.\n", prevTableNum, newTableNum);
     }
 }

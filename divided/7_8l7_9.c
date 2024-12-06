@@ -1,14 +1,14 @@
 #include "pos.h"
 
-// 7.8 ì£¼ë¬¸ ìƒì„± í”„ë¡¬í”„íŠ¸
+// 7.8 ÁÖ¹® »ı¼º ÇÁ·ÒÇÁÆ®
 void createOrder() {
     int tablesWithOrders[MAX_TABLE_NUMBER];  
     int orderCount = 0;
-    listTablesWithOrders(tablesWithOrders, &orderCount, "\nì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ” í…Œì´ë¸” ë²ˆí˜¸");  
+    listTablesWithOrders(tablesWithOrders, &orderCount, "\nÁÖ¹® ³»¿ªÀÌ ÀÖ´Â Å×ÀÌºí ¹øÈ£");  
 
     FILE* foodFile = fopen(FILE_PATH, "r+");
     if (foodFile == NULL) {
-        printf("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
         return;
     }
     rewind(foodFile);
@@ -23,7 +23,7 @@ void createOrder() {
     char tableFilePath[256];
     snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
     
-    // ë¹ˆ í…Œì´ë¸”ì¸ì§€ í™•ì¸
+    // ºó Å×ÀÌºíÀÎÁö È®ÀÎ
     bool isEmptyTable = true;
     FILE* checkFile = fopen(tableFilePath, "r");
     if (checkFile) {
@@ -37,16 +37,16 @@ void createOrder() {
         fclose(checkFile);
     }
     
-    printFoodList();  // íŒë§¤ ëª©ë¡ ì¶œë ¥
+    printFoodList();  // ÆÇ¸Å ¸ñ·Ï Ãâ·Â
 
     int selection = -1;  
     OrderItem* orderList = NULL;
     int firstNum, secondNum, price;
     char foodName[50];
-    bool orderMade = false;  // ì‹¤ì œ ì£¼ë¬¸ì´ ë°œìƒí–ˆëŠ”ì§€ ì¶”ì í•˜ëŠ” í”Œë˜ê·¸
+    bool orderMade = false;  // ½ÇÁ¦ ÁÖ¹®ÀÌ ¹ß»ıÇß´ÂÁö ÃßÀûÇÏ´Â ÇÃ·¡±×
 
     while (selection != 0) {  
-        printf("\n<ì£¼ë¬¸ì„ ëë‚´ë ¤ë©´ 0ì„ ì…ë ¥í•˜ì„¸ìš”>\n\n");
+        printf("\n<ÁÖ¹®À» ³¡³»·Á¸é 0À» ÀÔ·ÂÇÏ¼¼¿ä>\n\n");
         selection = inputFoodNumber();
 
         if (selection == 0) {
@@ -64,12 +64,12 @@ void createOrder() {
                     validSelection = 1;
                     int quantity = inputQuantity();
 
-                    // ìµœì´ˆ ì£¼ë¬¸ì¸ ê²½ìš°, ê²°ì œ ë‹¨ìœ„ ì •ë³´ëŠ” ë‚˜ì¤‘ì— ì“¸ ê²ƒì„
+                    // ÃÖÃÊ ÁÖ¹®ÀÎ °æ¿ì, °áÁ¦ ´ÜÀ§ Á¤º¸´Â ³ªÁß¿¡ ¾µ °ÍÀÓ
                     if (isEmptyTable) {
                         orderMade = true;
                     }
 
-                    // ìˆ˜ëŸ‰ë§Œí¼ ë°˜ë³µí•´ì„œ í•­ëª© ì¶”ê°€
+                    // ¼ö·®¸¸Å­ ¹İº¹ÇØ¼­ Ç×¸ñ Ãß°¡
                     for (int i = 0; i < quantity; i++) {
                         orderList = addOrderItem(orderList, secondNum);
                     }
@@ -79,21 +79,21 @@ void createOrder() {
         }
 
         if (!validSelection) {
-            printf("í•´ë‹¹í•˜ëŠ” ìˆ«ìì˜ ì„ íƒì§€ê°€ ì—†ìŠµë‹ˆë‹¤.\n");
+            printf("ÇØ´çÇÏ´Â ¼ıÀÚÀÇ ¼±ÅÃÁö°¡ ¾ø½À´Ï´Ù.\n");
         }
     }
 
-    // ì‹¤ì œ ì£¼ë¬¸ì´ ë°œìƒí•œ ê²½ìš°ì—ë§Œ íŒŒì¼ì— ì €ì¥
+    // ½ÇÁ¦ ÁÖ¹®ÀÌ ¹ß»ıÇÑ °æ¿ì¿¡¸¸ ÆÄÀÏ¿¡ ÀúÀå
     if (orderMade || orderList != NULL) {
         FILE* tempFile = fopen("temp.txt", "w");
         if (tempFile) {
-            // 1. ê¸°ì¡´ ì£¼ë¬¸ ë‚´ì—­ ë³µì‚¬
+            // 1. ±âÁ¸ ÁÖ¹® ³»¿ª º¹»ç
             if (!isEmptyTable) {
                 FILE* existingFile = fopen(tableFilePath, "r");
                 if (existingFile) {
                     char line[256];
                     while (fgets(line, sizeof(line), existingFile)) {
-                        if (line[0] != '#') {  // ìˆœìˆ˜ ì£¼ë¬¸ ë‚´ì—­ë§Œ ë³µì‚¬
+                        if (line[0] != '#') {  // ¼ø¼ö ÁÖ¹® ³»¿ª¸¸ º¹»ç
                             fprintf(tempFile, "%s", line);
                         }
                     }
@@ -101,7 +101,7 @@ void createOrder() {
                 }
             }
 
-            // 2. ìƒˆë¡œìš´ ì£¼ë¬¸ ì¶”ê°€
+            // 2. »õ·Î¿î ÁÖ¹® Ãß°¡
             OrderItem* current = orderList;
             while (current != NULL) {
                 for (int i = 0; i < current->quantity; i++) {
@@ -110,12 +110,12 @@ void createOrder() {
                 current = current->next;
             }
 
-            // 3. ê²°ì œ ë‹¨ìœ„ ì •ë³´ (#) ì¶”ê°€
+            // 3. °áÁ¦ ´ÜÀ§ Á¤º¸ (#) Ãß°¡
             if (isEmptyTable && orderMade) {
-                // ìƒˆë¡œìš´ í…Œì´ë¸”ì˜ ê²½ìš° ê²°ì œ ë‹¨ìœ„ ì„¤ì •
+                // »õ·Î¿î Å×ÀÌºíÀÇ °æ¿ì °áÁ¦ ´ÜÀ§ ¼³Á¤
                 fprintf(tempFile, "#%d\n", tableNumber);
             } else if (!isEmptyTable) {
-                // ê¸°ì¡´ ê²°ì œ ë‹¨ìœ„ ì •ë³´ ë³µì‚¬
+                // ±âÁ¸ °áÁ¦ ´ÜÀ§ Á¤º¸ º¹»ç
                 FILE* existingFile = fopen(tableFilePath, "r");
                 if (existingFile) {
                     char line[256];
@@ -128,7 +128,7 @@ void createOrder() {
                 }
             }
 
-            // 4. ë¶€ë¶„ ê²°ì œ ì •ë³´ (##) ë³µì‚¬
+            // 4. ºÎºĞ °áÁ¦ Á¤º¸ (##) º¹»ç
             if (!isEmptyTable) {
                 FILE* existingFile = fopen(tableFilePath, "r");
                 if (existingFile) {
@@ -144,12 +144,12 @@ void createOrder() {
 
             fclose(tempFile);
 
-            // ì„ì‹œ íŒŒì¼ì„ ì›ë˜ íŒŒì¼ë¡œ êµì²´
+            // ÀÓ½Ã ÆÄÀÏÀ» ¿ø·¡ ÆÄÀÏ·Î ±³Ã¼
             remove(tableFilePath);
             rename("temp.txt", tableFilePath);
 
-            // ì£¼ë¬¸ ê²°ê³¼ ì¶œë ¥
-            printf("\n%dë²ˆ í…Œì´ë¸” ", tableNumber);
+            // ÁÖ¹® °á°ú Ãâ·Â
+            printf("\n%d¹ø Å×ÀÌºí ", tableNumber);
             current = orderList;
             int itemCount = 0;
             while (current != NULL) {
@@ -159,27 +159,27 @@ void createOrder() {
                         if (itemCount > 0) {
                             printf(" ");
                         }
-                        printf("%s %dê°œ", foodName, current->quantity);
+                        printf("%s %d°³", foodName, current->quantity);
                         itemCount++;
                         break;
                     }
                 }
                 current = current->next;
             }
-            printf(" ì£¼ë¬¸ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
+            printf(" ÁÖ¹®¿Ï·áµÇ¾ú½À´Ï´Ù.\n");
         }
     }
 
-    // ë©”ëª¨ë¦¬ í•´ì œ
+    // ¸Ş¸ğ¸® ÇØÁ¦
     freeOrderItems(orderList);
     fclose(foodFile);
 }
-// 7.9 ì£¼ë¬¸ ì¡°íšŒ í”„ë¡¬í”„íŠ¸
+// 7.9 ÁÖ¹® Á¶È¸ ÇÁ·ÒÇÁÆ®
 void printOrder() {
-    // ì£¼ë¬¸ ê°€ëŠ¥í•œ í…Œì´ë¸” ëª©ë¡ í‘œì‹œ
+    // ÁÖ¹® °¡´ÉÇÑ Å×ÀÌºí ¸ñ·Ï Ç¥½Ã
     int tablesWithOrders[MAX_TABLE_NUMBER];  
     int orderCount = 0;
-    listTablesWithOrders(tablesWithOrders, &orderCount, "\nì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ” í…Œì´ë¸” ë²ˆí˜¸");
+    listTablesWithOrders(tablesWithOrders, &orderCount, "\nÁÖ¹® ³»¿ªÀÌ ÀÖ´Â Å×ÀÌºí ¹øÈ£");
 
     int tableNumber = 0;
     while (1) {
@@ -188,39 +188,39 @@ void printOrder() {
         else break;
     }
 
-    // ê²°ì œ ë‹¨ìœ„ ì •ë³´ ê°€ì ¸ì˜¤ê¸°
+    // °áÁ¦ ´ÜÀ§ Á¤º¸ °¡Á®¿À±â
     PaymentUnit* unit = getPaymentUnit(tableNumber);
     if (unit->tableCount == 0) {
-        // ê²°ì œ ë‹¨ìœ„ê°€ ì—†ëŠ” ê²½ìš° ì„ íƒëœ í…Œì´ë¸”ë§Œ ì²˜ë¦¬
+        // °áÁ¦ ´ÜÀ§°¡ ¾ø´Â °æ¿ì ¼±ÅÃµÈ Å×ÀÌºí¸¸ Ã³¸®
         unit->tables[0] = tableNumber;
         unit->tableCount = 1;
     }
 
-    // ì œëª© ì¶œë ¥ - ê²°ì œ ë‹¨ìœ„ì— ì†í•œ ëª¨ë“  í…Œì´ë¸” ë²ˆí˜¸ í‘œì‹œ
+    // Á¦¸ñ Ãâ·Â - °áÁ¦ ´ÜÀ§¿¡ ¼ÓÇÑ ¸ğµç Å×ÀÌºí ¹øÈ£ Ç¥½Ã
     printf("\n[");
     for (int i = 0; i < unit->tableCount; i++) {
         printf("%d", unit->tables[i]);
         if (i < unit->tableCount - 1) printf(", ");
     }
-    printf("]ë²ˆ í…Œì´ë¸” ì£¼ë¬¸ ì¡°íšŒ\n\n");
+    printf("]¹ø Å×ÀÌºí ÁÖ¹® Á¶È¸\n\n");
 
-    printf("%-20s %-10s %-10s\n", "ë©”ë‰´", "ìˆ˜ëŸ‰", "ê¸ˆì•¡");
+    printf("%-20s %-10s %-10s\n", "¸Ş´º", "¼ö·®", "±İ¾×");
 
-    // íŒë§¤í•­ëª©ëª©ë¡ íŒŒì¼ ì—´ê¸°
+    // ÆÇ¸ÅÇ×¸ñ¸ñ·Ï ÆÄÀÏ ¿­±â
     FILE* foodFile = fopen(FILE_PATH, "r");
     if (foodFile == NULL) {
-        printf("íŒë§¤ í•­ëª© íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("ÆÇ¸Å Ç×¸ñ ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
         free(unit->partialPayments);
         free(unit);
         return;
     }
 
-    // ëª¨ë“  ì£¼ë¬¸ ì •ë³´ë¥¼ ì €ì¥í•  ì—°ê²° ë¦¬ìŠ¤íŠ¸
+    // ¸ğµç ÁÖ¹® Á¤º¸¸¦ ÀúÀåÇÒ ¿¬°á ¸®½ºÆ®
     OrderItem* orderList = NULL;
     int totalAmount = 0;
     int totalPartialPayments = 0;
 
-    // ê²°ì œ ë‹¨ìœ„ì— ì†í•œ ëª¨ë“  í…Œì´ë¸”ì˜ ì£¼ë¬¸ ë‚´ì—­ ìˆ˜ì§‘
+    // °áÁ¦ ´ÜÀ§¿¡ ¼ÓÇÑ ¸ğµç Å×ÀÌºíÀÇ ÁÖ¹® ³»¿ª ¼öÁı
     for (int t = 0; t < unit->tableCount; t++) {
         char tablePath[256];
         snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, unit->tables[t]);
@@ -245,7 +245,7 @@ void printOrder() {
         fclose(tableFile);
     }
 
-    // ì£¼ë¬¸ ì •ë³´ ì¶œë ¥
+    // ÁÖ¹® Á¤º¸ Ãâ·Â
     int foundItems = 0;
     OrderItem* current = orderList;
     while (current != NULL) {
@@ -267,11 +267,11 @@ void printOrder() {
     }
 
     if (foundItems == 0) {
-        printf("ì£¼ë¬¸í•œ íŒë§¤ í•­ëª©ì´ ì—†ìŠµë‹ˆë‹¤.\n");
+        printf("ÁÖ¹®ÇÑ ÆÇ¸Å Ç×¸ñÀÌ ¾ø½À´Ï´Ù.\n");
     } else {
-        printf("\ní•©ê³„: %dì›\n", totalAmount);
+        printf("\nÇÕ°è: %d¿ø\n", totalAmount);
         if (totalPartialPayments > 0) {
-            printf("ë¶€ë¶„ ê²°ì œ: ");
+            printf("ºÎºĞ °áÁ¦: ");
             bool first = true;
             for (int t = 0; t < unit->tableCount; t++) {
                 char tablePath[256];
@@ -285,7 +285,7 @@ void printOrder() {
                         int payment;
                         if (sscanf(line + 2, "%d", &payment) == 1) {
                             if (!first) printf(", ");
-                            printf("%dì›", payment);
+                            printf("%d¿ø", payment);
                             first = false;
                         }
                     }
@@ -296,7 +296,7 @@ void printOrder() {
         }
     }
 
-    // ë©”ëª¨ë¦¬ í•´ì œ
+    // ¸Ş¸ğ¸® ÇØÁ¦
     freeOrderItems(orderList);
     fclose(foodFile);
     free(unit->partialPayments);

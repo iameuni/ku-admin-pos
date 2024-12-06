@@ -5,18 +5,31 @@ OBJS := $(OBJDIR)/main.o $(OBJDIR)/table.o $(OBJDIR)/etcFunc.o $(OBJDIR)/7_2l7_5
         $(OBJDIR)/7_12.o $(OBJDIR)/orderItem.o $(OBJDIR)/paymentUnit.o \
         $(OBJDIR)/tableMove.o $(OBJDIR)/paymentCancel.o
 
-all: pos
+# 운영 체제 감지
+ifeq ($(OS),Windows_NT)
+    RM := del /Q
+    RM_DIR := rmdir /Q /S
+    MKDIR := mkdir
+    TARGET := pos.exe
+else
+    RM := rm -f
+    RM_DIR := rm -rf
+    MKDIR := mkdir -p
+    TARGET := pos
+endif
 
-pos: $(OBJS)
-	gcc -o pos $(OBJS)
+all: $(TARGET)
+
+$(TARGET): $(OBJS)
+	gcc -o $@ $^
 
 $(OBJDIR)/%.o: %.c | $(OBJDIR)
 	gcc -c $< -o $@
 
 $(OBJDIR):
-	mkdir -p $(OBJDIR)
+	$(MKDIR) $(OBJDIR)
 
 clean:
-	rm -f $(OBJDIR)/*.o
-	rm -f pos
-	rmdir $(OBJDIR)
+	$(RM) $(subst /,\,$(OBJDIR)/*.o)
+	$(RM) $(TARGET)
+	$(RM_DIR) $(OBJDIR)

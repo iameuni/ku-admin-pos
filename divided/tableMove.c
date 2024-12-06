@@ -1,24 +1,24 @@
 #include "pos.h"
 
 bool isValidDestinationTable(int destTable, int* destTables, int destCount, PaymentUnit* sourceUnit) {
-    // ì¡´ì¬í•˜ì§€ ì•ŠëŠ” í…Œì´ë¸” ë²ˆí˜¸ ì²´í¬
+    // Á¸ÀçÇÏÁö ¾Ê´Â Å×ÀÌºí ¹øÈ£ Ã¼Å©
     if (!isTableExist(destTable)) {
-        printf("ì¡´ì¬í•˜ì§€ ì•ŠëŠ” í…Œì´ë¸” ë²ˆí˜¸ì…ë‹ˆë‹¤.\n");
+        printf("Á¸ÀçÇÏÁö ¾Ê´Â Å×ÀÌºí ¹øÈ£ÀÔ´Ï´Ù.\n");
         return false;
     }
 
-    // ì´ë¯¸ ì„ íƒëœ í…Œì´ë¸”ì¸ì§€ ì²´í¬
+    // ÀÌ¹Ì ¼±ÅÃµÈ Å×ÀÌºíÀÎÁö Ã¼Å©
     for (int i = 0; i < destCount; i++) {
         if (destTables[i] == destTable) {
-            printf("ì´ë¯¸ ì„ íƒëœ í…Œì´ë¸”ì…ë‹ˆë‹¤.\n");
+            printf("ÀÌ¹Ì ¼±ÅÃµÈ Å×ÀÌºíÀÔ´Ï´Ù.\n");
             return false;
         }
     }
 
-    // ì¶œë°œ í…Œì´ë¸”ê³¼ ë™ì¼í•œ í…Œì´ë¸”ì¸ì§€ ì²´í¬
+    // Ãâ¹ß Å×ÀÌºí°ú µ¿ÀÏÇÑ Å×ÀÌºíÀÎÁö Ã¼Å©
     for (int i = 0; i < sourceUnit->tableCount; i++) {
         if (sourceUnit->tables[i] == destTable) {
-            return true; // ì¶œë°œ í…Œì´ë¸”ì˜ ê²°ì œ ë‹¨ìœ„ì— ì†í•œ í…Œì´ë¸”ì€ í—ˆìš©
+            return true; // Ãâ¹ß Å×ÀÌºíÀÇ °áÁ¦ ´ÜÀ§¿¡ ¼ÓÇÑ Å×ÀÌºíÀº Çã¿ë
         }
     }
 
@@ -26,7 +26,7 @@ bool isValidDestinationTable(int destTable, int* destTables, int destCount, Paym
 }
 
 
-// í…Œì´ë¸”ì´ ëª©ì ì§€ í…Œì´ë¸” ëª©ë¡ì— ìˆëŠ”ì§€ í™•ì¸í•˜ëŠ” í—¬í¼ í•¨ìˆ˜
+// Å×ÀÌºíÀÌ ¸ñÀûÁö Å×ÀÌºí ¸ñ·Ï¿¡ ÀÖ´ÂÁö È®ÀÎÇÏ´Â ÇïÆÛ ÇÔ¼ö
 bool isInDestTables(int tableNum, int* destTables, int destCount) {
     for (int i = 0; i < destCount; i++) {
         if (destTables[i] == tableNum) {
@@ -37,11 +37,11 @@ bool isInDestTables(int tableNum, int* destTables, int destCount) {
 }
 
 void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
-    // 1. ì¶œë°œ í…Œì´ë¸”ì˜ ë‚´ì—­ì„ ì„ì‹œ íŒŒì¼ì— ìˆœì„œëŒ€ë¡œ ë°±ì—…
+    // 1. Ãâ¹ß Å×ÀÌºíÀÇ ³»¿ªÀ» ÀÓ½Ã ÆÄÀÏ¿¡ ¼ø¼­´ë·Î ¹é¾÷
     FILE* tempFile = fopen("temp.txt", "w");
     if (!tempFile) return;
 
-    // 1.1. ëª¨ë“  í…Œì´ë¸”ì˜ ì£¼ë¬¸ ë‚´ì—­ë§Œ ë¨¼ì € ìˆ˜ì§‘
+    // 1.1. ¸ğµç Å×ÀÌºíÀÇ ÁÖ¹® ³»¿ª¸¸ ¸ÕÀú ¼öÁı
     for (int i = 0; i < sourceUnit->tableCount; i++) {
         char sourcePath[256];
         snprintf(sourcePath, sizeof(sourcePath), "%s/%d.txt", TABLE_FILE_PATH, sourceUnit->tables[i]);
@@ -50,7 +50,7 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         if (sourceFile) {
             char line[256];
             while (fgets(line, sizeof(line), sourceFile)) {
-                if (line[0] != '#') {  // ì£¼ë¬¸ ë‚´ì—­ë§Œ ì €ì¥
+                if (line[0] != '#') {  // ÁÖ¹® ³»¿ª¸¸ ÀúÀå
                     fprintf(tempFile, "%s", line);
                 }
             }
@@ -58,7 +58,7 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         }
     }
 
-    // 1.2. ëª¨ë“  í…Œì´ë¸”ì˜ ë¶€ë¶„ ê²°ì œ ë‚´ì—­ ìˆ˜ì§‘
+    // 1.2. ¸ğµç Å×ÀÌºíÀÇ ºÎºĞ °áÁ¦ ³»¿ª ¼öÁı
     for (int i = 0; i < sourceUnit->tableCount; i++) {
         char sourcePath[256];
         snprintf(sourcePath, sizeof(sourcePath), "%s/%d.txt", TABLE_FILE_PATH, sourceUnit->tables[i]);
@@ -67,7 +67,7 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         if (sourceFile) {
             char line[256];
             while (fgets(line, sizeof(line), sourceFile)) {
-                if (line[0] == '#' && line[1] == '#') {  // ë¶€ë¶„ ê²°ì œ ë‚´ì—­ë§Œ ì €ì¥
+                if (line[0] == '#' && line[1] == '#') {  // ºÎºĞ °áÁ¦ ³»¿ª¸¸ ÀúÀå
                     fprintf(tempFile, "%s", line);
                 }
             }
@@ -77,7 +77,7 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
 
     fclose(tempFile);
 
-    // 2. ì¶œë°œ í…Œì´ë¸”ë“¤ì„ ëª¨ë‘ ë¹„ì›€
+    // 2. Ãâ¹ß Å×ÀÌºíµéÀ» ¸ğµÎ ºñ¿ò
     for (int i = 0; i < sourceUnit->tableCount; i++) {
         char tablePath[256];
         snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, sourceUnit->tables[i]);
@@ -85,11 +85,11 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         if (file) fclose(file);
     }
 
-    // 3. ì…ë ¥ëœ ëª©ì ì§€ í…Œì´ë¸”ë“¤ì˜ ê²°ì œ ë‹¨ìœ„ë“¤ì„ ëª¨ë‘ ì°¾ì•„ì„œ í•˜ë‚˜ë¡œ í•©ì¹¨
+    // 3. ÀÔ·ÂµÈ ¸ñÀûÁö Å×ÀÌºíµéÀÇ °áÁ¦ ´ÜÀ§µéÀ» ¸ğµÎ Ã£¾Æ¼­ ÇÏ³ª·Î ÇÕÄ§
     int newUnit[MAX_TABLE_NUMBER];
     int newUnitCount = 0;
 
-    // 3.1 ë¨¼ì € ì…ë ¥ëœ ëª©ì ì§€ í…Œì´ë¸”ë“¤ì„ newUnitì— ì¶”ê°€
+    // 3.1 ¸ÕÀú ÀÔ·ÂµÈ ¸ñÀûÁö Å×ÀÌºíµéÀ» newUnit¿¡ Ãß°¡
     for (int i = 0; i < destCount; i++) {
         bool exists = false;
         for (int j = 0; j < newUnitCount; j++) {
@@ -103,7 +103,7 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         }
     }
 
-    // 3.2 ê° ëª©ì ì§€ í…Œì´ë¸”ì˜ ê¸°ì¡´ ê²°ì œ ë‹¨ìœ„ í…Œì´ë¸”ë“¤ë„ newUnitì— ì¶”ê°€
+    // 3.2 °¢ ¸ñÀûÁö Å×ÀÌºíÀÇ ±âÁ¸ °áÁ¦ ´ÜÀ§ Å×ÀÌºíµéµµ newUnit¿¡ Ãß°¡
     for (int i = 0; i < destCount; i++) {
         PaymentUnit* destUnit = getPaymentUnit(destTables[i]);
         if (destUnit->tableCount > 0) {
@@ -124,7 +124,7 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         free(destUnit);
     }
 
-    // 4. ëª¨ë“  ê²°ì œ ë‹¨ìœ„ í…Œì´ë¸” íŒŒì¼ ì—…ë°ì´íŠ¸
+    // 4. ¸ğµç °áÁ¦ ´ÜÀ§ Å×ÀÌºí ÆÄÀÏ ¾÷µ¥ÀÌÆ®
     for (int i = 0; i < newUnitCount; i++) {
         char tablePath[256];
         snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, newUnit[i]);
@@ -132,25 +132,25 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         FILE* tempFile = fopen("temp_update.txt", "w");
         if (!tempFile) continue;
 
-        // 4.1. ê¸°ì¡´ ì£¼ë¬¸ ë‚´ì—­ ë³µì‚¬
+        // 4.1. ±âÁ¸ ÁÖ¹® ³»¿ª º¹»ç
         FILE* tableFile = fopen(tablePath, "r");
         if (tableFile) {
             char line[256];
             while (fgets(line, sizeof(line), tableFile)) {
-                if (line[0] != '#') {  // ì£¼ë¬¸ ë‚´ì—­ë§Œ ë³µì‚¬
+                if (line[0] != '#') {  // ÁÖ¹® ³»¿ª¸¸ º¹»ç
                     fprintf(tempFile, "%s", line);
                 }
             }
             fclose(tableFile);
         }
 
-        // 4.2. ì²« ë²ˆì§¸ ëª©ì ì§€ í…Œì´ë¸”ì´ë©´ ë°±ì—…í•œ ì£¼ë¬¸ ë‚´ì—­ë„ ì¶”ê°€
+        // 4.2. Ã¹ ¹øÂ° ¸ñÀûÁö Å×ÀÌºíÀÌ¸é ¹é¾÷ÇÑ ÁÖ¹® ³»¿ªµµ Ãß°¡
         if (newUnit[i] == destTables[0]) {
             FILE* backupFile = fopen("temp.txt", "r");
             if (backupFile) {
                 char line[256];
                 while (fgets(line, sizeof(line), backupFile)) {
-                    if (line[0] != '#') {  // ì£¼ë¬¸ ë‚´ì—­ë§Œ ë³µì‚¬
+                    if (line[0] != '#') {  // ÁÖ¹® ³»¿ª¸¸ º¹»ç
                         fprintf(tempFile, "%s", line);
                     }
                 }
@@ -158,30 +158,30 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
             }
         }
 
-        // 4.3. ìƒˆë¡œìš´ ê²°ì œ ë‹¨ìœ„ ì •ë³´ ì¶”ê°€
+        // 4.3. »õ·Î¿î °áÁ¦ ´ÜÀ§ Á¤º¸ Ãß°¡
         for (int j = 0; j < newUnitCount; j++) {
             fprintf(tempFile, "#%d\n", newUnit[j]);
         }
 
-        // 4.4. ê¸°ì¡´ ë¶€ë¶„ ê²°ì œ ë‚´ì—­ ë³µì‚¬
+        // 4.4. ±âÁ¸ ºÎºĞ °áÁ¦ ³»¿ª º¹»ç
         tableFile = fopen(tablePath, "r");
         if (tableFile) {
             char line[256];
             while (fgets(line, sizeof(line), tableFile)) {
-                if (line[0] == '#' && line[1] == '#') {  // ë¶€ë¶„ ê²°ì œ ë‚´ì—­ë§Œ ë³µì‚¬
+                if (line[0] == '#' && line[1] == '#') {  // ºÎºĞ °áÁ¦ ³»¿ª¸¸ º¹»ç
                     fprintf(tempFile, "%s", line);
                 }
             }
             fclose(tableFile);
         }
 
-        // 4.5. ì²« ë²ˆì§¸ ëª©ì ì§€ í…Œì´ë¸”ì´ë©´ ë°±ì—…í•œ ë¶€ë¶„ ê²°ì œ ë‚´ì—­ë„ ì¶”ê°€
+        // 4.5. Ã¹ ¹øÂ° ¸ñÀûÁö Å×ÀÌºíÀÌ¸é ¹é¾÷ÇÑ ºÎºĞ °áÁ¦ ³»¿ªµµ Ãß°¡
         if (newUnit[i] == destTables[0]) {
             FILE* backupFile = fopen("temp.txt", "r");
             if (backupFile) {
                 char line[256];
                 while (fgets(line, sizeof(line), backupFile)) {
-                    if (line[0] == '#' && line[1] == '#') {  // ë¶€ë¶„ ê²°ì œ ë‚´ì—­ë§Œ ë³µì‚¬
+                    if (line[0] == '#' && line[1] == '#') {  // ºÎºĞ °áÁ¦ ³»¿ª¸¸ º¹»ç
                         fprintf(tempFile, "%s", line);
                     }
                 }
@@ -191,21 +191,21 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
 
         fclose(tempFile);
 
-        // 4.6. ì„ì‹œ íŒŒì¼ë¡œ ì›ë³¸ íŒŒì¼ êµì²´
+        // 4.6. ÀÓ½Ã ÆÄÀÏ·Î ¿øº» ÆÄÀÏ ±³Ã¼
         remove(tablePath);
         rename("temp_update.txt", tablePath);
     }
 
     remove("temp.txt");
 
-    // 5. ê²°ê³¼ ë©”ì‹œì§€ ì¶œë ¥
+    // 5. °á°ú ¸Ş½ÃÁö Ãâ·Â
     printf("\n");
     for (int i = 0; i < sourceUnit->tableCount; i++) {
         printf("%d", sourceUnit->tables[i]);
         if (i < sourceUnit->tableCount - 1) printf(", ");
     }
-    printf("ë²ˆ í…Œì´ë¸”ì´ ");
-    // ì§€ê¸ˆê¹Œì§€ ì„ íƒëœ ê° í…Œì´ë¸”ì— ëŒ€í•´ ê²°ì œ ë‹¨ìœ„ ì „ì²´ë¥¼ í‘œì‹œ
+    printf("¹ø Å×ÀÌºíÀÌ ");
+    // Áö±İ±îÁö ¼±ÅÃµÈ °¢ Å×ÀÌºí¿¡ ´ëÇØ °áÁ¦ ´ÜÀ§ ÀüÃ¼¸¦ Ç¥½Ã
     bool first = true;
         PaymentUnit* unit = getPaymentUnit(destTables[0]);
         if (unit->tableCount > 0) {
@@ -218,5 +218,5 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         }
         free(unit->partialPayments);
         free(unit);
-    printf("ë²ˆ í…Œì´ë¸”ë¡œ ì´ë™ë˜ì—ˆìŠµë‹ˆë‹¤.\n");
+    printf("¹ø Å×ÀÌºí·Î ÀÌµ¿µÇ¾ú½À´Ï´Ù.\n");
 }

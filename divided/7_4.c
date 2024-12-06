@@ -1,22 +1,22 @@
 #include "pos.h"
 
-// 7.4.1 í…Œì´ë¸” ë²ˆí˜¸ ì…ë ¥
+// 7.4.1 Å×ÀÌºí ¹øÈ£ ÀÔ·Â
 int inputTableNumber(bool paymentMode) {
     int tableNumber;
-    int maxTableNumber = getLastTableNumber(); // ìµœëŒ€ í…Œì´ë¸” ë²ˆí˜¸ë¥¼ ê°€ì ¸ì˜´
+    int maxTableNumber = getLastTableNumber(); // ÃÖ´ë Å×ÀÌºí ¹øÈ£¸¦ °¡Á®¿È
 
-    // ì‚¬ìš©ìì—ê²Œ ì…ë ¥ ìš”ì²­
-    if (!paymentMode) { // ì¼ë°˜ ëª¨ë“œ
-        printf("í…Œì´ë¸” ë²ˆí˜¸ë¥¼ ì…ë ¥í•˜ì„¸ìš” (1~%d): ", maxTableNumber);
-        tableNumber = inputInt(NULL, false, false); // 0 ì…ë ¥ ê¸ˆì§€
+    // »ç¿ëÀÚ¿¡°Ô ÀÔ·Â ¿äÃ»
+    if (!paymentMode) { // ÀÏ¹İ ¸ğµå
+        printf("Å×ÀÌºí ¹øÈ£¸¦ ÀÔ·ÂÇÏ¼¼¿ä (1~%d): ", maxTableNumber);
+        tableNumber = inputInt(NULL, false, false); // 0 ÀÔ·Â ±İÁö
     }
     else {
-        tableNumber = inputInt(NULL, true, false); // 0 ì…ë ¥ í—ˆìš©
+        tableNumber = inputInt(NULL, true, false); // 0 ÀÔ·Â Çã¿ë
     }
 
-    // ê²°ì œ ëª¨ë“œ ì¶”ê°€ ì¡°ê±´ ê²€ì‚¬
+    // °áÁ¦ ¸ğµå Ãß°¡ Á¶°Ç °Ë»ç
     if (paymentMode) {
-        // ì—”í„°ë‚˜ ê³µë°± ì…ë ¥ ì‹œ -1 ë°˜í™˜
+        // ¿£ÅÍ³ª °ø¹é ÀÔ·Â ½Ã -1 ¹İÈ¯
         if (tableNumber == -1) {
             return -1;
         }
@@ -24,30 +24,30 @@ int inputTableNumber(bool paymentMode) {
             return 0;
         }
         if (tableNumber == -28) return -2;
-        // í…Œì´ë¸” ë²ˆí˜¸ê°€ 0 ë˜ëŠ” 1~maxTableNumber ë²”ìœ„ì— ìˆê³ , ì¡´ì¬í•˜ëŠ”ì§€ í™•ì¸
+        // Å×ÀÌºí ¹øÈ£°¡ 0 ¶Ç´Â 1~maxTableNumber ¹üÀ§¿¡ ÀÖ°í, Á¸ÀçÇÏ´ÂÁö È®ÀÎ
         if (tableNumber > maxTableNumber || !isTableExist(tableNumber)) {
-            printf("ì˜¤ë¥˜: 0ê³¼ ì—”í„°, 1~%d ì‚¬ì´ì˜ ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ë²ˆí˜¸ë§Œ ì…ë ¥ ê°€ëŠ¥í•©ë‹ˆë‹¤.\n", maxTableNumber);
-            return -2; // ìœ íš¨í•˜ì§€ ì•Šì€ ë²ˆí˜¸ ì‹œë„ ì‹œ -2 ë°˜í™˜
+            printf("¿À·ù: 0°ú ¿£ÅÍ, 1~%d »çÀÌÀÇ Á¸ÀçÇÏ´Â Å×ÀÌºí ¹øÈ£¸¸ ÀÔ·Â °¡´ÉÇÕ´Ï´Ù.\n", maxTableNumber);
+            return -2; // À¯È¿ÇÏÁö ¾ÊÀº ¹øÈ£ ½Ãµµ ½Ã -2 ¹İÈ¯
         }
     }
     else {
-        // ì¼ë°˜ ëª¨ë“œì—ì„œ ìœ íš¨ ë²”ìœ„ì™€ í…Œì´ë¸”ì´ ì¡´ì¬í•˜ëŠ”ì§€ í™•ì¸ (1~maxTableNumber)
+        // ÀÏ¹İ ¸ğµå¿¡¼­ À¯È¿ ¹üÀ§¿Í Å×ÀÌºíÀÌ Á¸ÀçÇÏ´ÂÁö È®ÀÎ (1~maxTableNumber)
         if (tableNumber > maxTableNumber || !isTableExist(tableNumber)) {
-            printf("ì˜¤ë¥˜: 1~%d ì‚¬ì´ì˜ ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ë²ˆí˜¸ë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n", maxTableNumber);
-            return -2; // ìœ íš¨í•˜ì§€ ì•Šì€ ë²ˆí˜¸ ì‹œë„ ì‹œ -2 ë°˜í™˜
+            printf("¿À·ù: 1~%d »çÀÌÀÇ Á¸ÀçÇÏ´Â Å×ÀÌºí ¹øÈ£¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n", maxTableNumber);
+            return -2; // À¯È¿ÇÏÁö ¾ÊÀº ¹øÈ£ ½Ãµµ ½Ã -2 ¹İÈ¯
         }
     }
 
-    return tableNumber; // ìœ íš¨í•œ í…Œì´ë¸” ë²ˆí˜¸ ë°˜í™˜
+    return tableNumber; // À¯È¿ÇÑ Å×ÀÌºí ¹øÈ£ ¹İÈ¯
 }
 
-// 7.4.2 ìˆ˜ëŸ‰ ì…ë ¥
+// 7.4.2 ¼ö·® ÀÔ·Â
 int inputQuantity() {
     int quantity;
     while (1) {
-        quantity = inputInt("ìˆ˜ëŸ‰ì„ ì…ë ¥í•˜ì„¸ìš”: ", false, false);
+        quantity = inputInt("¼ö·®À» ÀÔ·ÂÇÏ¼¼¿ä: ", false, false);
         if (quantity < 1 || quantity >99) {
-            printf("ì˜¤ë¥˜: 1~99ì‚¬ì´ì˜ ìˆ˜ëŸ‰ì„ ì…ë ¥í•˜ì„¸ìš”.\n");
+            printf("¿À·ù: 1~99»çÀÌÀÇ ¼ö·®À» ÀÔ·ÂÇÏ¼¼¿ä.\n");
         }
         else {
             return quantity;
@@ -55,54 +55,54 @@ int inputQuantity() {
     }
 }
 
-// 7.4.3 ê²°ì œ ê¸ˆì•¡ ì…ë ¥
+// 7.4.3 °áÁ¦ ±İ¾× ÀÔ·Â
 int inputPaymentAmount(int remainingBalance) {
-    static int hasPartialPayment = 0;  // ë¶€ë¶„ ê²°ì œ ì—¬ë¶€ë¥¼ ì¶”ì 
+    static int hasPartialPayment = 0;  // ºÎºĞ °áÁ¦ ¿©ºÎ¸¦ ÃßÀû
 
     while (1) {
-        printf("ê²°ì œí•  ê¸ˆì•¡ì„ ì…ë ¥í•˜ì„¸ìš” [%d]: ", remainingBalance);
+        printf("°áÁ¦ÇÒ ±İ¾×À» ÀÔ·ÂÇÏ¼¼¿ä [%d]: ", remainingBalance);
         int paymentAmount = inputInt(NULL, true, false);
 
-        if (paymentAmount == (-MAX_INT + 9)) {  // '.' ì…ë ¥ ì‹œ
+        if (paymentAmount == (-MAX_INT + 9)) {  // '.' ÀÔ·Â ½Ã
             if (!hasPartialPayment) {
-                printf("ë¶€ë¶„ ê²°ì œ ì—†ì´ ìƒˆ ê²°ì œ ë‹¨ìœ„ë¥¼ ìƒì„±í–ˆìŠµë‹ˆë‹¤.\n");
+                printf("ºÎºĞ °áÁ¦ ¾øÀÌ »õ °áÁ¦ ´ÜÀ§¸¦ »ı¼ºÇß½À´Ï´Ù.\n");
             } else {
-                printf("ë¶€ë¶„ê²°ì œ ë˜ì—ˆìŠµë‹ˆë‹¤.\n");
+                printf("ºÎºĞ°áÁ¦ µÇ¾ú½À´Ï´Ù.\n");
             }
-            hasPartialPayment = 0;  // ìƒíƒœ ì´ˆê¸°í™”
+            hasPartialPayment = 0;  // »óÅÂ ÃÊ±âÈ­
             return -2;
         }
 
-        if (paymentAmount == -1) {  // ì—”í„° ì…ë ¥ ì‹œ
-            hasPartialPayment = 0;  // ìƒíƒœ ì´ˆê¸°í™”
+        if (paymentAmount == -1) {  // ¿£ÅÍ ÀÔ·Â ½Ã
+            hasPartialPayment = 0;  // »óÅÂ ÃÊ±âÈ­
             if (remainingBalance == 0) {
-                printf("%dì› ê²°ì œ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.\n", remainingBalance);
+                printf("%d¿ø °áÁ¦ ¿Ï·áµÇ¾ú½À´Ï´Ù.\n", remainingBalance);
             } else {
-                printf("%dì› ê²°ì œ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.\n", remainingBalance);
+                printf("%d¿ø °áÁ¦ ¿Ï·áµÇ¾ú½À´Ï´Ù.\n", remainingBalance);
             }
             return 0;
         }
 
-        if (paymentAmount == 0) {  // '0' ì…ë ¥ ì‹œ
-            printf("ê²°ì œ ì¤‘ë‹¨.\n");
-            hasPartialPayment = 0;  // ìƒíƒœ ì´ˆê¸°í™”
+        if (paymentAmount == 0) {  // '0' ÀÔ·Â ½Ã
+            printf("°áÁ¦ Áß´Ü.\n");
+            hasPartialPayment = 0;  // »óÅÂ ÃÊ±âÈ­
             return -1;
         }
 
         if (paymentAmount < -1) continue;
 
         if (paymentAmount > remainingBalance) {
-            printf("ì˜¤ë¥˜: ê²°ì œí•  ê¸ˆì•¡ë³´ë‹¤ í½ë‹ˆë‹¤.\n");
+            printf("¿À·ù: °áÁ¦ÇÒ ±İ¾×º¸´Ù Å®´Ï´Ù.\n");
             continue;
         }
 
-        hasPartialPayment = 1;  // ìœ íš¨í•œ ê²°ì œ ê¸ˆì•¡ ì…ë ¥ ì‹œ ìƒíƒœ ì„¤ì •
+        hasPartialPayment = 1;  // À¯È¿ÇÑ °áÁ¦ ±İ¾× ÀÔ·Â ½Ã »óÅÂ ¼³Á¤
         remainingBalance -= paymentAmount;
-        printf("%dì› ì¤‘ %dì› ë¶„í•  ê²°ì œ ë˜ì—ˆìŠµë‹ˆë‹¤.\n", remainingBalance + paymentAmount, paymentAmount);
+        printf("%d¿ø Áß %d¿ø ºĞÇÒ °áÁ¦ µÇ¾ú½À´Ï´Ù.\n", remainingBalance + paymentAmount, paymentAmount);
         
         if (remainingBalance == 0) {
-            printf("%dì› ê²°ì œ ì™„ë£Œë˜ì—ˆìŠµë‹ˆë‹¤.\n", paymentAmount);
-            hasPartialPayment = 0;  // ìƒíƒœ ì´ˆê¸°í™”
+            printf("%d¿ø °áÁ¦ ¿Ï·áµÇ¾ú½À´Ï´Ù.\n", paymentAmount);
+            hasPartialPayment = 0;  // »óÅÂ ÃÊ±âÈ­
         }
         
         return remainingBalance;

@@ -14,11 +14,11 @@ PaymentUnit* getPaymentUnit(int tableNumber) {
     char line[256];
     while (fgets(line, sizeof(line), file)) {
         if (line[0] == '#') {
-            if (line[1] != '#') { // ê²°ì œ ë‹¨ìœ„ í‘œì‹œ
+            if (line[1] != '#') { // °áÁ¦ ´ÜÀ§ Ç¥½Ã
                 int unitTable;
                 sscanf(line + 1, "%d", &unitTable);
                 unit->tables[unit->tableCount++] = unitTable;
-            } else { // ë¶€ë¶„ ê²°ì œ ë‚´ì—­
+            } else { // ºÎºĞ °áÁ¦ ³»¿ª
                 int payment;
                 sscanf(line + 2, "%d", &payment);
                 unit->partialPayments = realloc(unit->partialPayments, 
@@ -30,35 +30,35 @@ PaymentUnit* getPaymentUnit(int tableNumber) {
     fclose(file);
     return unit;
 }
-// updatePaymentUnit í•¨ìˆ˜ ìˆ˜ì •
+// updatePaymentUnit ÇÔ¼ö ¼öÁ¤
 void updatePaymentUnit(int primaryTable, int* unitTables, int unitCount) {
-    // ê²°ì œ ë‹¨ìœ„ì— ì†í•œ ëª¨ë“  í…Œì´ë¸”ì— ëŒ€í•´ ì²˜ë¦¬
+    // °áÁ¦ ´ÜÀ§¿¡ ¼ÓÇÑ ¸ğµç Å×ÀÌºí¿¡ ´ëÇØ Ã³¸®
     for (int i = 0; i < unitCount; i++) {
         char tablePath[256];
         snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, unitTables[i]);
         
-        // ì„ì‹œ íŒŒì¼ ìƒì„±
+        // ÀÓ½Ã ÆÄÀÏ »ı¼º
         FILE* tempFile = fopen("temp.txt", "w");
         if (!tempFile) continue;
 
-        // 1. ë¨¼ì € ì£¼ë¬¸ ë‚´ì—­ë§Œ ë³µì‚¬
+        // 1. ¸ÕÀú ÁÖ¹® ³»¿ª¸¸ º¹»ç
         FILE* tableFile = fopen(tablePath, "r");
         if (tableFile) {
             char line[256];
             while (fgets(line, sizeof(line), tableFile)) {
-                if (line[0] != '#') {  // ì£¼ë¬¸ ë‚´ì—­ë§Œ ë³µì‚¬
+                if (line[0] != '#') {  // ÁÖ¹® ³»¿ª¸¸ º¹»ç
                     fprintf(tempFile, "%s", line);
                 }
             }
             fclose(tableFile);
         }
 
-        // 2. ê²°ì œ ë‹¨ìœ„ ì •ë³´ (#) ê¸°ë¡
+        // 2. °áÁ¦ ´ÜÀ§ Á¤º¸ (#) ±â·Ï
         for (int j = 0; j < unitCount; j++) {
             fprintf(tempFile, "#%d\n", unitTables[j]);
         }
 
-        // 3. ë¶€ë¶„ ê²°ì œ ì •ë³´ (##) ë³µì‚¬
+        // 3. ºÎºĞ °áÁ¦ Á¤º¸ (##) º¹»ç
         tableFile = fopen(tablePath, "r");
         if (tableFile) {
             char line[256];
@@ -76,7 +76,7 @@ void updatePaymentUnit(int primaryTable, int* unitTables, int unitCount) {
     }
 }
 
-// updatePaymentRecord í•¨ìˆ˜ ìˆ˜ì •
+// updatePaymentRecord ÇÔ¼ö ¼öÁ¤
 void updatePaymentRecord(int tableNumber, int paymentAmount) {
     char tablePath[256];
     snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, tableNumber);
@@ -84,7 +84,7 @@ void updatePaymentRecord(int tableNumber, int paymentAmount) {
     FILE* tempFile = fopen("temp.txt", "w");
     if (!tempFile) return;
     
-    // 1. ì£¼ë¬¸ ë‚´ì—­ ë³µì‚¬
+    // 1. ÁÖ¹® ³»¿ª º¹»ç
     FILE* tableFile = fopen(tablePath, "r");
     if (!tableFile) {
         fclose(tempFile);
@@ -93,12 +93,12 @@ void updatePaymentRecord(int tableNumber, int paymentAmount) {
 
     char line[256];
     while (fgets(line, sizeof(line), tableFile)) {
-        if (line[0] != '#') {  // ì£¼ë¬¸ ë‚´ì—­ë§Œ ë³µì‚¬
+        if (line[0] != '#') {  // ÁÖ¹® ³»¿ª¸¸ º¹»ç
             fprintf(tempFile, "%s", line);
         }
     }
 
-    // 2. ê²°ì œ ë‹¨ìœ„ ì •ë³´ (#) ë³µì‚¬
+    // 2. °áÁ¦ ´ÜÀ§ Á¤º¸ (#) º¹»ç
     rewind(tableFile);
     while (fgets(line, sizeof(line), tableFile)) {
         if (line[0] == '#' && line[1] != '#') {
@@ -106,7 +106,7 @@ void updatePaymentRecord(int tableNumber, int paymentAmount) {
         }
     }
 
-    // 3. ê¸°ì¡´ ë¶€ë¶„ ê²°ì œ ì •ë³´ (##) ë³µì‚¬
+    // 3. ±âÁ¸ ºÎºĞ °áÁ¦ Á¤º¸ (##) º¹»ç
     rewind(tableFile);
     while (fgets(line, sizeof(line), tableFile)) {
         if (line[0] == '#' && line[1] == '#') {
@@ -114,7 +114,7 @@ void updatePaymentRecord(int tableNumber, int paymentAmount) {
         }
     }
 
-    // 4. ìƒˆë¡œìš´ ë¶€ë¶„ ê²°ì œ ì •ë³´ ì¶”ê°€
+    // 4. »õ·Î¿î ºÎºĞ °áÁ¦ Á¤º¸ Ãß°¡
     fprintf(tempFile, "##%d\n", paymentAmount);
 
     fclose(tableFile);

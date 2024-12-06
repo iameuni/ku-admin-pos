@@ -1,13 +1,13 @@
 #include "pos.h"
 
-// í”„ë¡œê·¸ë¨ ì¢…ë£Œ ê¸°ëŠ¥
+// ÇÁ·Î±×·¥ Á¾·á ±â´É
 void exitProgram() {
-    printf("í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n");
+    printf("ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n");
     system("PAUSE");
     exit(0);
 }
 
-// ë§ˆì§€ë§‰ íŒë§¤ í•­ëª© ê³ ìœ  ë²ˆí˜¸ë¥¼ ê°€ì ¸ì˜¤ëŠ” í•¨ìˆ˜ (7.6 íŒë§¤ í•­ëª© ì¶”ê°€ í”„ë¡¬í”„íŠ¸ì—ì„œ ì‚¬ìš©)
+// ¸¶Áö¸· ÆÇ¸Å Ç×¸ñ °íÀ¯ ¹øÈ£¸¦ °¡Á®¿À´Â ÇÔ¼ö (7.6 ÆÇ¸Å Ç×¸ñ Ãß°¡ ÇÁ·ÒÇÁÆ®¿¡¼­ »ç¿ë)
 int getLastSecondNumber(FILE* file) {
     int firstNum, secondNum, price;
     char foodName[50];
@@ -19,7 +19,7 @@ int getLastSecondNumber(FILE* file) {
     }
     return lastSecondNum;
 }
-// í…ìŠ¤íŠ¸ íŒŒì¼ íŠ¹ì • ë²”ìœ„ì˜ ì¤„ì„ ì‚­ì œí•˜ëŠ” í•¨ìˆ˜ (7.10 ê²°ì œ ì²˜ë¦¬ í”„ë¡¬í”„íŠ¸ì—ì„œ ì‚¬ìš©)
+// ÅØ½ºÆ® ÆÄÀÏ Æ¯Á¤ ¹üÀ§ÀÇ ÁÙÀ» »èÁ¦ÇÏ´Â ÇÔ¼ö (7.10 °áÁ¦ Ã³¸® ÇÁ·ÒÇÁÆ®¿¡¼­ »ç¿ë)
 int deleteLines(const char* filePath, int startLine, int endLine) {
     FILE* fp_read, * fp_write;
     char line[1024];
@@ -52,7 +52,7 @@ int deleteLines(const char* filePath, int startLine, int endLine) {
     return 0;
 }
 
-// ì •ìˆ˜ ì…ë ¥ í•¨ìˆ˜
+// Á¤¼ö ÀÔ·Â ÇÔ¼ö
 int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
     char n[MAX_INPUT_NUM + 2];
     char* endptr;
@@ -60,69 +60,69 @@ int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
 
     if (prompt != NULL) printf("%s", prompt);
     if (fgets(n, sizeof(n), stdin) == NULL) {
-        printf("ì…ë ¥ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤. ë‹¤ì‹œ ì‹œë„í•´ì£¼ì„¸ìš”.\n");
+        printf("ÀÔ·Â ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù. ´Ù½Ã ½ÃµµÇØÁÖ¼¼¿ä.\n");
     }
     else {
         n[strcspn(n, "\n")] = '\0';
         if (strlen(n) > MAX_INPUT_NUM) {
-            printf("ê²½ê³ : %dì ì´í•˜ë¡œ ìˆ«ìë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n", MAX_INPUT_NUM);
+            printf("°æ°í: %dÀÚ ÀÌÇÏ·Î ¼ıÀÚ¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n", MAX_INPUT_NUM);
             return -MAX_INT;
         }
         else {
             char* start = n;
             char* end = n + strlen(n) - 1;
 
-            n[strcspn(n, "\n")] = '\0'; // ê°œí–‰ ë¬¸ì ì œê±°
+            n[strcspn(n, "\n")] = '\0'; // °³Çà ¹®ÀÚ Á¦°Å
 
-            // ìŠ¤í˜ì´ìŠ¤ë°”ëŠ” í—ˆìš©, íƒ­ì€ ì˜¤ë¥˜ ì²˜ë¦¬
-            while (*start == ' ') start++;  // ìŠ¤í˜ì´ìŠ¤ë°”ëŠ” í—ˆìš©
-            if (strchr(n, '\t') != NULL || strchr(n, '\v') != NULL || strchr(n, '\f') != NULL || strchr(n, '\r') != NULL) { // ì…ë ¥ì— íƒ­ì´ í¬í•¨ë˜ë©´ ì˜¤ë¥˜ ë°˜í™˜
-                printf("ì˜¤ë¥˜: ì…ë ¥ì— í—ˆìš©ë˜ì§€ ì•ŠëŠ” ê³µë°± ë¬¸ìê°€ í¬í•¨ë˜ì–´ ìˆìŠµë‹ˆë‹¤.\n");
-                return -MAX_INT+1; // íƒ­ ë¬¸ì ì˜¤ë¥˜
+            // ½ºÆäÀÌ½º¹Ù´Â Çã¿ë, ÅÇÀº ¿À·ù Ã³¸®
+            while (*start == ' ') start++;  // ½ºÆäÀÌ½º¹Ù´Â Çã¿ë
+            if (strchr(n, '\t') != NULL || strchr(n, '\v') != NULL || strchr(n, '\f') != NULL || strchr(n, '\r') != NULL) { // ÀÔ·Â¿¡ ÅÇÀÌ Æ÷ÇÔµÇ¸é ¿À·ù ¹İÈ¯
+                printf("¿À·ù: ÀÔ·Â¿¡ Çã¿ëµÇÁö ¾Ê´Â °ø¹é ¹®ÀÚ°¡ Æ÷ÇÔµÇ¾î ÀÖ½À´Ï´Ù.\n");
+                return -MAX_INT+1; // ÅÇ ¹®ÀÚ ¿À·ù
             }
 
             if (*start == '.') {
                 return -MAX_INT + 9;
             }
 
-            // ë¹ˆ ì…ë ¥ ì²˜ë¦¬
+            // ºó ÀÔ·Â Ã³¸®
             if (*start == '\0'&&!allowMinus) {
-                return -1; // ì—”í„°ê°€ ëˆŒë ¸ì„ ê²½ìš° -1 ë°˜í™˜
+                return -1; // ¿£ÅÍ°¡ ´­·ÈÀ» °æ¿ì -1 ¹İÈ¯
             } 
             if (*start == '\0' && allowMinus) return -MAX_INT + 9;
 
             if (start[0] == '0' && strlen(start) > 1) {
-                printf("ì˜¤ë¥˜: 0ìœ¼ë¡œ ì‹œì‘í•˜ëŠ” ìˆ˜ëŠ” ì…ë ¥í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+                printf("¿À·ù: 0À¸·Î ½ÃÀÛÇÏ´Â ¼ö´Â ÀÔ·ÂÇÒ ¼ö ¾ø½À´Ï´Ù.\n");
                 return -MAX_INT+2;
             }
 
             if (start[0] == '-' && start[1] == '0') {
-                printf("ì˜¤ë¥˜: 0ìœ¼ë¡œ ì‹œì‘í•˜ëŠ” ìˆ˜ëŠ” ì…ë ¥í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+                printf("¿À·ù: 0À¸·Î ½ÃÀÛÇÏ´Â ¼ö´Â ÀÔ·ÂÇÒ ¼ö ¾ø½À´Ï´Ù.\n");
                 return -MAX_INT+3;
             }
 
             else if (*start == '\0'&&!allowMinus) {
-                printf("ì˜¤ë¥˜: ì…ë ¥ê°’ì´ ë¹„ì–´ìˆìŠµë‹ˆë‹¤.\n");
+                printf("¿À·ù: ÀÔ·Â°ªÀÌ ºñ¾îÀÖ½À´Ï´Ù.\n");
                 return -MAX_INT+4;
             }
             else {
-                while (end > start && *end == ' ') end--; // ìŠ¤í˜ì´ìŠ¤ë°”ëŠ” í—ˆìš©
+                while (end > start && *end == ' ') end--; // ½ºÆäÀÌ½º¹Ù´Â Çã¿ë
                 *(end + 1) = '\0';
 
                 num = strtol(start, &endptr, 10);
 
                 if (*endptr != '\0') {
-                    printf("ì˜¤ë¥˜: ìŒì´ ì•„ë‹Œ ì •ìˆ˜ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
+                    printf("¿À·ù: À½ÀÌ ¾Æ´Ñ Á¤¼ö¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
                     return -MAX_INT+6;
                 }
                 else {
                     if ((!allowMinus && num < 0) || num > INT_MAX) {
-                        printf("ì˜¤ë¥˜: ìŒì´ ì•„ë‹Œ ì •ìˆ˜ë¥¼ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
+                        printf("¿À·ù: À½ÀÌ ¾Æ´Ñ Á¤¼ö¸¦ ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
                         return -MAX_INT + 7;
                     }
                     else {
                         if (num == 0 && !allowZero) {
-                            printf("ì˜¤ë¥˜: 0ì€ ì…ë ¥í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
+                            printf("¿À·ù: 0Àº ÀÔ·ÂÇÒ ¼ö ¾ø½À´Ï´Ù.\n");
                             return -MAX_INT + 8;
                         }
                         return (int)num;

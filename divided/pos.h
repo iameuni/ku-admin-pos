@@ -10,22 +10,22 @@
 #include <stdbool.h>
 #include <limits.h> 
 
-// ë§¤í¬ë¡œ ì •ì˜
+// ¸ÅÅ©·Î Á¤ÀÇ
 #define MAX_INPUT_NUM 100
 #define MAX_TABLE_NUMBER 10
-#define MAX_TABLE_ADJUST 9 // í…Œì´ë¸” ì¦ê° ìµœëŒ€ ì ˆëŒ“ê°’
-#define FILE_PATH "./foodlist.txt" // íŒŒì¼ ê²½ë¡œ ì„¤ì •
-#define TABLE_FILE_PATH "./table" //í…Œì´ë¸” í´ë” ê²½ë¡œ ì„¤ì •
+#define MAX_TABLE_ADJUST 9 // Å×ÀÌºí Áõ°¨ ÃÖ´ë Àı´ñ°ª
+#define FILE_PATH "./foodlist.txt" // ÆÄÀÏ °æ·Î ¼³Á¤
+#define TABLE_FILE_PATH "./table" //Å×ÀÌºí Æú´õ °æ·Î ¼³Á¤
 #define MAX_INT 2147483647
 
-//////////////////// êµ¬ì¡°ì²´ ì„ ì–¸ ////////////////////
+//////////////////// ±¸Á¶Ã¼ ¼±¾ğ ////////////////////
 typedef struct OrderItem {
     int itemID;
     int quantity;
     struct OrderItem* next;
 } OrderItem;
 
-// ê¸°íƒ€ í•¨ìˆ˜ ì„ ì–¸
+// ±âÅ¸ ÇÔ¼ö ¼±¾ğ
 void exitProgram();
 int getLastSecondNumber(FILE* file);
 OrderItem* addOrderItem(OrderItem* head, int itemID);
@@ -39,7 +39,7 @@ void listTablesWithOrders(int* tablesWithOrders, int* orderCount, const char* me
 int getCurrentTableCount();
 void changeTable(int prevTableNum, int newTableNum);
 
-// ë©”ì¸ ê¸°ëŠ¥ í•¨ìˆ˜ ì„ ì–¸
+// ¸ŞÀÎ ±â´É ÇÔ¼ö ¼±¾ğ
 bool checkDataIntegrity();
 char* inputFoodName();
 int inputFoodNumber();
@@ -56,8 +56,8 @@ void makePayment();
 void adjustTables();
 int printMain();
 
-// 2ì°¨ ìš”êµ¬ ì‚¬í•­
-// êµ¬ì¡°ì²´ ì„ ì–¸ì— ì¶”ê°€
+// 2Â÷ ¿ä±¸ »çÇ×
+// ±¸Á¶Ã¼ ¼±¾ğ¿¡ Ãß°¡
 typedef struct {
     int tables[MAX_TABLE_NUMBER];
     int tableCount;
@@ -65,7 +65,7 @@ typedef struct {
     int paymentCount;
 } PaymentUnit;
 
-// í•¨ìˆ˜ ì„ ì–¸ì— ì¶”ê°€
+// ÇÔ¼ö ¼±¾ğ¿¡ Ãß°¡
 PaymentUnit* getPaymentUnit(int tableNumber);
 void moveTable();
 void cancelPayment();
@@ -83,7 +83,5 @@ typedef struct {
     int tableNumbers[MAX_TABLE_NUMBER];
     int tableCount;
 } PaymentContext;
-
-PaymentContext currentContext;  // ì „ì—­ ë³€ìˆ˜ë¡œ ì„ ì–¸
 
 #endif // POS_H

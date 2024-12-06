@@ -1,22 +1,22 @@
 #include "pos.h"
 
-// 7.3.1 íŒë§¤ í•­ëª©ëª… ì…ë ¥
+// 7.3.1 ÆÇ¸Å Ç×¸ñ¸í ÀÔ·Â
 char* inputFoodName() {
     char* s = (char*)malloc(sizeof(char) * (MAX_INPUT_NUM + 2));
     if (s == NULL) {
-        fprintf(stderr, "ë©”ëª¨ë¦¬ í• ë‹¹ ì‹¤íŒ¨\n");
+        fprintf(stderr, "¸Ş¸ğ¸® ÇÒ´ç ½ÇÆĞ\n");
         return NULL;
     }
 
     while (1) {
-        printf("íŒë§¤ í•­ëª©ëª…: ");
+        printf("ÆÇ¸Å Ç×¸ñ¸í: ");
         if (fgets(s, MAX_INPUT_NUM + 2, stdin) == NULL) {
-            printf("ì…ë ¥ ì˜¤ë¥˜ ë°œìƒ\n");
+            printf("ÀÔ·Â ¿À·ù ¹ß»ı\n");
         }
         else {
-            s[strcspn(s, "\n")] = '\0'; // \nì„ ì œê±°
+            s[strcspn(s, "\n")] = '\0'; // \nÀ» Á¦°Å
 
-            // ì• ë’¤ ê³µë°± ì œê±°
+            // ¾Õ µÚ °ø¹é Á¦°Å
             char* start = s;
             char* end = s + strlen(s) - 1;
             while (isspace((unsigned char)*start)) start++;
@@ -24,13 +24,13 @@ char* inputFoodName() {
             memmove(s, start, end - start + 1);
             s[end - start + 1] = '\0';
 
-            // ê¸¸ì´ ê²€ì‚¬ (ê³µë°± ì œê±° í›„)
+            // ±æÀÌ °Ë»ç (°ø¹é Á¦°Å ÈÄ)
             int len = strlen(s);
             if (len < 1 || len > 20) {
-                printf("ê²½ê³ : ì…ë ¥ì€ 1ì´ìƒ 20ì´í•˜ì´ì–´ì•¼ í•©ë‹ˆë‹¤. ë‹¤ì‹œ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
+                printf("°æ°í: ÀÔ·ÂÀº 1ÀÌ»ó 20ÀÌÇÏÀÌ¾î¾ß ÇÕ´Ï´Ù. ´Ù½Ã ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
             }
             else {
-                // ì•ŒíŒŒë²³ ê²€ì‚¬
+                // ¾ËÆÄºª °Ë»ç
                 int valid = 1;
                 for (int i = 0; s[i] != '\0'; i++) {
                     if (!isalpha((unsigned char)s[i])) {
@@ -39,7 +39,7 @@ char* inputFoodName() {
                     }
                 }
                 if (!valid) {
-                    printf("ê²½ê³ : í•­ëª©ëª…ì€ ì•ŒíŒŒë²³ë§Œ ì…ë ¥í•´ì•¼ í•©ë‹ˆë‹¤. ë‹¤ì‹œ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
+                    printf("°æ°í: Ç×¸ñ¸íÀº ¾ËÆÄºª¸¸ ÀÔ·ÂÇØ¾ß ÇÕ´Ï´Ù. ´Ù½Ã ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
                 }
                 else {
                     return s;
@@ -49,16 +49,16 @@ char* inputFoodName() {
     }
 }
 
-// 7.3.2 íŒë§¤ í•­ëª©ê°€ ì…ë ¥
+// 7.3.2 ÆÇ¸Å Ç×¸ñ°¡ ÀÔ·Â
 int inputPrice() {
     int price;
     while (1) {
-        price = inputInt("íŒë§¤ í•­ëª©ê°€: ", false,false);
+        price = inputInt("ÆÇ¸Å Ç×¸ñ°¡: ", false,false);
         if (price >= 1 && price <= 9999999) {
             return price;
         }
         else {
-            printf("ì˜¤ë¥˜: 1~9999999ì‚¬ì´ì˜ ìˆ˜ë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n");
+            printf("¿À·ù: 1~9999999»çÀÌÀÇ ¼ö¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n");
         }
     }
 }
