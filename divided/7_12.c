@@ -56,9 +56,42 @@ void moveTable() {
                 if (i < sourceUnit->tableCount - 1) printf(", ");
             }
             printf("}번 테이블을 이동할 테이블을 입력하세요{");
+            
+            // 지금까지 선택된 각 테이블에 대해 결제 단위 전체를 표시
+            bool first = true;
             for (int i = 0; i < destCount; i++) {
-                printf("%d", destTables[i]);
-                if (i < destCount - 1) printf(", ");
+                bool isSourceTable = false;
+                // 출발 테이블의 결제 단위에 속한 테이블인지 확인
+                for (int j = 0; j < sourceUnit->tableCount; j++) {
+                    if (sourceUnit->tables[j] == destTables[i]) {
+                        isSourceTable = true;
+                        break;
+                    }
+                }
+                
+                if (isSourceTable) {
+                    // 출발 테이블 결제 단위에 속한 테이블은 단독으로 표시
+                    if (!first) printf(", ");
+                    printf("%d", destTables[i]);
+                    first = false;
+                } else {
+                    // 다른 테이블은 결제 단위 전체 표시
+                    PaymentUnit* unit = getPaymentUnit(destTables[i]);
+                    if (unit->tableCount > 0) {
+                        if (!first) printf(", ");
+                        for (int j = 0; j < unit->tableCount; j++) {
+                            printf("%d", unit->tables[j]);
+                            if (j < unit->tableCount - 1) printf(", ");
+                        }
+                        first = false;
+                    } else {
+                        if (!first) printf(", ");
+                        printf("%d", destTables[i]);
+                        first = false;
+                    }
+                    free(unit->partialPayments);
+                    free(unit);
+                }
             }
             printf("}: ");
         }
