@@ -54,7 +54,7 @@ int deleteLines(const char* filePath, int startLine, int endLine) {
 
 // 정수 입력 함수
 int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
-    char n[MAX_INPUT + 2];
+    char n[MAX_INPUT_NUM + 2];
     char* endptr;
     long num;
 
@@ -64,8 +64,8 @@ int inputInt(const char* prompt, bool allowZero, bool allowMinus) {
     }
     else {
         n[strcspn(n, "\n")] = '\0';
-        if (strlen(n) > MAX_INPUT) {
-            printf("경고: %d자 이하로 숫자를 입력해주세요.\n", MAX_INPUT);
+        if (strlen(n) > MAX_INPUT_NUM) {
+            printf("경고: %d자 이하로 숫자를 입력해주세요.\n", MAX_INPUT_NUM);
             return -MAX_INT;
         }
         else {
