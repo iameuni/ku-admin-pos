@@ -6,7 +6,7 @@ void makePayment() {
     int orderCount = 0;
     listTablesWithOrders(tablesWithOrders, &orderCount, "\n결제 가능한 테이블 번호");
 
-    currentContext.tableCount = 0;  // 전역 PaymentContext 초기화
+    currentContext.tableCount = 0;  
     int primarySelectedTable = -1;
 
     // 결제할 테이블 선택
@@ -60,7 +60,6 @@ void makePayment() {
         
         PaymentUnit* unit = getPaymentUnit(input);
         if (unit->tableCount > 0) {
-            // 결제 단위에 속한 테이블들 추가
             for (int i = 0; i < unit->tableCount; i++) {
                 bool exists = false;
                 for (int j = 0; j < currentContext.tableCount; j++) {
@@ -143,17 +142,15 @@ void makePayment() {
 
     // 남은 결제 금액 계산
     int remainingBalance = totalOrderAmount - totalPartialPayments;
-    if (remainingBalance <= 0) {
-        printf("이미 전액 결제되었습니다.\n");
-        return;
-    }
+
 
     printf("총 주문액: %d원\n", totalOrderAmount);
     printf("기존 부분 결제액: %d원\n", totalPartialPayments);
     printf("남은 결제액: %d원\n\n", remainingBalance);
 
-    // 결제 처리
-    while (remainingBalance > 0) {
+    // 무조건 결제 금액 입력 받기
+// makePayment 함수 내의 결제 처리 부분
+    while (true) {
         int payment = inputPaymentAmount(remainingBalance);
         
         if (payment == -1) {  // 결제 취소 (0 입력)
@@ -165,8 +162,10 @@ void makePayment() {
             break;
         }
 
-        // 결제 기록 업데이트
-        updatePaymentRecord(primarySelectedTable, remainingBalance - payment);
+        // 실제 결제가 발생한 경우에만 (payment가 0이 아닐 때만) 결제 기록 업데이트
+        if (remainingBalance != payment) {  // 즉, 실제로 결제된 금액이 있을 때만
+            updatePaymentRecord(primarySelectedTable, remainingBalance - payment);
+        }
         remainingBalance = payment;
 
         if (remainingBalance == 0) {

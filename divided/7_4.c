@@ -74,8 +74,12 @@ int inputPaymentAmount(int remainingBalance) {
         }
 
         if (paymentAmount == -1) {  // 엔터 입력 시
-            printf("%d원 결제 완료되었습니다.\n", remainingBalance);
             hasPartialPayment = 0;  // 상태 초기화
+            if (remainingBalance == 0) {
+                printf("%d원 결제 완료되었습니다.\n", remainingBalance);
+            } else {
+                printf("%d원 결제 완료되었습니다.\n", remainingBalance);
+            }
             return 0;
         }
 
@@ -98,7 +102,7 @@ int inputPaymentAmount(int remainingBalance) {
         
         if (remainingBalance == 0) {
             printf("%d원 결제 완료되었습니다.\n", paymentAmount);
-            hasPartialPayment = 0;
+            hasPartialPayment = 0;  // 상태 초기화
         }
         
         return remainingBalance;

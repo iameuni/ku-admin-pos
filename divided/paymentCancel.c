@@ -54,7 +54,14 @@ void executeCancelPayments(PaymentUnit* unit, int* selectedPayments, int selecte
         rename("temp.txt", tablePath);
     }
 
-    printf("선택한 부분결제가 취소되었습니다.\n");
+    // 취소된 부분 결제 금액들 출력
+    for (int i = 0; i < selectedCount; i++) {
+        printf("%d원", selectedPayments[i]);
+        if (i < selectedCount - 1) {
+            printf(" ");
+        }
+    }
+    printf(" 부분결제가 결제 취소되었습니다.\n");
 }
 
 void listTablesWithPartialPayments(int* tables, int* count, const char* message) {

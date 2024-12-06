@@ -37,17 +37,42 @@ bool isInDestTables(int tableNum, int* destTables, int destCount) {
 }
 
 void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
-    // 1. 테이블 데이터 저장 구조체
+    // 1. 모든 목적지 테이블의 결제 단위 정보 수집
+    int allDestTables[MAX_TABLE_NUMBER];
+    int totalDestCount = 0;
+    bool processed[MAX_TABLE_NUMBER + 1] = {false};
+
+    for (int i = 0; i < destCount; i++) {
+        if (processed[destTables[i]]) continue;
+        
+        PaymentUnit* destUnit = getPaymentUnit(destTables[i]);
+        if (destUnit->tableCount > 0) {
+            // 결제 단위에 속한 모든 테이블 추가
+            for (int j = 0; j < destUnit->tableCount; j++) {
+                if (!processed[destUnit->tables[j]]) {
+                    allDestTables[totalDestCount++] = destUnit->tables[j];
+                    processed[destUnit->tables[j]] = true;
+                }
+            }
+        } else {
+            // 단독 테이블인 경우
+            allDestTables[totalDestCount++] = destTables[i];
+            processed[destTables[i]] = true;
+        }
+        free(destUnit->partialPayments);
+        free(destUnit);
+    }
+
+    // 2. 테이블 데이터 저장 구조체
     typedef struct {
         char orders[5000];      // 주문 내역
         char payments[5000];    // 부분 결제 내역
-        char unitInfo[1000];    // 결제 단위 정보
         bool hasContent;
     } TableContent;
     
     TableContent contents[MAX_TABLE_NUMBER + 1] = {0};
     
-    // 1-1. 출발 테이블들의 내용 저장
+    // 2-1. 출발 테이블들의 내용 저장
     for (int i = 0; i < sourceUnit->tableCount; i++) {
         int tableNum = sourceUnit->tables[i];
         char tablePath[256];
@@ -58,7 +83,6 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
             char line[256];
             contents[tableNum].orders[0] = '\0';
             contents[tableNum].payments[0] = '\0';
-            contents[tableNum].unitInfo[0] = '\0';
             contents[tableNum].hasContent = true;
             
             while (fgets(line, sizeof(line), file)) {
@@ -66,18 +90,16 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
                     strcat(contents[tableNum].orders, line);
                 } else if (line[0] == '#' && line[1] == '#') {
                     strcat(contents[tableNum].payments, line);
-                } else {
-                    strcat(contents[tableNum].unitInfo, line);
                 }
             }
             fclose(file);
         }
     }
 
-    // 1-2. 목적지 테이블들의 내용 저장
-    for (int i = 0; i < destCount; i++) {
-        int tableNum = destTables[i];
-        if (contents[tableNum].hasContent) continue;  // 이미 저장된 경우 스킵
+    // 2-2. 목적지 테이블들의 내용 저장
+    for (int i = 0; i < totalDestCount; i++) {
+        int tableNum = allDestTables[i];
+        if (contents[tableNum].hasContent) continue;
         
         char tablePath[256];
         snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, tableNum);
@@ -87,7 +109,6 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
             char line[256];
             contents[tableNum].orders[0] = '\0';
             contents[tableNum].payments[0] = '\0';
-            contents[tableNum].unitInfo[0] = '\0';
             contents[tableNum].hasContent = true;
             
             while (fgets(line, sizeof(line), file)) {
@@ -95,25 +116,22 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
                     strcat(contents[tableNum].orders, line);
                 } else if (line[0] == '#' && line[1] == '#') {
                     strcat(contents[tableNum].payments, line);
-                } else {
-                    strcat(contents[tableNum].unitInfo, line);
                 }
             }
             fclose(file);
         }
     }
     
-    // 2. 목적지 테이블들 업데이트
-    for (int i = 0; i < destCount; i++) {
-        int tableNum = destTables[i];
+    // 3. 모든 목적지 테이블 업데이트
+    for (int i = 0; i < totalDestCount; i++) {
+        int tableNum = allDestTables[i];
         char tablePath[256];
         snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, tableNum);
         
         FILE* file = fopen(tablePath, "w");
         if (!file) continue;
 
-        // 2-1. 주문 내역
-        // 기존 주문 내역 유지
+        // 3-1. 기존 주문 내역 유지
         if (contents[tableNum].hasContent) {
             fprintf(file, "%s", contents[tableNum].orders);
         }
@@ -128,19 +146,16 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
             }
         }
 
-        // 2-2. 결제 단위 정보 처리
-        // 모든 목적지 테이블에 대해 결제 단위 정보를 동일하게 설정
-        for (int j = 0; j < destCount; j++) {
-            fprintf(file, "#%d\n", destTables[j]);
+        // 3-2. 새로운 결제 단위 정보 추가
+        for (int j = 0; j < totalDestCount; j++) {
+            fprintf(file, "#%d\n", allDestTables[j]);
         }
 
-        // 2-3. 부분 결제 내역
-        // 기존 부분 결제 내역 유지
+        // 3-3. 부분 결제 내역 처리
         if (contents[tableNum].hasContent) {
             fprintf(file, "%s", contents[tableNum].payments);
         }
         
-        // 첫 번째 목적지 테이블인 경우만 출발 테이블의 부분 결제 내역 추가
         if (i == 0) {
             for (int j = 0; j < sourceUnit->tableCount; j++) {
                 int sourceNum = sourceUnit->tables[j];
@@ -153,12 +168,12 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         fclose(file);
     }
     
-    // 3. 출발 테이블 비우기 (목적지에 포함되지 않은 것만)
+    // 4. 출발 테이블 비우기 (목적지에 포함되지 않은 것만)
     for (int i = 0; i < sourceUnit->tableCount; i++) {
         int tableNum = sourceUnit->tables[i];
         bool isDestination = false;
-        for (int j = 0; j < destCount; j++) {
-            if (tableNum == destTables[j]) {
+        for (int j = 0; j < totalDestCount; j++) {
+            if (tableNum == allDestTables[j]) {
                 isDestination = true;
                 break;
             }
@@ -173,15 +188,16 @@ void executeTableMove(PaymentUnit* sourceUnit, int* destTables, int destCount) {
         }
     }
     
+    // 5. 결과 출력
     printf("\n");
     for (int i = 0; i < sourceUnit->tableCount; i++) {
         printf("%d", sourceUnit->tables[i]);
         if (i < sourceUnit->tableCount - 1) printf(", ");
     }
     printf("번 테이블이 ");
-    for (int i = 0; i < destCount; i++) {
-        printf("%d", destTables[i]);
-        if (i < destCount - 1) printf(", ");
+    for (int i = 0; i < totalDestCount; i++) {
+        printf("%d", allDestTables[i]);
+        if (i < totalDestCount - 1) printf(", ");
     }
     printf("번 테이블로 이동되었습니다.\n");
 }
