@@ -1,100 +1,93 @@
 #include "pos.h"
 
-// 7.12 Å×ÀÌºí ÀÌµ¿ ÇÁ·ÒÇÁÆ®
+// 7.12 í…Œì´ë¸” ì´ë™ í”„ë¡¬í”„íŠ¸
 int inputSourceTableNumber() {
     while (1) {
-        int tableNumber = inputInt("ÀÌµ¿½ÃÅ³ Å×ÀÌºíÀ» ÀÔ·ÂÇÏ¼¼¿ä: ", false, false);
-        if (tableNumber < 0) return tableNumber;  // ¿À·ù ÄÚµå ¹İÈ¯
+        int tableNumber = inputInt("ì´ë™ì‹œí‚¬ í…Œì´ë¸”ì„ ì…ë ¥í•˜ì„¸ìš”: ", false, false);
+        if (tableNumber < 0) return tableNumber;  // ì˜¤ë¥˜ ì½”ë“œ ë°˜í™˜
 
-        // Å×ÀÌºíÀÌ Á¸ÀçÇÏ´ÂÁö È®ÀÎ
+        // í…Œì´ë¸”ì´ ì¡´ì¬í•˜ëŠ”ì§€ í™•ì¸
         if (tableNumber > MAX_TABLE_NUMBER || !isTableExist(tableNumber)) {
-            printf("¿À·ù: 1~%d »çÀÌÀÇ Á¸ÀçÇÏ´Â Å×ÀÌºí ¹øÈ£¸¦ ÀÔ·ÂÇÏ¼¼¿ä.\n", MAX_TABLE_NUMBER);
+            printf("ì˜¤ë¥˜: 1~%d ì‚¬ì´ì˜ ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ë²ˆí˜¸ë¥¼ ì…ë ¥í•˜ì„¸ìš”.\n", MAX_TABLE_NUMBER);
             continue;
         }
 
-        // ÁÖ¹® ³»¿ªÀÌ ÀÖ´ÂÁö È®ÀÎ
+        // ì£¼ë¬¸ ë‚´ì—­ì´ ìˆëŠ”ì§€ í™•ì¸
         if (!hasOrders(tableNumber)) {
-            printf("\nÁÖ¹® ³»¿ªÀÌ ¾ø´Â Å×ÀÌºíÀÔ´Ï´Ù.\n\n");
+            printf("\nì£¼ë¬¸ ë‚´ì—­ì´ ì—†ëŠ” í…Œì´ë¸”ì…ë‹ˆë‹¤.\n\n");
             continue;
         }
 
         return tableNumber;
     }
 }
+
 void moveTable() {
     int tablesWithOrders[MAX_TABLE_NUMBER];
     int orderCount = 0;
-    listTablesWithOrders(tablesWithOrders, &orderCount, "\nÁÖ¹®ÀÌ ÀÖ´Â Å×ÀÌºí ¹øÈ£");
+    listTablesWithOrders(tablesWithOrders, &orderCount, "\nì£¼ë¬¸ì´ ìˆëŠ” í…Œì´ë¸” ë²ˆí˜¸");
 
-    // Ãâ¹ß Å×ÀÌºí ¼±ÅÃ
+    // ì¶œë°œ í…Œì´ë¸” ì„ íƒ
     int sourceTable = inputSourceTableNumber();
     if (sourceTable < 0) return;
 
-    // °áÁ¦ ´ÜÀ§ È®ÀÎ (ÀÌÇÏ µ¿ÀÏ)
+    // ê²°ì œ ë‹¨ìœ„ í™•ì¸
     PaymentUnit* sourceUnit = getPaymentUnit(sourceTable);
     if (sourceUnit->tableCount == 0) {
         sourceUnit->tables[0] = sourceTable;
         sourceUnit->tableCount = 1;
     }
-    
-    printf("{");
-    for (int i = 0; i < sourceUnit->tableCount; i++) {
-        printf("%d", sourceUnit->tables[i]);
-        if (i < sourceUnit->tableCount - 1) printf(", ");
-    }
-    printf("}¹ø Å×ÀÌºíÀ» ÀÌµ¿ÇÒ Å×ÀÌºíÀ» ÀÔ·ÂÇÏ¼¼¿ä{}: ");
 
-    // ¸ñÀûÁö Å×ÀÌºíµé ¼±ÅÃ
+    // ëª©ì ì§€ í…Œì´ë¸”ë“¤ ì„ íƒ
     int destTables[MAX_TABLE_NUMBER];
     int destCount = 0;
     
     while (1) {
-        if (destCount > 0) {
-            printf("{");
-            for (int i = 0; i < sourceUnit->tableCount; i++) {
-                printf("%d", sourceUnit->tables[i]);
-                if (i < sourceUnit->tableCount - 1) printf(", ");
-            }
-            printf("}¹ø Å×ÀÌºíÀ» ÀÌµ¿ÇÒ Å×ÀÌºíÀ» ÀÔ·ÂÇÏ¼¼¿ä{");
-            
-            // Áö±İ±îÁö ¼±ÅÃµÈ °¢ Å×ÀÌºí¿¡ ´ëÇØ °áÁ¦ ´ÜÀ§ ÀüÃ¼¸¦ Ç¥½Ã
-            bool first = true;
-            for (int i = 0; i < destCount; i++) {
-                bool isSourceTable = false;
-                // Ãâ¹ß Å×ÀÌºíÀÇ °áÁ¦ ´ÜÀ§¿¡ ¼ÓÇÑ Å×ÀÌºíÀÎÁö È®ÀÎ
-                for (int j = 0; j < sourceUnit->tableCount; j++) {
-                    if (sourceUnit->tables[j] == destTables[i]) {
-                        isSourceTable = true;
-                        break;
-                    }
+        // í˜„ì¬ ìƒíƒœ ì¶œë ¥
+        printf("{");
+        for (int i = 0; i < sourceUnit->tableCount; i++) {
+            printf("%d", sourceUnit->tables[i]);
+            if (i < sourceUnit->tableCount - 1) printf(", ");
+        }
+        printf("}ë²ˆ í…Œì´ë¸”ì„ ì´ë™í•  í…Œì´ë¸”ì„ ì…ë ¥í•˜ì„¸ìš”{");
+        
+        // ì§€ê¸ˆê¹Œì§€ ì„ íƒëœ ê° í…Œì´ë¸”ì— ëŒ€í•´ ê²°ì œ ë‹¨ìœ„ ì „ì²´ë¥¼ í‘œì‹œ
+        bool first = true;
+        for (int i = 0; i < destCount; i++) {
+            bool isSourceTable = false;
+            // ì¶œë°œ í…Œì´ë¸”ì˜ ê²°ì œ ë‹¨ìœ„ì— ì†í•œ í…Œì´ë¸”ì¸ì§€ í™•ì¸
+            for (int j = 0; j < sourceUnit->tableCount; j++) {
+                if (sourceUnit->tables[j] == destTables[i]) {
+                    isSourceTable = true;
+                    break;
                 }
-                
-                if (isSourceTable) {
-                    // Ãâ¹ß Å×ÀÌºí °áÁ¦ ´ÜÀ§¿¡ ¼ÓÇÑ Å×ÀÌºíÀº ´Üµ¶À¸·Î Ç¥½Ã
+            }
+            
+            if (isSourceTable) {
+                // ì¶œë°œ í…Œì´ë¸” ê²°ì œ ë‹¨ìœ„ì— ì†í•œ í…Œì´ë¸”ì€ ë‹¨ë…ìœ¼ë¡œ í‘œì‹œ
+                if (!first) printf(", ");
+                printf("%d", destTables[i]);
+                first = false;
+            } else {
+                // ë‹¤ë¥¸ í…Œì´ë¸”ì€ ê²°ì œ ë‹¨ìœ„ ì „ì²´ í‘œì‹œ
+                PaymentUnit* unit = getPaymentUnit(destTables[i]);
+                if (unit->tableCount > 0) {
+                    if (!first) printf(", ");
+                    for (int j = 0; j < unit->tableCount; j++) {
+                        printf("%d", unit->tables[j]);
+                        if (j < unit->tableCount - 1) printf(", ");
+                    }
+                    first = false;
+                } else {
                     if (!first) printf(", ");
                     printf("%d", destTables[i]);
                     first = false;
-                } else {
-                    // ´Ù¸¥ Å×ÀÌºíÀº °áÁ¦ ´ÜÀ§ ÀüÃ¼ Ç¥½Ã
-                    PaymentUnit* unit = getPaymentUnit(destTables[i]);
-                    if (unit->tableCount > 0) {
-                        if (!first) printf(", ");
-                        for (int j = 0; j < unit->tableCount; j++) {
-                            printf("%d", unit->tables[j]);
-                            if (j < unit->tableCount - 1) printf(", ");
-                        }
-                        first = false;
-                    } else {
-                        if (!first) printf(", ");
-                        printf("%d", destTables[i]);
-                        first = false;
-                    }
-                    free(unit->partialPayments);
-                    free(unit);
                 }
+                free(unit->partialPayments);
+                free(unit);
             }
-            printf("}: ");
         }
+        printf("}: ");
 
         int destTable = inputTableNumber(true);
         if (destTable == -1) {
@@ -102,30 +95,30 @@ void moveTable() {
             continue;
         }
         if (destTable == 0) {
-            printf("ÀÌµ¿ÀÌ Ãë¼ÒµÇ¾ú½À´Ï´Ù.\n");
+            printf("ì´ë™ì´ ì·¨ì†Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
             free(sourceUnit->partialPayments);
             free(sourceUnit);
             return;
         }
 
-        // À¯È¿¼º °Ë»ç
+        // ìœ íš¨ì„± ê²€ì‚¬
         if (!isTableExist(destTable)) {
-            printf("Á¸ÀçÇÏÁö ¾Ê´Â Å×ÀÌºí ¹øÈ£ÀÔ´Ï´Ù.\n");
-            continue;
+            printf("ì¡´ì¬í•˜ì§€ ì•ŠëŠ” í…Œì´ë¸” ë²ˆí˜¸ì…ë‹ˆë‹¤.\n");
+            continue;  // ë°˜ë³µë¬¸ ì²˜ìŒìœ¼ë¡œ ëŒì•„ê°€ì„œ í”„ë¡¬í”„íŠ¸ ë‹¤ì‹œ ì¶œë ¥
         }
 
-        // ÀÌ¹Ì ¼±ÅÃµÈ Å×ÀÌºíÀÎÁö È®ÀÎ
+        // ì´ë¯¸ ì„ íƒëœ í…Œì´ë¸”ì¸ì§€ í™•ì¸
         bool alreadySelected = false;
         for (int i = 0; i < destCount; i++) {
             if (destTables[i] == destTable) {
-                printf("ÀÌ¹Ì ¼±ÅÃµÈ Å×ÀÌºíÀÔ´Ï´Ù.\n");
+                printf("ì´ë¯¸ ì„ íƒëœ í…Œì´ë¸”ì…ë‹ˆë‹¤.\n");
                 alreadySelected = true;
                 break;
             }
         }
-        if (alreadySelected) continue;
+        if (alreadySelected) continue;  // ë°˜ë³µë¬¸ ì²˜ìŒìœ¼ë¡œ ëŒì•„ê°€ì„œ í”„ë¡¬í”„íŠ¸ ë‹¤ì‹œ ì¶œë ¥
 
-        // Ãâ¹ß Å×ÀÌºí°ú µ¿ÀÏÇÑ Å×ÀÌºí Çã¿ë
+        // ì¶œë°œ í…Œì´ë¸”ê³¼ ë™ì¼í•œ í…Œì´ë¸” í—ˆìš©
         bool isSourceTable = false;
         for (int i = 0; i < sourceUnit->tableCount; i++) {
             if (sourceUnit->tables[i] == destTable) {
@@ -134,11 +127,11 @@ void moveTable() {
             }
         }
 
-        // ¼±ÅÃµÈ Å×ÀÌºí Ãß°¡ (°áÁ¦ ´ÜÀ§¿Í »ó°ü¾øÀÌ ¼±ÅÃµÈ Å×ÀÌºí¸¸)
+        // ì„ íƒëœ í…Œì´ë¸” ì¶”ê°€
         destTables[destCount++] = destTable;
     }
 
-    // Å×ÀÌºí ÀÌµ¿ ½ÇÇà
+    // í…Œì´ë¸” ì´ë™ ì‹¤í–‰
     if (destCount > 0) {
         executeTableMove(sourceUnit, destTables, destCount);
     }
