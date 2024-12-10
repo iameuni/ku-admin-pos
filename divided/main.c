@@ -1,13 +1,13 @@
 #include "pos.h"
 
-//////////////////// ±âÈ¹¼­ ±â¹İ ÇÁ·ÒÇÁÆ® ////////////////////
+//////////////////// ê¸°íšì„œ ê¸°ë°˜ í”„ë¡¬í”„íŠ¸ ////////////////////
 
-// 7.1 µ¥ÀÌÅÍ ÆÄÀÏ ¹«°á¼º °Ë»ç
+// 7.1 ë°ì´í„° íŒŒì¼ ë¬´ê²°ì„± ê²€ì‚¬
 bool checkDataIntegrity() {
-    ///// ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÆÄÀÏ °Ë»ç (±âÁ¸ ÄÚµå¿Í µ¿ÀÏ) /////
+    ///// íŒë§¤ í•­ëª© ë°ì´í„° íŒŒì¼ ê²€ì‚¬ (ê¸°ì¡´ ì½”ë“œì™€ ë™ì¼) /////
     FILE* foodFile = fopen(FILE_PATH, "r+");
     if (foodFile == NULL) {
-        printf("ÆÄÀÏÀ» ¿­ ¼ö ¾ø½À´Ï´Ù.\n");
+        printf("íŒŒì¼ì„ ì—´ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
         return false;
     }
 
@@ -15,7 +15,7 @@ bool checkDataIntegrity() {
     int itemCount = 0;
     char line[256];
 
-    // ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÀĞ±â
+    // íŒë§¤ í•­ëª© ë°ì´í„° ì½ê¸°
     int lineNumber = 0;
     int expectedId = 1;
     while (fgets(line, sizeof(line), foodFile) && itemCount < 100) {
@@ -38,19 +38,19 @@ bool checkDataIntegrity() {
         while (*ptr && isspace(*ptr)) ptr++;
         if (sscanf(ptr, "%d", &price) != 1) continue;
 
-        // °íÀ¯ ¹øÈ£ Áßº¹ °Ë»ç
+        // ê³ ìœ  ë²ˆí˜¸ ì¤‘ë³µ ê²€ì‚¬
         for (int i = 0; i < itemCount; i++) {
             if (itemIds[i] == id) {
-                printf("ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÆÄÀÏ %d¹øÂ° ÁÙ°ú %d¹øÂ° ÁÙ¿¡¼­ °íÀ¯ ¹øÈ£ Áßº¹ÀÌ ¹ß»ıÇß½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n",
+                printf("íŒë§¤ í•­ëª© ë°ì´í„° íŒŒì¼ %dë²ˆì§¸ ì¤„ê³¼ %dë²ˆì§¸ ì¤„ì—ì„œ ê³ ìœ  ë²ˆí˜¸ ì¤‘ë³µì´ ë°œìƒí–ˆìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n",
                     i + 1, lineNumber);
                 fclose(foodFile);
                 return false;
             }
         }
 
-        // °íÀ¯ ¹øÈ£ ¼øÂ÷Àû Áõ°¡ °Ë»ç
+        // ê³ ìœ  ë²ˆí˜¸ ìˆœì°¨ì  ì¦ê°€ ê²€ì‚¬
         if (id != expectedId) {
-            printf("ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÆÄÀÏÀÇ °íÀ¯ ¹øÈ£°¡ ¿Ã¹Ù¸¥ ¼ø¼­·Î Áõ°¡ÇÏÁö ¾Ê½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n");
+            printf("íŒë§¤ í•­ëª© ë°ì´í„° íŒŒì¼ì˜ ê³ ìœ  ë²ˆí˜¸ê°€ ì˜¬ë°”ë¥¸ ìˆœì„œë¡œ ì¦ê°€í•˜ì§€ ì•ŠìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n");
             fclose(foodFile);
             return false;
         }
@@ -60,11 +60,11 @@ bool checkDataIntegrity() {
     }
     fclose(foodFile);
 
-    ///// Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏ °Ë»ç (¼öÁ¤µÈ ºÎºĞ) /////
+    ///// í…Œì´ë¸” ë°ì´í„° íŒŒì¼ ê²€ì‚¬ (ìˆ˜ì •ëœ ë¶€ë¶„) /////
     int tableCount = 0;
-    int existingTables[11] = { 0 };  // Á¸ÀçÇÏ´Â Å×ÀÌºí ¹øÈ£ Ã¼Å©¿ë (0¹ø ÀÎµ¦½º´Â »ç¿ë¾ÈÇÔ)
+    int existingTables[11] = { 0 };  // ì¡´ì¬í•˜ëŠ” í…Œì´ë¸” ë²ˆí˜¸ ì²´í¬ìš© (0ë²ˆ ì¸ë±ìŠ¤ëŠ” ì‚¬ìš©ì•ˆí•¨)
 
-    // Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏ °Ë»ç ºÎºĞ ¼öÁ¤
+    // í…Œì´ë¸” ë°ì´í„° íŒŒì¼ ê²€ì‚¬ ë¶€ë¶„ ìˆ˜ì •
     for (int table = 1; table <= MAX_TABLE_NUMBER; table++) {
         char tableFileName[256];
         snprintf(tableFileName, sizeof(tableFileName), "%s/%d.txt", TABLE_FILE_PATH, table);
@@ -80,25 +80,25 @@ bool checkDataIntegrity() {
         
         while (fgets(line, sizeof(line), tableFile)) {
             tableLineNumber++;
-            line[strcspn(line, "\n")] = 0;  // °³Çà ¹®ÀÚ Á¦°Å
+            line[strcspn(line, "\n")] = 0;  // ê°œí–‰ ë¬¸ì ì œê±°
 
             if (line[0] == '#') {
                 if (line[1] == '#') {
-                    // ## ºÎºĞ °áÁ¦ ±İ¾× °Ë»ç
+                    // ## ë¶€ë¶„ ê²°ì œ ê¸ˆì•¡ ê²€ì‚¬
                     char* paymentStr = line + 2;
-                    while (*paymentStr == ' ') paymentStr++;  // ¾ÕÂÊ °ø¹é Á¦°Å
+                    while (*paymentStr == ' ') paymentStr++;  // ì•ìª½ ê³µë°± ì œê±°
                     
-                    // 0À¸·Î ½ÃÀÛÇÏ´ÂÁö °Ë»ç
+                    // 0ìœ¼ë¡œ ì‹œì‘í•˜ëŠ”ì§€ ê²€ì‚¬
                     if (paymentStr[0] == '0' && strlen(paymentStr) > 1) {
-                        printf("Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏ %d¹øÂ° ÁÙ: ºÎºĞ °áÁ¦ ±İ¾×ÀÌ 0À¸·Î ½ÃÀÛÇÒ ¼ö ¾ø½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n", tableLineNumber);
+                        printf("í…Œì´ë¸” ë°ì´í„° íŒŒì¼ %dë²ˆì§¸ ì¤„: ë¶€ë¶„ ê²°ì œ ê¸ˆì•¡ì´ 0ìœ¼ë¡œ ì‹œì‘í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n", tableLineNumber);
                         fclose(tableFile);
                         return false;
                     }
 
-                    // ¼ıÀÚ¸¸ Æ÷ÇÔÇÏ´ÂÁö °Ë»ç
+                    // ìˆ«ìë§Œ í¬í•¨í•˜ëŠ”ì§€ ê²€ì‚¬
                     for (int i = 0; paymentStr[i]; i++) {
                         if (!isdigit(paymentStr[i])) {
-                            printf("Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏ %d¹øÂ° ÁÙ: ºÎºĞ °áÁ¦ ±İ¾×ÀÌ ¿Ã¹Ù¸£Áö ¾Ê½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n", tableLineNumber);
+                            printf("í…Œì´ë¸” ë°ì´í„° íŒŒì¼ %dë²ˆì§¸ ì¤„: ë¶€ë¶„ ê²°ì œ ê¸ˆì•¡ì´ ì˜¬ë°”ë¥´ì§€ ì•ŠìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n", tableLineNumber);
                             fclose(tableFile);
                             return false;
                         }
@@ -106,21 +106,21 @@ bool checkDataIntegrity() {
 
                     int payment = atoi(paymentStr);
                     if (payment <= 0) {
-                        printf("Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏ %d¹øÂ° ÁÙ: ºÎºĞ °áÁ¦ ±İ¾×ÀÌ ¾çÀÇ Á¤¼ö°¡ ¾Æ´Õ´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n", tableLineNumber);
+                        printf("í…Œì´ë¸” ë°ì´í„° íŒŒì¼ %dë²ˆì§¸ ì¤„: ë¶€ë¶„ ê²°ì œ ê¸ˆì•¡ì´ ì–‘ì˜ ì •ìˆ˜ê°€ ì•„ë‹™ë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n", tableLineNumber);
                         fclose(tableFile);
                         return false;
                     }
                     totalPartialPayments += payment;
                 }
                 else {
-                    // # °áÁ¦ ´ÜÀ§ Å×ÀÌºí ¹øÈ£ °Ë»ç
+                    // # ê²°ì œ ë‹¨ìœ„ í…Œì´ë¸” ë²ˆí˜¸ ê²€ì‚¬
                     char* tableStr = line + 1;
-                    while (*tableStr == ' ') tableStr++;  // ¾ÕÂÊ °ø¹é Á¦°Å
+                    while (*tableStr == ' ') tableStr++;  // ì•ìª½ ê³µë°± ì œê±°
                     
-                    // ¼ıÀÚ¸¸ Æ÷ÇÔÇÏ´ÂÁö °Ë»ç
+                    // ìˆ«ìë§Œ í¬í•¨í•˜ëŠ”ì§€ ê²€ì‚¬
                     for (int i = 0; tableStr[i]; i++) {
                         if (!isdigit(tableStr[i])) {
-                            printf("Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏ %d¹øÂ° ÁÙ: °áÁ¦ ´ÜÀ§ Å×ÀÌºí ¹øÈ£°¡ ¿Ã¹Ù¸£Áö ¾Ê½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n", tableLineNumber);
+                            printf("í…Œì´ë¸” ë°ì´í„° íŒŒì¼ %dë²ˆì§¸ ì¤„: ê²°ì œ ë‹¨ìœ„ í…Œì´ë¸” ë²ˆí˜¸ê°€ ì˜¬ë°”ë¥´ì§€ ì•ŠìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n", tableLineNumber);
                             fclose(tableFile);
                             return false;
                         }
@@ -128,24 +128,24 @@ bool checkDataIntegrity() {
 
                     int unitTable = atoi(tableStr);
                     if (unitTable < 1 || unitTable > MAX_TABLE_NUMBER || !isTableExist(unitTable)) {
-                        printf("Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏ %d¹øÂ° ÁÙ: ¿Ã¹Ù¸£Áö ¾ÊÀº °áÁ¦ ´ÜÀ§ Å×ÀÌºí ¹øÈ£ÀÔ´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n", tableLineNumber);
+                        printf("í…Œì´ë¸” ë°ì´í„° íŒŒì¼ %dë²ˆì§¸ ì¤„: ì˜¬ë°”ë¥´ì§€ ì•Šì€ ê²°ì œ ë‹¨ìœ„ í…Œì´ë¸” ë²ˆí˜¸ì…ë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n", tableLineNumber);
                         fclose(tableFile);
                         return false;
                     }
 
-                    // °áÁ¦ ´ÜÀ§¿¡ Ãß°¡
+                    // ê²°ì œ ë‹¨ìœ„ì— ì¶”ê°€
                     paymentUnitTables[paymentUnitCount++] = unitTable;
                 }
             }
             else {
                 int saleItemId;
                 if (sscanf(line, "%d", &saleItemId) != 1) {
-                    printf("Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏÀÇ %d¹øÂ° ÁÙ¿¡¼­ ¿Ã¹Ù¸¥ Çü½ÄÀÇ ÆÇ¸Å Ç×¸ñ °íÀ¯ ¹øÈ£¸¦ Ã£À» ¼ö ¾ø½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n", tableLineNumber);
+                    printf("í…Œì´ë¸” ë°ì´í„° íŒŒì¼ì˜ %dë²ˆì§¸ ì¤„ì—ì„œ ì˜¬ë°”ë¥¸ í˜•ì‹ì˜ íŒë§¤ í•­ëª© ê³ ìœ  ë²ˆí˜¸ë¥¼ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n", tableLineNumber);
                     fclose(tableFile);
                     return false;
                 }
                 
-                // ÆÇ¸Å Ç×¸ñ µ¥ÀÌÅÍ ÆÄÀÏ¿¡ Á¸ÀçÇÏ´Â ¹øÈ£ÀÎÁö È®ÀÎ
+                // íŒë§¤ í•­ëª© ë°ì´í„° íŒŒì¼ì— ì¡´ì¬í•˜ëŠ” ë²ˆí˜¸ì¸ì§€ í™•ì¸
                 bool found = false;
                 for (int i = 0; i < itemCount; i++) {
                     if (itemIds[i] == saleItemId) {
@@ -154,14 +154,14 @@ bool checkDataIntegrity() {
                     }
                 }
                 if (!found) {
-                    printf("Å×ÀÌºí µ¥ÀÌÅÍ ÆÄÀÏÀÇ %d¹øÂ° ÁÙÀÇ ÆÇ¸Å Ç×¸ñ °íÀ¯ ¹øÈ£ %d´Â ¿Ã¹Ù¸¥ ÆÇ¸Å Ç×¸ñ °íÀ¯ ¹øÈ£°¡ ¾Æ´Õ´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n", tableLineNumber, saleItemId);
+                    printf("í…Œì´ë¸” ë°ì´í„° íŒŒì¼ì˜ %dë²ˆì§¸ ì¤„ì˜ íŒë§¤ í•­ëª© ê³ ìœ  ë²ˆí˜¸ %dëŠ” ì˜¬ë°”ë¥¸ íŒë§¤ í•­ëª© ê³ ìœ  ë²ˆí˜¸ê°€ ì•„ë‹™ë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n", tableLineNumber, saleItemId);
                     fclose(tableFile);
                     return false;
                 }
             }
         }
 
-        // °áÁ¦ ´ÜÀ§ »óÈ£ ÂüÁ¶ °Ë»ç
+        // ê²°ì œ ë‹¨ìœ„ ìƒí˜¸ ì°¸ì¡° ê²€ì‚¬
         if (paymentUnitCount > 0) {
             for (int i = 0; i < paymentUnitCount; i++) {
                 int unitTable = paymentUnitTables[i];
@@ -170,12 +170,12 @@ bool checkDataIntegrity() {
                 
                 FILE* unitFile = fopen(unitFileName, "r");
                 if (!unitFile) {
-                    printf("°áÁ¦ ´ÜÀ§·Î ¹­ÀÎ Å×ÀÌºí %dÀÇ ÆÄÀÏÀ» Ã£À» ¼ö ¾ø½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n", unitTable);
+                    printf("ê²°ì œ ë‹¨ìœ„ë¡œ ë¬¶ì¸ í…Œì´ë¸” %dì˜ íŒŒì¼ì„ ì°¾ì„ ìˆ˜ ì—†ìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n", unitTable);
                     fclose(tableFile);
                     return false;
                 }
 
-                // °áÁ¦ ´ÜÀ§ Å×ÀÌºíµéÀÌ ¼­·Î¸¦ ÂüÁ¶ÇÏ´ÂÁö °Ë»ç
+                // ê²°ì œ ë‹¨ìœ„ í…Œì´ë¸”ë“¤ì´ ì„œë¡œë¥¼ ì°¸ì¡°í•˜ëŠ”ì§€ ê²€ì‚¬
                 bool foundAllReferences = true;
                 for (int j = 0; j < paymentUnitCount; j++) {
                     bool foundReference = false;
@@ -200,7 +200,7 @@ bool checkDataIntegrity() {
                 fclose(unitFile);
                 
                 if (!foundAllReferences) {
-                    printf("°áÁ¦ ´ÜÀ§·Î ¹­ÀÎ Å×ÀÌºíµéÀÇ »óÈ£ ÂüÁ¶°¡ ¿Ã¹Ù¸£Áö ¾Ê½À´Ï´Ù. ÇÁ·Î±×·¥À» Á¾·áÇÕ´Ï´Ù.\n");
+                    printf("ê²°ì œ ë‹¨ìœ„ë¡œ ë¬¶ì¸ í…Œì´ë¸”ë“¤ì˜ ìƒí˜¸ ì°¸ì¡°ê°€ ì˜¬ë°”ë¥´ì§€ ì•ŠìŠµë‹ˆë‹¤. í”„ë¡œê·¸ë¨ì„ ì¢…ë£Œí•©ë‹ˆë‹¤.\n");
                     fclose(tableFile);
                     return false;
                 }
@@ -213,44 +213,44 @@ bool checkDataIntegrity() {
     return true;
 }
 
-// 7.11 Å×ÀÌºí Áõ°¨ ÇÁ·ÒÇÁÆ®
+// 7.11 í…Œì´ë¸” ì¦ê° í”„ë¡¬í”„íŠ¸
 void adjustTables() {
     while (1) {
         int currentTableCount = getCurrentTableCount();
 
-        printf("\nÁõ°¨½ÃÅ³ Å×ÀÌºí ¼ö¸¦ ÀÔ·ÂÇÏ¼¼¿ä (-%d ~ %d): ",MAX_TABLE_ADJUST, MAX_TABLE_ADJUST);
+        printf("\nì¦ê°ì‹œí‚¬ í…Œì´ë¸” ìˆ˜ë¥¼ ì…ë ¥í•˜ì„¸ìš” (-%d ~ %d): ",MAX_TABLE_ADJUST, MAX_TABLE_ADJUST);
 
        
         int adjustment = inputInt(NULL, true, true);
 
-        // '0' ÀÔ·Â ½Ã Ãë¼Ò
+        // '0' ì…ë ¥ ì‹œ ì·¨ì†Œ
         if (adjustment == 0) {
-            printf("Å×ÀÌºí Áõ°¨ ÀÛ¾÷ÀÌ Ãë¼ÒµÇ¾ú½À´Ï´Ù.\n");
+            printf("í…Œì´ë¸” ì¦ê° ì‘ì—…ì´ ì·¨ì†Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
             return;
         }
 
-        // ¹üÀ§ °ËÁõ (-MAX_TABLE_ADJUST ~ MAX_TABLE_ADJUST)
+        // ë²”ìœ„ ê²€ì¦ (-MAX_TABLE_ADJUST ~ MAX_TABLE_ADJUST)
         if (adjustment < -MAX_TABLE_ADJUST || adjustment > MAX_TABLE_ADJUST) {
-            printf("¿Ã¹Ù¸£Áö ¾ÊÀº ÀÔ·ÂÀÔ´Ï´Ù.\n");
+            printf("ì˜¬ë°”ë¥´ì§€ ì•Šì€ ì…ë ¥ì…ë‹ˆë‹¤.\n");
             continue;
         }
 
-        // Å×ÀÌºí °¨¼Ò
+        // í…Œì´ë¸” ê°ì†Œ
         if (adjustment < 0) {
-            // ÇöÀç Å×ÀÌºí ¼ö°¡ °¨¼Ò½ÃÅ°·Á´Â ¼öº¸´Ù Àû°Å³ª °°Àº °æ¿ì
+            // í˜„ì¬ í…Œì´ë¸” ìˆ˜ê°€ ê°ì†Œì‹œí‚¤ë ¤ëŠ” ìˆ˜ë³´ë‹¤ ì ê±°ë‚˜ ê°™ì€ ê²½ìš°
             if (currentTableCount <= -adjustment) {
-                printf("¿À·ù: ÇöÀç Å×ÀÌºíÀÌ %d°³ »ÓÀÌ¶ó¼­ %d°³¸¦ °¨¼Ò½ÃÅ³ ¼ö ¾ø½À´Ï´Ù.\n",
+                printf("ì˜¤ë¥˜: í˜„ì¬ í…Œì´ë¸”ì´ %dê°œ ë¿ì´ë¼ì„œ %dê°œë¥¼ ê°ì†Œì‹œí‚¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n",
                     currentTableCount, -adjustment);
                 continue;
             }
 
-            // °¨¼Ò ÈÄ Å×ÀÌºí ¼ö°¡ 1°³ ¹Ì¸¸ÀÌ µÇ´Â °æ¿ì
+            // ê°ì†Œ í›„ í…Œì´ë¸” ìˆ˜ê°€ 1ê°œ ë¯¸ë§Œì´ ë˜ëŠ” ê²½ìš°
             if (currentTableCount + adjustment < 1) {
-                printf("¿À·ù: Å×ÀÌºíÀº ÃÖ¼Ò 1°³°¡ Á¸ÀçÇØ¾ß ÇÕ´Ï´Ù.\n");
+                printf("ì˜¤ë¥˜: í…Œì´ë¸”ì€ ìµœì†Œ 1ê°œê°€ ì¡´ì¬í•´ì•¼ í•©ë‹ˆë‹¤.\n");
                 continue;
             }
 
-            // ÁÖ¹® ³»¿ªÀÌ ¾ø´Â Å×ÀÌºí ¼ö °è»ê
+            // ì£¼ë¬¸ ë‚´ì—­ì´ ì—†ëŠ” í…Œì´ë¸” ìˆ˜ ê³„ì‚°
             int emptyCount = 0;
             for (int i = MAX_TABLE_NUMBER; i >= 1; i--) {
                 if (isTableExist(i) && !hasOrders(i)) {
@@ -258,23 +258,23 @@ void adjustTables() {
                 }
             }
 
-            // ÁÖ¹® ³»¿ªÀÌ ¾ø´Â Å×ÀÌºíÀÌ ÇÏ³ªµµ ¾ø´Â °æ¿ì
+            // ì£¼ë¬¸ ë‚´ì—­ì´ ì—†ëŠ” í…Œì´ë¸”ì´ í•˜ë‚˜ë„ ì—†ëŠ” ê²½ìš°
             if (emptyCount == 0) {
-                printf("¿À·ù: ¸ğµç Å×ÀÌºí¿¡ ÁÖ¹® ³»¿ªÀÌ ÀÖ¾î¼­ °¨¼Ò½ÃÅ³ ¼ö ¾ø½À´Ï´Ù.\n");
+                printf("ì˜¤ë¥˜: ëª¨ë“  í…Œì´ë¸”ì— ì£¼ë¬¸ ë‚´ì—­ì´ ìˆì–´ì„œ ê°ì†Œì‹œí‚¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n");
                 continue;
             }
 
-            // ÁÖ¹® ³»¿ªÀÌ ¾ø´Â Å×ÀÌºí ¼ö°¡ °¨¼Ò½ÃÅ°·Á´Â ¼öº¸´Ù ÀûÀº °æ¿ì
+            // ì£¼ë¬¸ ë‚´ì—­ì´ ì—†ëŠ” í…Œì´ë¸” ìˆ˜ê°€ ê°ì†Œì‹œí‚¤ë ¤ëŠ” ìˆ˜ë³´ë‹¤ ì ì€ ê²½ìš°
             if (emptyCount < -adjustment) {
-                printf("¿À·ù: ÁÖ¹® ³»¿ªÀÌ ¾ø´Â Å×ÀÌºíÀÌ %d°³ »ÓÀÌ¶ó¼­ %d°³¸¦ °¨¼Ò½ÃÅ³ ¼ö ¾ø½À´Ï´Ù.\n",
+                printf("ì˜¤ë¥˜: ì£¼ë¬¸ ë‚´ì—­ì´ ì—†ëŠ” í…Œì´ë¸”ì´ %dê°œ ë¿ì´ë¼ì„œ %dê°œë¥¼ ê°ì†Œì‹œí‚¬ ìˆ˜ ì—†ìŠµë‹ˆë‹¤.\n",
                     emptyCount, -adjustment);
                 continue;
             }
 
-            // Å×ÀÌºí °¨¼Ò ½ÇÇà
+            // í…Œì´ë¸” ê°ì†Œ ì‹¤í–‰
             int removed = 0;
             while (removed < -adjustment) {
-                // °¡Àå Å« ¹øÈ£ÀÇ ºó Å×ÀÌºí Ã£±â
+                // ê°€ì¥ í° ë²ˆí˜¸ì˜ ë¹ˆ í…Œì´ë¸” ì°¾ê¸°
                 int tableToRemove = -1;
                 for (int i = MAX_TABLE_NUMBER; i >= 1; i--) {
                     if (isTableExist(i) && !hasOrders(i)) {
@@ -284,28 +284,28 @@ void adjustTables() {
                 }
 
                 if (tableToRemove == -1) {
-                    printf("¿¹±âÄ¡ ¾ÊÀº ¿À·ù°¡ ¹ß»ıÇß½À´Ï´Ù.\n");
+                    printf("ì˜ˆê¸°ì¹˜ ì•Šì€ ì˜¤ë¥˜ê°€ ë°œìƒí–ˆìŠµë‹ˆë‹¤.\n");
                     return;
                 }
 
                 char tableFilePath[256];
                 snprintf(tableFilePath, sizeof(tableFilePath), "%s/%d.txt", TABLE_FILE_PATH, tableToRemove);
                 remove(tableFilePath);
-                printf("%d¹ø Å×ÀÌºíÀÌ Á¦°ÅµÇ¾ú½À´Ï´Ù.\n", tableToRemove);
+                printf("%dë²ˆ í…Œì´ë¸”ì´ ì œê±°ë˜ì—ˆìŠµë‹ˆë‹¤.\n", tableToRemove);
                 removed++;
             }
         }
-        // Å×ÀÌºí Áõ°¡
+        // í…Œì´ë¸” ì¦ê°€
         else {
             if (currentTableCount + adjustment > MAX_TABLE_NUMBER) {
-                printf("Å×ÀÌºíÀº ÃÖ´ë %d°³±îÁö¸¸ Á¸ÀçÇÒ ¼ö ÀÖ½À´Ï´Ù.\n", MAX_TABLE_NUMBER);
+                printf("í…Œì´ë¸”ì€ ìµœëŒ€ %dê°œê¹Œì§€ë§Œ ì¡´ì¬í•  ìˆ˜ ìˆìŠµë‹ˆë‹¤.\n", MAX_TABLE_NUMBER);
                 continue;
             }
 
-            // Å×ÀÌºí Áõ°¡ ½ÇÇà
+            // í…Œì´ë¸” ì¦ê°€ ì‹¤í–‰
             int added = 0;
             while (added < adjustment) {
-                // »ç¿ë °¡´ÉÇÑ °¡Àå ÀÛÀº ¹øÈ£ Ã£±â
+                // ì‚¬ìš© ê°€ëŠ¥í•œ ê°€ì¥ ì‘ì€ ë²ˆí˜¸ ì°¾ê¸°
                 int newTableNumber = -1;
                 for (int i = 1; i <= MAX_TABLE_NUMBER; i++) {
                     if (!isTableExist(i)) {
@@ -315,7 +315,7 @@ void adjustTables() {
                 }
 
                 if (newTableNumber == -1) {
-                    printf("´õ ÀÌ»ó Ãß°¡ÇÒ ¼ö ÀÖ´Â Å×ÀÌºí ¹øÈ£°¡ ¾ø½À´Ï´Ù.\n");
+                    printf("ë” ì´ìƒ ì¶”ê°€í•  ìˆ˜ ìˆëŠ” í…Œì´ë¸” ë²ˆí˜¸ê°€ ì—†ìŠµë‹ˆë‹¤.\n");
                     return;
                 }
 
@@ -324,35 +324,35 @@ void adjustTables() {
                 FILE* tableFile = fopen(tableFilePath, "w");
                 if (tableFile != NULL) {
                     fclose(tableFile);
-                    printf("%d¹ø Å×ÀÌºíÀÌ Ãß°¡µÇ¾ú½À´Ï´Ù.\n", newTableNumber);
+                    printf("%dë²ˆ í…Œì´ë¸”ì´ ì¶”ê°€ë˜ì—ˆìŠµë‹ˆë‹¤.\n", newTableNumber);
                     added++;
                 }
             }
         }
 
-        // ¼º°øÀûÀ¸·Î Ã³¸®µÈ °æ¿ì ÇÔ¼ö Á¾·á
+        // ì„±ê³µì ìœ¼ë¡œ ì²˜ë¦¬ëœ ê²½ìš° í•¨ìˆ˜ ì¢…ë£Œ
         return;
     }
 }
 
-// 7.14 ¸ŞÀÎ ¸Ş´º ÇÁ·ÒÇÁÆ®
+// 7.14 ë©”ì¸ ë©”ë‰´ í”„ë¡¬í”„íŠ¸
 int printMain() {
     int s;
     while (1) {
-        printf("\n¸ŞÀÎ ¸Ş´º\n");
-        printf("1. ÆÇ¸Å Ç×¸ñ Á¶È¸\n");
-        printf("2. ÆÇ¸Å Ç×¸ñ Ãß°¡\n");
-        printf("3. ÆÇ¸Å Ç×¸ñ Á¦°Å\n");
-        printf("4. ÁÖ¹® »ı¼º\n");
-        printf("5. ÁÖ¹® Á¶È¸\n");
-        printf("6. °áÁ¦ Ã³¸®\n");
-        printf("7. Å×ÀÌºí Áõ°¨\n");
-        printf("8. Å×ÀÌºí ÀÌµ¿\n");
-        printf("9. °áÁ¦ Ãë¼Ò\n");
-        printf("10. Á¾·á\n");
-        s = inputInt("¸Ş´º ¼±ÅÃ: ", false, false);
+        printf("\në©”ì¸ ë©”ë‰´\n");
+        printf("1. íŒë§¤ í•­ëª© ì¡°íšŒ\n");
+        printf("2. íŒë§¤ í•­ëª© ì¶”ê°€\n");
+        printf("3. íŒë§¤ í•­ëª© ì œê±°\n");
+        printf("4. ì£¼ë¬¸ ìƒì„±\n");
+        printf("5. ì£¼ë¬¸ ì¡°íšŒ\n");
+        printf("6. ê²°ì œ ì²˜ë¦¬\n");
+        printf("7. í…Œì´ë¸” ì¦ê°\n");
+        printf("8. í…Œì´ë¸” ì´ë™\n");
+        printf("9. ê²°ì œ ì·¨ì†Œ\n");
+        printf("10. ì¢…ë£Œ\n");
+        s = inputInt("ë©”ë‰´ ì„ íƒ: ", false, false);
         if (s > 10) {
-            printf("1~10 »çÀÌÀÇ °ªÀ» ÀÔ·ÂÇØÁÖ¼¼¿ä.\n");
+            printf("1~10 ì‚¬ì´ì˜ ê°’ì„ ì…ë ¥í•´ì£¼ì„¸ìš”.\n");
         }
         else {
             return s;
@@ -360,7 +360,7 @@ int printMain() {
     }
 }
 
-// ÇÁ·Î±×·¥ ½ÇÇà
+// í”„ë¡œê·¸ë¨ ì‹¤í–‰
 int main(void) {
     while (1) {
 
@@ -371,43 +371,43 @@ int main(void) {
         int s = printMain();
         switch (s) {
         case 1:
-            // 7.5 ÆÇ¸Å Ç×¸ñ Á¶È¸ ÇÁ·ÒÇÁÆ®
+            // 7.5 íŒë§¤ í•­ëª© ì¡°íšŒ í”„ë¡¬í”„íŠ¸
             printFoodList();
             break;
         case 2:
-            // 7.6 ÆÇ¸Å Ç×¸ñ Ãß°¡ ÇÁ·ÒÇÁÆ®
+            // 7.6 íŒë§¤ í•­ëª© ì¶”ê°€ í”„ë¡¬í”„íŠ¸
             addToFoodList();
             break;
         case 3:
-            // 7.7 ÆÇ¸Å Ç×¸ñ Á¦°Å ÇÁ·ÒÇÁÆ®
+            // 7.7 íŒë§¤ í•­ëª© ì œê±° í”„ë¡¬í”„íŠ¸
             removeFoodItem();
             break;
         case 4:
-            // 7.8 ÁÖ¹® »ı¼º ÇÁ·ÒÇÁÆ®
+            // 7.8 ì£¼ë¬¸ ìƒì„± í”„ë¡¬í”„íŠ¸
             createOrder();
             break;
         case 5:
-            // 7.9 ÁÖ¹® Á¶È¸ ÇÁ·ÒÇÁÆ®
+            // 7.9 ì£¼ë¬¸ ì¡°íšŒ í”„ë¡¬í”„íŠ¸
             printOrder();
             break;
         case 6:
-            // 7.10 °áÁ¦ Ã³¸® ÇÁ·ÒÇÁÆ®
+            // 7.10 ê²°ì œ ì²˜ë¦¬ í”„ë¡¬í”„íŠ¸
             makePayment();
             break;
         case 7:
-            // 7.11 Å×ÀÌºí Áõ°¨ ÇÁ·ÒÇÁÆ®
+            // 7.11 í…Œì´ë¸” ì¦ê° í”„ë¡¬í”„íŠ¸
             adjustTables();
             break;
         case 8:
-            // 7.12 Å×ÀÌºí ÀÌµ¿ ÇÁ·ÒÇÁÆ®
+            // 7.12 í…Œì´ë¸” ì´ë™ í”„ë¡¬í”„íŠ¸
             moveTable();
             break;
         case 9:
-            // 7.13 °áÁ¦ Ãë¼Ò ÇÁ·ÒÇÁÆ®
+            // 7.13 ê²°ì œ ì·¨ì†Œ í”„ë¡¬í”„íŠ¸
             cancelPayment();
             break;
         case 10:
-            // 7.14 ¸ŞÀÎ ¸Ş´º ÇÁ·ÒÇÁÆ®ÀÇ Á¾·á ±â´É
+            // 7.14 ë©”ì¸ ë©”ë‰´ í”„ë¡¬í”„íŠ¸ì˜ ì¢…ë£Œ ê¸°ëŠ¥
             exitProgram();
             break;
         default:

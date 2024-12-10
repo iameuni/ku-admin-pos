@@ -12,10 +12,10 @@ void executeCancelPayments(PaymentUnit* unit, int* selectedPayments, int selecte
         if (!tempFile || !tableFile) continue;
 
         char line[256];
-        // ¼±ÅÃµÈ ±İ¾×º°·Î Ãë¼Ò ¼öÇà ¿©ºÎ ÃßÀû
+        // ì„ íƒëœ ê¸ˆì•¡ë³„ë¡œ ì·¨ì†Œ ìˆ˜í–‰ ì—¬ë¶€ ì¶”ì 
         bool* cancelled = (bool*)calloc(selectedCount, sizeof(bool));
         
-        // ¸ÕÀú ÁÖ¹® ³»¿ª°ú °áÁ¦ ´ÜÀ§ Á¤º¸ º¹»ç
+        // ë¨¼ì € ì£¼ë¬¸ ë‚´ì—­ê³¼ ê²°ì œ ë‹¨ìœ„ ì •ë³´ ë³µì‚¬
         while (fgets(line, sizeof(line), tableFile)) {
             if (line[0] != '#') {
                 fprintf(tempFile, "%s", line);
@@ -24,7 +24,7 @@ void executeCancelPayments(PaymentUnit* unit, int* selectedPayments, int selecte
             }
         }
 
-        // ºÎºĞ °áÁ¦ ³»¿ª Ã³¸®
+        // ë¶€ë¶„ ê²°ì œ ë‚´ì—­ ì²˜ë¦¬
         rewind(tableFile);
         while (fgets(line, sizeof(line), tableFile)) {
             if (line[0] == '#' && line[1] == '#') {
@@ -32,7 +32,7 @@ void executeCancelPayments(PaymentUnit* unit, int* selectedPayments, int selecte
                 sscanf(line + 2, "%d", &payment);
                 
                 bool shouldKeep = true;
-                // ¾ÆÁ÷ Ãë¼ÒµÇÁö ¾ÊÀº ¼±ÅÃµÈ ±İ¾×°ú ÀÏÄ¡ÇÏ´ÂÁö È®ÀÎ
+                // ì•„ì§ ì·¨ì†Œë˜ì§€ ì•Šì€ ì„ íƒëœ ê¸ˆì•¡ê³¼ ì¼ì¹˜í•˜ëŠ”ì§€ í™•ì¸
                 for (int i = 0; i < selectedCount; i++) {
                     if (!cancelled[i] && payment == selectedPayments[i]) {
                         cancelled[i] = true;
@@ -54,14 +54,14 @@ void executeCancelPayments(PaymentUnit* unit, int* selectedPayments, int selecte
         rename("temp.txt", tablePath);
     }
 
-    // Ãë¼ÒµÈ ºÎºĞ °áÁ¦ ±İ¾×µé Ãâ·Â
+    // ì·¨ì†Œëœ ë¶€ë¶„ ê²°ì œ ê¸ˆì•¡ë“¤ ì¶œë ¥
     for (int i = 0; i < selectedCount; i++) {
-        printf("%d¿ø", selectedPayments[i]);
+        printf("%dì›", selectedPayments[i]);
         if (i < selectedCount - 1) {
             printf(" ");
         }
     }
-    printf(" ºÎºĞ°áÁ¦°¡ °áÁ¦ Ãë¼ÒµÇ¾ú½À´Ï´Ù.\n");
+    printf(" ë¶€ë¶„ê²°ì œê°€ ê²°ì œ ì·¨ì†Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
 }
 
 void listTablesWithPartialPayments(int* tables, int* count, const char* message) {
@@ -69,14 +69,14 @@ void listTablesWithPartialPayments(int* tables, int* count, const char* message)
     printf("%s: { ", message);
     bool first = true;
 
-    // ¸ÕÀú ºÎºĞ °áÁ¦°¡ ÀÖ´Â Å×ÀÌºíµéÀ» Ã£¾Æ¼­ °áÁ¦ ´ÜÀ§ Á¤º¸¸¦ ¼öÁı
+    // ë¨¼ì € ë¶€ë¶„ ê²°ì œê°€ ìˆëŠ” í…Œì´ë¸”ë“¤ì„ ì°¾ì•„ì„œ ê²°ì œ ë‹¨ìœ„ ì •ë³´ë¥¼ ìˆ˜ì§‘
     PaymentUnit* units[MAX_TABLE_NUMBER] = {NULL};
     int unitCount = 0;
 
     for (int i = 1; i <= MAX_TABLE_NUMBER; i++) {
         if (!isTableExist(i)) continue;
 
-        // ÀÌ¹Ì ´Ù¸¥ °áÁ¦ ´ÜÀ§¿¡ Æ÷ÇÔµÈ Å×ÀÌºíÀÎÁö È®ÀÎ
+        // ì´ë¯¸ ë‹¤ë¥¸ ê²°ì œ ë‹¨ìœ„ì— í¬í•¨ëœ í…Œì´ë¸”ì¸ì§€ í™•ì¸
         bool alreadyIncluded = false;
         for (int j = 0; j < unitCount; j++) {
             for (int k = 0; k < units[j]->tableCount; k++) {
@@ -89,11 +89,11 @@ void listTablesWithPartialPayments(int* tables, int* count, const char* message)
         }
         if (alreadyIncluded) continue;
 
-        // Å×ÀÌºíÀÇ °áÁ¦ ´ÜÀ§ Á¤º¸ È®ÀÎ
+        // í…Œì´ë¸”ì˜ ê²°ì œ ë‹¨ìœ„ ì •ë³´ í™•ì¸
         PaymentUnit* unit = getPaymentUnit(i);
         bool hasPartialPayment = false;
 
-        // °áÁ¦ ´ÜÀ§ ³» ¸ğµç Å×ÀÌºíÀÇ ºÎºĞ °áÁ¦ È®ÀÎ
+        // ê²°ì œ ë‹¨ìœ„ ë‚´ ëª¨ë“  í…Œì´ë¸”ì˜ ë¶€ë¶„ ê²°ì œ í™•ì¸
         if (unit->tableCount > 0) {
             for (int j = 0; j < unit->tableCount; j++) {
                 int tableNum = unit->tables[j];
@@ -114,7 +114,7 @@ void listTablesWithPartialPayments(int* tables, int* count, const char* message)
             }
 
             if (hasPartialPayment) {
-                // °áÁ¦ ´ÜÀ§ÀÇ ¸ğµç Å×ÀÌºí Ãß°¡
+                // ê²°ì œ ë‹¨ìœ„ì˜ ëª¨ë“  í…Œì´ë¸” ì¶”ê°€
                 for (int j = 0; j < unit->tableCount; j++) {
                     tables[(*count)++] = unit->tables[j];
                 }
@@ -122,7 +122,7 @@ void listTablesWithPartialPayments(int* tables, int* count, const char* message)
                 if (!first) printf(", ");
                 first = false;
 
-                // °áÁ¦ ´ÜÀ§ÀÇ ¸ğµç Å×ÀÌºí Ãâ·Â
+                // ê²°ì œ ë‹¨ìœ„ì˜ ëª¨ë“  í…Œì´ë¸” ì¶œë ¥
                 printf("{");
                 for (int j = 0; j < unit->tableCount; j++) {
                     printf("%d", unit->tables[j]);
@@ -160,7 +160,7 @@ void listTablesWithPartialPayments(int* tables, int* count, const char* message)
     }
     printf(" }\n\n");
 
-    // ¸Ş¸ğ¸® ÇØÁ¦
+    // ë©”ëª¨ë¦¬ í•´ì œ
     for (int i = 0; i < unitCount; i++) {
         free(units[i]->partialPayments);
         free(units[i]);
@@ -176,19 +176,19 @@ bool isPaymentSelected(int payment, int* selectedPayments, int selectedCount) {
 }
 
 bool isValidPartialPayment(int amount, PaymentUnit* unit, int* selectedPayments, int selectedCount) {
-    // ÀÌ¹Ì ¼±ÅÃµÈ ±İ¾×ÀÎÁö È®ÀÎ
+    // ì´ë¯¸ ì„ íƒëœ ê¸ˆì•¡ì¸ì§€ í™•ì¸
     if (isPaymentSelected(amount, selectedPayments, selectedCount)) {
-        printf("ÀÌ¹Ì ¼±ÅÃµÈ ºÎºĞ °áÁ¦ ±İ¾×ÀÔ´Ï´Ù.\n");
+        printf("ì´ë¯¸ ì„ íƒëœ ë¶€ë¶„ ê²°ì œ ê¸ˆì•¡ì…ë‹ˆë‹¤.\n");
         return false;
     }
 
-    // À¯È¿ÇÑ ºÎºĞ °áÁ¦ ±İ¾×ÀÎÁö È®ÀÎ
+    // ìœ íš¨í•œ ë¶€ë¶„ ê²°ì œ ê¸ˆì•¡ì¸ì§€ í™•ì¸
     for (int i = 0; i < unit->paymentCount; i++) {
         if (unit->partialPayments[i] == amount) {
             return true;
         }
     }
 
-    printf("ÇØ´çÇÏ´Â ºÎºĞ °áÁ¦ ±İ¾×ÀÌ ¾ø½À´Ï´Ù.\n");
+    printf("í•´ë‹¹í•˜ëŠ” ë¶€ë¶„ ê²°ì œ ê¸ˆì•¡ì´ ì—†ìŠµë‹ˆë‹¤.\n");
     return false;
 }

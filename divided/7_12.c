@@ -4,9 +4,17 @@
 int inputSourceTableNumber() {
     while (1) {
         int tableNumber = inputInt("이동시킬 테이블을 입력하세요: ", false, false);
-        if (tableNumber < 0) return tableNumber;  // 오류 코드 반환
+        
+        // inputInt의 오류값 처리
+        if (tableNumber == -1) {  // 엔터 입력
+            printf("테이블 번호를 입력해주세요.\n");
+            continue;
+        }
+        if (tableNumber <= -MAX_INT) {  // 그 외 입력 오류
+            continue;  // inputInt 함수가 이미 오류 메시지를 출력했으므로 계속 진행
+        }
 
-        // 테이블이 존재하는지 확인
+        // 테이블 번호 유효성 검사
         if (tableNumber > MAX_TABLE_NUMBER || !isTableExist(tableNumber)) {
             printf("오류: 1~%d 사이의 존재하는 테이블 번호를 입력하세요.\n", MAX_TABLE_NUMBER);
             continue;
@@ -18,7 +26,7 @@ int inputSourceTableNumber() {
             continue;
         }
 
-        return tableNumber;
+        return tableNumber;  // 유효한 테이블 번호만 반환
     }
 }
 

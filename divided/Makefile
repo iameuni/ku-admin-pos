@@ -5,31 +5,20 @@ OBJS := $(OBJDIR)/main.o $(OBJDIR)/table.o $(OBJDIR)/etcFunc.o $(OBJDIR)/7_2l7_5
         $(OBJDIR)/7_12.o $(OBJDIR)/orderItem.o $(OBJDIR)/paymentUnit.o \
         $(OBJDIR)/tableMove.o $(OBJDIR)/paymentCancel.o
 
-# 운영 체제 감지
-ifeq ($(OS),Windows_NT)
-    RM := del /Q
-    RM_DIR := rmdir /Q /S
-    MKDIR := mkdir
-    TARGET := pos.exe
-else
-    RM := rm -f
-    RM_DIR := rm -rf
-    MKDIR := mkdir -p
-    TARGET := pos
-endif
+TARGET := pos.exe
+
+# UTF-8 및 한글 출력을 위한 컴파일러 옵션
+CFLAGS := -fexec-charset=CP949 -finput-charset=UTF-8
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	gcc -o $@ $^
+	gcc $(CFLAGS) -o $@ $^
 
-$(OBJDIR)/%.o: %.c | $(OBJDIR)
-	gcc -c $< -o $@
-
-$(OBJDIR):
-	$(MKDIR) $(OBJDIR)
+$(OBJDIR)/%.o: %.c
+	if not exist $(OBJDIR) mkdir $(OBJDIR)
+	gcc $(CFLAGS) -c $< -o $@
 
 clean:
-	$(RM) $(subst /,\,$(OBJDIR)/*.o)
-	$(RM) $(TARGET)
-	$(RM_DIR) $(OBJDIR)
+	if exist $(OBJDIR) rmdir /s /q $(OBJDIR)
+	if exist $(TARGET) del /q $(TARGET)

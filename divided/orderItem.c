@@ -1,9 +1,9 @@
 #include "pos.h"
 
-// ÁÖ¹® Ç×¸ñ ¸®½ºÆ®¿¡ Ç×¸ñ Ãß°¡ (7.9 ÁÖ¹® Á¶È¸ ÇÁ·ÒÇÁÆ®. 7.10 °áÁ¦ Ã³¸® ÇÁ·ÒÇÁÆ®¿¡¼­ »ç¿ë)
+// ì£¼ë¬¸ í•­ëª© ë¦¬ìŠ¤íŠ¸ì— í•­ëª© ì¶”ê°€ (7.9 ì£¼ë¬¸ ì¡°íšŒ í”„ë¡¬í”„íŠ¸. 7.10 ê²°ì œ ì²˜ë¦¬ í”„ë¡¬í”„íŠ¸ì—ì„œ ì‚¬ìš©)
 OrderItem* addOrderItem(OrderItem* head, int itemID) {
     OrderItem* current = head;
-    // ÀÌ¹Ì Á¸ÀçÇÏ´Â Ç×¸ñÀÌ¸é ¼ö·® Áõ°¡
+    // ì´ë¯¸ ì¡´ì¬í•˜ëŠ” í•­ëª©ì´ë©´ ìˆ˜ëŸ‰ ì¦ê°€
     while (current != NULL) {
         if (current->itemID == itemID) {
             current->quantity++;
@@ -11,10 +11,10 @@ OrderItem* addOrderItem(OrderItem* head, int itemID) {
         }
         current = current->next;
     }
-    // »õ Ç×¸ñ Ãß°¡
+    // ìƒˆ í•­ëª© ì¶”ê°€
     OrderItem* newItem = (OrderItem*)malloc(sizeof(OrderItem));
     if (newItem == NULL) {
-        printf("¸Ş¸ğ¸® ÇÒ´ç ½ÇÆĞ\n");
+        printf("ë©”ëª¨ë¦¬ í• ë‹¹ ì‹¤íŒ¨\n");
         return head;
     }
     newItem->itemID = itemID;
@@ -22,7 +22,7 @@ OrderItem* addOrderItem(OrderItem* head, int itemID) {
     newItem->next = head;
     return newItem;
 }
-// ÁÖ¹® Ç×¸ñ ¸®½ºÆ® ÇØÁ¦ÇÏ´Â ÇÔ¼ö (7.9 ÁÖ¹® Á¶È¸ ÇÁ·ÒÇÁÆ®. 7.10 °áÁ¦ Ã³¸® ÇÁ·ÒÇÁÆ®¿¡¼­ »ç¿ë)
+// ì£¼ë¬¸ í•­ëª© ë¦¬ìŠ¤íŠ¸ í•´ì œí•˜ëŠ” í•¨ìˆ˜ (7.9 ì£¼ë¬¸ ì¡°íšŒ í”„ë¡¬í”„íŠ¸. 7.10 ê²°ì œ ì²˜ë¦¬ í”„ë¡¬í”„íŠ¸ì—ì„œ ì‚¬ìš©)
 void freeOrderItems(OrderItem* head) {
     while (head != NULL) {
         OrderItem* temp = head;

@@ -2,18 +2,18 @@
 
 PaymentContext currentContext;
 
-// 7.10 °áÁ¦ Ã³¸® ÇÁ·ÒÇÁÆ®
+// 7.10 ê²°ì œ ì²˜ë¦¬ í”„ë¡¬í”„íŠ¸
 void makePayment() {
     int tablesWithOrders[MAX_TABLE_NUMBER];
     int orderCount = 0;
-    listTablesWithOrders(tablesWithOrders, &orderCount, "\n°áÁ¦ °¡´ÉÇÑ Å×ÀÌºí ¹øÈ£");
+    listTablesWithOrders(tablesWithOrders, &orderCount, "\nê²°ì œ ê°€ëŠ¥í•œ í…Œì´ë¸” ë²ˆí˜¸");
 
     currentContext.tableCount = 0;  
     int primarySelectedTable = -1;
 
-    // °áÁ¦ÇÒ Å×ÀÌºí ¼±ÅÃ
+    // ê²°ì œí•  í…Œì´ë¸” ì„ íƒ (ê¸°ì¡´ ì½”ë“œì™€ ë™ì¼)
     while (true) {
-        printf("Å×ÀÌºí ¹øÈ£¸¦ ÀÔ·ÂÇÏ¼¼¿ä {");
+        printf("í…Œì´ë¸” ë²ˆí˜¸ë¥¼ ì…ë ¥í•˜ì„¸ìš” {");
         for (int i = 0; i < currentContext.tableCount; i++) {
             printf("%d", currentContext.tableNumbers[i]);
             if (i < currentContext.tableCount - 1) printf(", ");
@@ -26,11 +26,11 @@ void makePayment() {
             continue;
         }
         if (input == 0) {
-            printf("\n°áÁ¦°¡ Á¾·áµË´Ï´Ù.\n");
+            printf("\nê²°ì œê°€ ì¢…ë£Œë©ë‹ˆë‹¤.\n");
             return;
         }
 
-        // ÁÖ¹® ³»¿ª ÀÖ´ÂÁö È®ÀÎ
+        // ì£¼ë¬¸ ë‚´ì—­ ìˆëŠ”ì§€ í™•ì¸
         bool validOrder = false;
         for (int i = 0; i < orderCount; i++) {
             if (tablesWithOrders[i] == input) {
@@ -39,11 +39,11 @@ void makePayment() {
             }
         }
         if (!validOrder) {
-            printf("ÁÖ¹® ³»¿ªÀÌ ¾ø´Â Å×ÀÌºíÀÔ´Ï´Ù.\n");
+            printf("ì£¼ë¬¸ ë‚´ì—­ì´ ì—†ëŠ” í…Œì´ë¸”ì…ë‹ˆë‹¤.\n");
             continue;
         }
 
-        // ÀÌ¹Ì ¼±ÅÃµÈ Å×ÀÌºíÀÎÁö È®ÀÎ
+        // ì´ë¯¸ ì„ íƒëœ í…Œì´ë¸”ì¸ì§€ í™•ì¸
         bool alreadySelected = false;
         for (int i = 0; i < currentContext.tableCount; i++) {
             if (currentContext.tableNumbers[i] == input) {
@@ -52,7 +52,7 @@ void makePayment() {
             }
         }
         if (alreadySelected) {
-            printf("ÀÌ¹Ì ÀÔ·ÂÇÑ Å×ÀÌºí ¹øÈ£ÀÔ´Ï´Ù.\n");
+            printf("ì´ë¯¸ ì…ë ¥í•œ í…Œì´ë¸” ë²ˆí˜¸ì…ë‹ˆë‹¤.\n");
             continue;
         }
 
@@ -81,7 +81,7 @@ void makePayment() {
         free(unit);
     }
 
-    // °¢ Å×ÀÌºíÀÇ ÁÖ¹®¾× °è»ê ¹× Ãâ·Â
+    // ê° í…Œì´ë¸”ì˜ ì£¼ë¬¸ì•¡ ê³„ì‚° ë° ì¶œë ¥
     printf("\n");
     int totalOrderAmount = 0;
     int totalPartialPayments = 0;
@@ -100,7 +100,7 @@ void makePayment() {
             continue;
         }
 
-        // ÁÖ¹® ³»¿ª Áı°è
+        // ì£¼ë¬¸ ë‚´ì—­ ì§‘ê³„
         OrderItem* orderList = NULL;
         int itemID;
         char line[256];
@@ -118,7 +118,7 @@ void makePayment() {
             }
         }
 
-        // ÁÖ¹® ±İ¾× °è»ê
+        // ì£¼ë¬¸ ê¸ˆì•¡ ê³„ì‚°
         int tableTotal = 0;
         OrderItem* current = orderList;
         while (current != NULL) {
@@ -134,7 +134,7 @@ void makePayment() {
             current = current->next;
         }
 
-        printf("%d¹ø Å×ÀÌºí ÁÖ¹®¾×: %d\n", tableNumber, tableTotal);
+        printf("%dë²ˆ í…Œì´ë¸” ì£¼ë¬¸ì•¡: %d\n", tableNumber, tableTotal);
         totalOrderAmount += tableTotal;
 
         freeOrderItems(orderList);
@@ -142,64 +142,112 @@ void makePayment() {
         fclose(tableFile);
     }
 
-    // ³²Àº °áÁ¦ ±İ¾× °è»ê
+    // ë‚¨ì€ ê²°ì œ ê¸ˆì•¡ ê³„ì‚°
     int remainingBalance = totalOrderAmount - totalPartialPayments;
+    int originalRemainingBalance = remainingBalance;  // ì›ë˜ ë‚¨ì€ ê¸ˆì•¡ ì €ì¥
 
+    printf("ì´ ì£¼ë¬¸ì•¡: %dì›\n", totalOrderAmount);
+    printf("ê¸°ì¡´ ë¶€ë¶„ ê²°ì œì•¡: %dì›\n", totalPartialPayments);
+    printf("ë‚¨ì€ ê²°ì œì•¡: %dì›\n\n", remainingBalance);
 
-    printf("ÃÑ ÁÖ¹®¾×: %d¿ø\n", totalOrderAmount);
-    printf("±âÁ¸ ºÎºĞ °áÁ¦¾×: %d¿ø\n", totalPartialPayments);
-    printf("³²Àº °áÁ¦¾×: %d¿ø\n\n", remainingBalance);
+    // ì´ë²ˆ ì„¸ì…˜ì˜ ë¶€ë¶„ ê²°ì œ ê¸°ë¡ì„ ì„ì‹œë¡œ ì €ì¥
+    typedef struct TempPayment {
+        int amount;
+        struct TempPayment* next;
+    } TempPayment;
+    
+    TempPayment* tempPayments = NULL;
 
-    // ¹«Á¶°Ç °áÁ¦ ±İ¾× ÀÔ·Â ¹Ş±â
-// makePayment ÇÔ¼ö ³»ÀÇ °áÁ¦ Ã³¸® ºÎºĞ
     while (true) {
         int payment = inputPaymentAmount(remainingBalance);
         
-        if (payment == -1) {  // °áÁ¦ Ãë¼Ò (0 ÀÔ·Â)
+        if (payment == -1) {  // ê²°ì œ ì·¨ì†Œ (0 ì…ë ¥)
+            // ì„ì‹œ ì €ì¥ëœ ëª¨ë“  ë¶€ë¶„ ê²°ì œ ë‚´ì—­ ì‚­ì œ
+            TempPayment* current = tempPayments;
+            tempPayments = NULL;
+            while (current != NULL) {
+                TempPayment* next = current->next;
+                free(current);
+                current = next;
+            }
+            printf("ì´ë²ˆ ê²°ì œ ì„¸ì…˜ì˜ ëª¨ë“  ê²°ì œê°€ ì·¨ì†Œë˜ì—ˆìŠµë‹ˆë‹¤.\n");
             break;
         }
         
-        if (payment == -2) {  // ºÎºĞ °áÁ¦ (. ÀÔ·Â)
+        if (payment == -2) {  // ë¶€ë¶„ ê²°ì œ (. ì…ë ¥)
+            // ì„ì‹œ ì €ì¥ëœ ëª¨ë“  ë¶€ë¶„ ê²°ì œë¥¼ ì‹¤ì œë¡œ ì ìš©
+            TempPayment* current = tempPayments;
+            while (current != NULL) {
+                updatePaymentRecord(primarySelectedTable, current->amount);
+                current = current->next;
+            }
             updatePaymentUnit(primarySelectedTable, currentContext.tableNumbers, currentContext.tableCount);
+            
+            // ë©”ëª¨ë¦¬ í•´ì œ
+            current = tempPayments;
+            while (current != NULL) {
+                TempPayment* next = current->next;
+                free(current);
+                current = next;
+            }
             break;
         }
 
-        // ½ÇÁ¦ °áÁ¦°¡ ¹ß»ıÇÑ °æ¿ì¿¡¸¸ (payment°¡ 0ÀÌ ¾Æ´Ò ¶§¸¸) °áÁ¦ ±â·Ï ¾÷µ¥ÀÌÆ®
-        if (remainingBalance != payment) {  // Áï, ½ÇÁ¦·Î °áÁ¦µÈ ±İ¾×ÀÌ ÀÖÀ» ¶§¸¸
-            updatePaymentRecord(primarySelectedTable, remainingBalance - payment);
+        // ì‹¤ì œ ê²°ì œê°€ ë°œìƒí•œ ê²½ìš°
+        if (remainingBalance != payment) {
+            // ìƒˆë¡œìš´ ë¶€ë¶„ ê²°ì œë¥¼ ì„ì‹œ ì €ì¥
+            TempPayment* newPayment = (TempPayment*)malloc(sizeof(TempPayment));
+            newPayment->amount = remainingBalance - payment;
+            newPayment->next = tempPayments;
+            tempPayments = newPayment;
         }
         remainingBalance = payment;
 
         if (remainingBalance == 0) {
-            printf("Å×ÀÌºíÀ» ºñ¿ì½Ã°Ú½À´Ï±î?: ");
+            printf("í…Œì´ë¸”ì„ ë¹„ìš°ì‹œê² ìŠµë‹ˆê¹Œ?: ");
             char input[10];
             fgets(input, sizeof(input), stdin);
+            
+            // ì„ì‹œ ì €ì¥ëœ ëª¨ë“  ë¶€ë¶„ ê²°ì œë¥¼ ì‹¤ì œë¡œ ì ìš©
+            TempPayment* current = tempPayments;
+            while (current != NULL) {
+                updatePaymentRecord(primarySelectedTable, current->amount);
+                current = current->next;
+            }
+            
             if (input[0] != '.') {
-                // ¸ğµç ¼±ÅÃµÈ Å×ÀÌºí ºñ¿ì±â
+                // ëª¨ë“  ì„ íƒëœ í…Œì´ë¸” ë¹„ìš°ê¸°
                 for (int i = 0; i < currentContext.tableCount; i++) {
                     char tablePath[256];
                     snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, currentContext.tableNumbers[i]);
                     FILE* file = fopen(tablePath, "w");
                     if (file) fclose(file);
                 }
-                printf("Àü¾× °áÁ¦µÈ Å×ÀÌºíÀ» ºñ¿ü½À´Ï´Ù.\n");
+                printf("ì „ì•¡ ê²°ì œëœ í…Œì´ë¸”ì„ ë¹„ì› ìŠµë‹ˆë‹¤.\n");
             } else {
-                printf("Å×ÀÌºíÀ» ºñ¿ìÁö ¾Ê½À´Ï´Ù.\n");
+                printf("í…Œì´ë¸”ì„ ë¹„ìš°ì§€ ì•ŠìŠµë‹ˆë‹¤.\n");
+            }
+
+            // ë©”ëª¨ë¦¬ í•´ì œ
+            current = tempPayments;
+            while (current != NULL) {
+                TempPayment* next = current->next;
+                free(current);
+                current = next;
             }
             break;
         }
     }
 }
-
-// 7.13 °áÁ¦ Ãë¼Ò ÇÁ·ÒÇÁÆ®
+// 7.13 ê²°ì œ ì·¨ì†Œ í”„ë¡¬í”„íŠ¸
 void cancelPayment() {
     int tablesWithPayments[MAX_TABLE_NUMBER];
     int paymentCount = 0;
     listTablesWithPartialPayments(tablesWithPayments, &paymentCount, 
-        "\nºÎºĞ°áÁ¦ Ç×¸ñÀÌ ÀÖ´Â Å×ÀÌºí ¹øÈ£");
+        "\në¶€ë¶„ê²°ì œ í•­ëª©ì´ ìˆëŠ” í…Œì´ë¸” ë²ˆí˜¸");
     
     if (paymentCount == 0) {
-        printf("ºÎºĞ °áÁ¦ Ç×¸ñÀÌ ÀÖ´Â Å×ÀÌºíÀÌ ¾ø½À´Ï´Ù.\n");
+        printf("ë¶€ë¶„ ê²°ì œ í•­ëª©ì´ ìˆëŠ” í…Œì´ë¸”ì´ ì—†ìŠµë‹ˆë‹¤.\n");
         return;
     }
 
@@ -209,7 +257,7 @@ void cancelPayment() {
 
         PaymentUnit* unit = getPaymentUnit(tableNumber);
         
-        // °áÁ¦ ´ÜÀ§ ³»ÀÇ ¸ğµç Å×ÀÌºí¿¡¼­ ºÎºĞ °áÁ¦ ³»¿ª È®ÀÎ
+        // ê²°ì œ ë‹¨ìœ„ ë‚´ì˜ ëª¨ë“  í…Œì´ë¸”ì—ì„œ ë¶€ë¶„ ê²°ì œ ë‚´ì—­ í™•ì¸
         bool hasPartialPayments = false;
         if (unit->tableCount > 0) {
             for (int i = 0; i < unit->tableCount; i++) {
@@ -231,7 +279,7 @@ void cancelPayment() {
         }
 
         if (!hasPartialPayments) {
-            printf("Ãë¼ÒÇÒ ºÎºĞ°áÁ¦ ³»¿ªÀÌ ¾ø½À´Ï´Ù.\n");
+            printf("ì·¨ì†Œí•  ë¶€ë¶„ê²°ì œ ë‚´ì—­ì´ ì—†ìŠµë‹ˆë‹¤.\n");
             free(unit->partialPayments);
             free(unit);
             continue;
@@ -240,17 +288,17 @@ void cancelPayment() {
         int selectedPayments[100] = {0};
         int selectedCount = 0;
 
-        // ºÎºĞ °áÁ¦ ±İ¾× Á¤º¸¸¦ ÀúÀåÇÒ ±¸Á¶Ã¼ ¹è¿­
+        // ë¶€ë¶„ ê²°ì œ ê¸ˆì•¡ ì •ë³´ë¥¼ ì €ì¥í•  êµ¬ì¡°ì²´ ë°°ì—´
         typedef struct {
             int amount;
-            int remainingCount;  // ¾ÆÁ÷ ¼±ÅÃµÇÁö ¾ÊÀº ÇØ´ç ±İ¾×ÀÇ °³¼ö
-            int totalCount;      // ÇØ´ç ±İ¾×ÀÇ ÀüÃ¼ °³¼ö
+            int remainingCount;  // ì•„ì§ ì„ íƒë˜ì§€ ì•Šì€ í•´ë‹¹ ê¸ˆì•¡ì˜ ê°œìˆ˜
+            int totalCount;      // í•´ë‹¹ ê¸ˆì•¡ì˜ ì „ì²´ ê°œìˆ˜
         } PaymentInfo;
         
         PaymentInfo payments[100] = {0};
         int uniquePaymentCount = 0;
 
-        // ¸ğµç ºÎºĞ °áÁ¦ ³»¿ªÀ» ÇÑ ¹ø¿¡ ¼öÁı
+        // ëª¨ë“  ë¶€ë¶„ ê²°ì œ ë‚´ì—­ì„ í•œ ë²ˆì— ìˆ˜ì§‘
         for (int t = 0; t < unit->tableCount; t++) {
             char tablePath[256];
             snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, unit->tables[t]);
@@ -263,7 +311,7 @@ void cancelPayment() {
                     int amount;
                     sscanf(line + 2, "%d", &amount);
                     
-                    // ÀÌ¹Ì ÀÖ´Â ±İ¾×ÀÎÁö È®ÀÎ
+                    // ì´ë¯¸ ìˆëŠ” ê¸ˆì•¡ì¸ì§€ í™•ì¸
                     bool found = false;
                     for (int i = 0; i < uniquePaymentCount; i++) {
                         if (payments[i].amount == amount) {
@@ -285,8 +333,8 @@ void cancelPayment() {
         }
 
         while (1) {
-            // ³²Àº ºÎºĞ °áÁ¦ Ç×¸ñ Ãâ·Â
-            printf("°áÁ¦ Ãë¼ÒÇÒ ºÎºĞ°áÁ¦ Ç×¸ñÀ» °í¸£½Ã¿À [");
+            // ë‚¨ì€ ë¶€ë¶„ ê²°ì œ í•­ëª© ì¶œë ¥
+            printf("ê²°ì œ ì·¨ì†Œí•  ë¶€ë¶„ê²°ì œ í•­ëª©ì„ ê³ ë¥´ì‹œì˜¤ [");
             bool first = true;
             for (int i = 0; i < uniquePaymentCount; i++) {
                 if (payments[i].remainingCount > 0) {
@@ -301,19 +349,19 @@ void cancelPayment() {
 
             int amount = inputInt(NULL, true, false);
             if (amount == 0) {
-                printf("°áÁ¦ Ãë¼Ò°¡ Á¾·áµË´Ï´Ù.\n");
+                printf("ê²°ì œ ì·¨ì†Œê°€ ì¢…ë£Œë©ë‹ˆë‹¤.\n");
                 break;
             }
             if (amount == -1) {
                 if (selectedCount == 0) {
-                    printf("Ãë¼ÒÇÒ ¾×¼ö°¡ ¾ø½À´Ï´Ù. Ãë¼Ò ÀÛ¾÷À» Áß´ÜÇÏ·Á¸é 0À» ÀÔ·ÂÇÏ¼¼¿ä\n");
+                    printf("ì·¨ì†Œí•  ì•¡ìˆ˜ê°€ ì—†ìŠµë‹ˆë‹¤. ì·¨ì†Œ ì‘ì—…ì„ ì¤‘ë‹¨í•˜ë ¤ë©´ 0ì„ ì…ë ¥í•˜ì„¸ìš”\n");
                     continue;
                 }
                 executeCancelPayments(unit, selectedPayments, selectedCount);
                 break;
             }
 
-            // ÀÔ·ÂµÈ ±İ¾×ÀÌ À¯È¿ÇÑÁö È®ÀÎ
+            // ì…ë ¥ëœ ê¸ˆì•¡ì´ ìœ íš¨í•œì§€ í™•ì¸
             bool valid = false;
             for (int i = 0; i < uniquePaymentCount; i++) {
                 if (payments[i].amount == amount && payments[i].remainingCount > 0) {
@@ -325,7 +373,7 @@ void cancelPayment() {
             }
             
             if (!valid) {
-                printf("ÇØ´çÇÏ´Â ºÎºĞ °áÁ¦ ±İ¾×ÀÌ ¾ø½À´Ï´Ù.\n");
+                printf("í•´ë‹¹í•˜ëŠ” ë¶€ë¶„ ê²°ì œ ê¸ˆì•¡ì´ ì—†ìŠµë‹ˆë‹¤.\n");
             }
         }
 
