@@ -35,6 +35,12 @@ void moveTable() {
     int orderCount = 0;
     listTablesWithOrders(tablesWithOrders, &orderCount, "\n주문이 있는 테이블 번호");
 
+    // 주문이 있는 테이블이 없는 경우 검사 추가
+    if (orderCount == 0) {
+        printf("주문내역이 있는 테이블이 존재하지 않습니다.\n");
+        return;
+    }
+
     // 출발 테이블 선택
     int sourceTable = inputSourceTableNumber();
     if (sourceTable < 0) return;
