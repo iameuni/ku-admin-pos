@@ -204,28 +204,41 @@ void makePayment() {
         remainingBalance = payment;
 
         if (remainingBalance == 0) {
-            printf("테이블을 비우시겠습니까?: ");
-            char input[10];
-            fgets(input, sizeof(input), stdin);
-            
+            while (1) {
+                printf("테이블을 비우시겠습니까?: ");
+                char input[10];
+                fgets(input, sizeof(input), stdin);
+                input[strcspn(input, "\n")] = '\0';  // 개행 문자 제거
+
+                // 입력이 '.' 인 경우
+                if (strcmp(input, ".") == 0) {
+                    printf("테이블을 비우지 않습니다.\n");
+                    break;
+                }
+                // 엔터만 입력한 경우
+                else if (strlen(input) == 0) {
+                    // 모든 선택된 테이블 비우기
+                    for (int i = 0; i < currentContext.tableCount; i++) {
+                        char tablePath[256];
+                        snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, currentContext.tableNumbers[i]);
+                        FILE* file = fopen(tablePath, "w");
+                        if (file) fclose(file);
+                    }
+                    printf("전액 결제된 테이블을 비웠습니다.\n");
+                    break;
+                }
+                // 그 외의 입력
+                else {
+                    printf("오류: \".\" 혹은 엔터를 입력하시오\n");
+                    continue;
+                }
+            }
+
             // 임시 저장된 모든 부분 결제를 실제로 적용
             TempPayment* current = tempPayments;
             while (current != NULL) {
                 updatePaymentRecord(primarySelectedTable, current->amount);
                 current = current->next;
-            }
-            
-            if (input[0] != '.') {
-                // 모든 선택된 테이블 비우기
-                for (int i = 0; i < currentContext.tableCount; i++) {
-                    char tablePath[256];
-                    snprintf(tablePath, sizeof(tablePath), "%s/%d.txt", TABLE_FILE_PATH, currentContext.tableNumbers[i]);
-                    FILE* file = fopen(tablePath, "w");
-                    if (file) fclose(file);
-                }
-                printf("전액 결제된 테이블을 비웠습니다.\n");
-            } else {
-                printf("테이블을 비우지 않습니다.\n");
             }
 
             // 메모리 해제
