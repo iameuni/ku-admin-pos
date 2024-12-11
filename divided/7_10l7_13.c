@@ -207,16 +207,20 @@ void makePayment() {
             while (1) {
                 printf("테이블을 비우시겠습니까?: ");
                 char input[10];
-                fgets(input, sizeof(input), stdin);
+                if (fgets(input, sizeof(input), stdin) == NULL) continue;
+                
                 input[strcspn(input, "\n")] = '\0';  // 개행 문자 제거
 
-                // 입력이 '.' 인 경우
-                if (strcmp(input, ".") == 0) {
-                    printf("테이블을 비우지 않습니다.\n");
-                    break;
-                }
-                // 엔터만 입력한 경우
-                else if (strlen(input) == 0) {
+                // 앞뒤 공백 제거 
+                char* start = input;
+                char* end = input + strlen(input) - 1;
+
+                while (isspace((unsigned char)*start)) start++;
+                while (end > start && isspace((unsigned char)*end)) end--;
+                *(end + 1) = '\0';
+
+                // 입력이 비어있는 경우 (엔터만 입력)
+                if (strlen(start) == 0) {
                     // 모든 선택된 테이블 비우기
                     for (int i = 0; i < currentContext.tableCount; i++) {
                         char tablePath[256];
@@ -227,8 +231,13 @@ void makePayment() {
                     printf("전액 결제된 테이블을 비웠습니다.\n");
                     break;
                 }
-                // 그 외의 입력
-                else {
+                // . 앞뒤에 공백이 있어도 정상 입력으로 처리
+                else if (strcmp(start, ".") == 0) {
+                    printf("테이블을 비우지 않습니다.\n");
+                    break;
+                }
+                // 그 외의 입력일 경우만 오류 메시지
+                else if (strlen(start) > 0 && strcmp(start, ".") != 0) {
                     printf("오류: \".\" 혹은 엔터를 입력하시오\n");
                     continue;
                 }
