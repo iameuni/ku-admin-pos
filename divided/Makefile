@@ -5,7 +5,7 @@ OBJS := $(OBJDIR)/main.o $(OBJDIR)/table.o $(OBJDIR)/etcFunc.o $(OBJDIR)/7_2l7_5
         $(OBJDIR)/7_12.o $(OBJDIR)/orderItem.o $(OBJDIR)/paymentUnit.o \
         $(OBJDIR)/tableMove.o $(OBJDIR)/paymentCancel.o
 
-TARGET := pos.exe
+TARGET := C:/ku-admin-pos/exe/pos.exe
 
 # UTF-8 및 한글 출력을 위한 컴파일러 옵션
 CFLAGS := -fexec-charset=CP949 -finput-charset=UTF-8
