@@ -263,6 +263,7 @@ void makePayment() {
 }
 // 7.13 결제 취소 프롬프트
 void cancelPayment() {
+    int cancelAmount;
     int tablesWithPayments[MAX_TABLE_NUMBER];
     int paymentCount = 0;
     listTablesWithPartialPayments(tablesWithPayments, &paymentCount, 
